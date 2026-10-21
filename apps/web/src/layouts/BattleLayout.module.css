@@ -1,0 +1,14 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--forest-900);
+}
+.main {
+  flex: 1;
+  padding: var(--space-4);
+}
+.footer {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--parchment-300);
+}
