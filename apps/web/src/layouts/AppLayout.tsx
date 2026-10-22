@@ -1,8 +1,8 @@
 import {
   BookOpen,
   Castle,
-  Flame,
   FlaskConical,
+  LogOut,
   Home,
   Menu,
   ScrollText,
@@ -12,8 +12,11 @@ import {
   BarChart3,
   Timer,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
+import { api } from '../lib/api';
 import styles from './AppLayout.module.css';
 
 const NAV = [
@@ -27,6 +30,30 @@ const NAV = [
   { to: '/leaderboard', label: 'Leaderboard', icon: Trophy },
   { to: '/settings', label: 'Settings', icon: Settings },
 ] as const;
+
+/** Real data from GET /me (the first call also creates the player's profile server-side). */
+function PlayerChip() {
+  const { signOut } = useAuth();
+  const me = useQuery({ queryKey: ['me'], queryFn: api.me });
+  return (
+    <span className={styles.player}>
+      {me.isPending && <span>Loading…</span>}
+      {me.isError && (
+        <span role="alert" title={me.error.message}>
+          Profile unavailable
+        </span>
+      )}
+      {me.data && (
+        <span className={styles.playerName}>
+          {me.data.profile.displayName} · Lv {me.data.progress.level}
+        </span>
+      )}
+      <button type="button" className={styles.signOut} onClick={() => void signOut()}>
+        <LogOut aria-hidden size={14} /> Log out
+      </button>
+    </span>
+  );
+}
 
 export function AppLayout() {
   const [open, setOpen] = useState(false);
@@ -58,9 +85,7 @@ export function AppLayout() {
               <Icon aria-hidden size={16} /> {label}
             </NavLink>
           ))}
-          <NavLink to="/login" className={styles.link} onClick={() => setOpen(false)}>
-            <Flame aria-hidden size={16} /> Log in
-          </NavLink>
+          <PlayerChip />
         </nav>
       </header>
       <main className={styles.main}>

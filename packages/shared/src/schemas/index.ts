@@ -1,2 +1,2 @@
-// Shared Zod schemas live here. Populated from Phase 3 onward.
-export {};
+// Shared Zod schemas and DTO types. Both apps import from here (never redefine them).
+export * from './profile.js';

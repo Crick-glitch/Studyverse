@@ -1,0 +1,62 @@
+.wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+}
+.panel {
+  width: min(26rem, 100%);
+  background: var(--parchment-100);
+  color: var(--charcoal-800);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.panel h1 {
+  font-family: var(--font-display);
+  margin: 0 0 var(--space-3);
+}
+.field {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+.field input {
+  padding: var(--space-2);
+  border: 2px solid var(--charcoal-800);
+  border-radius: var(--radius);
+  background: #fff;
+  font: inherit;
+}
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.button {
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--charcoal-800);
+  border-radius: var(--radius);
+  background: var(--gold-500);
+  color: var(--charcoal-800);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.secondary {
+  background: transparent;
+}
+.error {
+  color: #8a2d12;
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+}
+.notice {
+  color: var(--forest-700);
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+}
