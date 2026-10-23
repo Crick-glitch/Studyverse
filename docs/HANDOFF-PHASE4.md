@@ -1,7 +1,6 @@
 # Phase 4 handoff (partial): what is done, what is not
 
-Status: Phase 4 (`03-core-modules.md`) is **partly built**. Everything below marked DONE typechecks and has
-tests; everything marked TODO does not exist yet. Phase 3 and the foundation are untouched except where
+Status: Phase 4 (`03-core-modules.md`): the **API half is done and tested**; the **web screens are not**. Phase 3 and the foundation are untouched except where
 noted under "Changes to Phase 3 files".
 
 ## Fixes for the two errors you hit
@@ -17,60 +16,48 @@ noted under "Changes to Phase 3 files".
    The first `db:deploy` P1001 ("can't reach database") then success on retry was a transient network/pooler
    hiccup, not a code problem.
 
-## DONE
+## DONE (all of this ran: API suite 124 tests pass against local PostgreSQL 16, shared 57, eslint clean)
 
-- Schema + migration `20261022120000_phase4_core_modules` (hand-written; drift test passes against local
-  PostgreSQL 16): `SessionKind` enum, `StudySession.kind` / `outcomeReason`, `SessionClaimQuestion` now holds
-  snapshots (`text`, `choices`, `correctIndex`, nullable `questionId`, new nullable `cardId`), new
-  `QuestionReport` table (RLS on, no policies). **Run `npx prisma migrate dev` once on your machine
-  (or `npm run db:deploy` to apply it to Supabase) and confirm there is no drift.**
-- `packages/shared` (57 tests pass): balance constants for sessions/SRS/flashcards/CSV/import limits;
-  `subjects`, `random`, `period` (UTC day/ISO week keys), `srs` (SM-2 + Sage Memory), `rewards` (pure session
-  reward math), `choices` (placeholder detection, distractor cleaning, 3-choice builder), `csv` (RFC 4180
-  parser/writer, formula-injection hardening, flashcard CSV parse/export with row-level errors), `avatars`,
-  and Zod schemas + DTO types for tasks, sessions, flashcards, quests and local import.
-- API helpers/services written and typechecking, **but not yet covered by tests and not mounted on any route**:
-  `lib/playerLock.ts`, `services/streak.ts` (touchStreak, addEnergy, getModifiers), `services/quests.ts`
-  (instances, recordQuestEvent, list, idempotent claim), `services/tasks.ts` (CRUD, complete with
-  `grantXp`, reopen, daily paid-completion cap).
-- Existing suites still pass: shared 57, API 48.
+- Schema + migration `20261022120000_phase4_core_modules` (hand-written; the drift test passes locally).
+  **Run `npx prisma migrate dev` once on your machine (or `npm run db:deploy` for Supabase) and confirm no drift.**
+- `packages/shared`: balance, subjects, random, period, srs, rewards, choices, csv, avatars, Zod schemas + DTOs
+  (tasks, sessions, flashcards, quests, import, `questionReportSchema`). `ClaimResultDto.questions[]` now carries
+  `questionId` (so the UI can offer "Report this question").
+- API services + routes, all mounted in `app.ts` behind one auth step, all scoped to `req.user.id`:
+  - sessions (`/sessions`, `/sessions/active`, `/sessions/review`, `/sessions/:id/{start,pause,resume,finish,abandon}`,
+    `GET|POST /sessions/:id/claim`, `DELETE /sessions/:id`), server clock only, claim quiz snapshots, idempotent claim;
+  - tasks (`/tasks`, `/tasks/:id/{complete,reopen}`), quests (`/quests`, `/quests/:id/claim`),
+    `POST /questions/:id/report`;
+  - flashcards (`/decks`, `/decks/:id/cards`, `/cards/:id`, `/flashcards/due`, `/cards/:id/review`,
+    `/decks/:id/csv/{preview,import}`, `GET /decks/:id/csv`, `GET /flashcards/csv`);
+  - local import (`GET /import/local/preflight`, `POST /import/local`). CSV + import routes accept 2 MB JSON bodies
+    (everything else 100 KB) and use the import rate limiter.
+  - `AppDeps.clock` is injectable (tests move time without sleeping).
+- Seed: `seed/questionBank.ts` (vm sandbox, upsert by `legacyId`, flags `needsReview`, never edits), `seed/quests.ts`
+  (5 quests), both run by `runSeed`. The count is read from the file (148).
+- Tests (`apps/api/src`): `sessions.int`, `tasks-quests.int`, `flashcards.int`, `import.int`, `questionBank.int`.
+- Bugs found and fixed while testing: stale-session detection and the daily task cap compared the database clock
+  with the injected clock (both now use timestamps stamped from the same clock); the stricter auth rate limiter was
+  accidentally applied to every private route (now only `/me`, `/profile`, `/progress`).
 
 ## TODO (in this order)
 
-1. `services/sessions.ts` + `routes/sessions.ts`: create, start (one running/paused at a time, stale auto-abandon),
-   pause, resume, finish (server elapsed time, 80% rule, focus clamp, builds the claim quiz snapshot),
-   `GET /sessions/active`, `GET /sessions/:id/claim` (no answers), `POST /sessions/:id/claim` (grade
-   server-side, `computeSessionReward`, `grantXp(sourceType='session')`, energy, quests, SRS for review
-   sessions; idempotent), abandon, review-session creation from due cards.
-2. `services/decks.ts`, `cards.ts`, `review.ts`, `csv.ts` + `routes/flashcards.ts`: deck/card CRUD (batch insert,
-   ownership), `GET /flashcards/due` (choice vs reveal mode), review submit (compare-and-set on `dueAtSeen`),
-   CSV preview / import (dedupe by normalized question, limits) / export.
-3. `routes/tasks.ts`, `routes/quests.ts`, `routes/questions.ts` (`POST /questions/:id/report`), and
-   `services/importLocal.ts` + `routes/import.ts` (preflight, import with merge confirmation, `payloadHash`
-   idempotency, one `legacy_import` ledger row with `leaderboardEligible=false`). Mount them in `app.ts`;
-   give the import and CSV routes a 2 MB JSON limit (global limit is 100 KB) and the import rate limiter.
-4. Question bank seed (`seed/questionBank.ts`): load the old `questions.js` in a `vm` sandbox (fake `window`),
-   upsert by `legacyId`, flag suspicious entries `needsReview=true` (never edit them), seed the 5 quest
-   definitions (daily: finish a session, review 10 cards, win a battle; weekly: win 5 battles, study 150 min),
-   add to `runSeed`. Question count must be read from the file, not hardcoded (it should be 148).
-   Suggested manual flags: hist-h-007 (malformed), hist-h-004, hist-m-005, sci-e-007, sci-e-008, math-m-003,
-   lang-m-008, lang-h-005, other-h-005, plus near-duplicates (sci-m-009/bio-e-003, sci-m-005/bio-h-006,
-   sci-e-002/other-e-007, lang-h-003/lang-h-006) and automated checks (duplicate choices, bad correctIndex).
-5. API tests (against local PostgreSQL, like the existing ones): task complete twice and reopen/complete pays
-   once, daily cap, ownership 404s; session lifecycle with an injected clock, <80% pays nothing, claim twice
-   pays once, concurrent claims pay once, claim endpoints never leak `correctIndex` before submit; flashcards
-   add 3 then a 4th keeps all 4, CSV round trip and duplicate skip, other user gets 404; quest claim
-   idempotency; import into empty account, retry (no duplicates), existing progress requires merge; seed
-   count equals the count computed from the source file, every `correctIndex` maps to the same choice text,
-   seeding twice creates no duplicates.
-6. Web: real `/quests`, `/sessions`, `/lab` screens (TanStack Query, refetch after every mutation, server
-   clock for the timer, claim quiz, review mode, CSV preview/import/export), and the first-login import
-   dialog (Import / Not now / Download backup; write `studyverse-data-backup-<timestamp>` before importing).
-   No emoji art; escape via React only.
-7. Update `docs/DECISIONS.md` (suggested entries: tasks daily paid cap; include `needsReview` questions with a
-   report action; sessions elapsed-time rules; claim-quiz snapshots; quest counting rules; import mapping
-   incl. energy/raid counters/attribute points NOT imported; CSV formula hardening), `docs/HANDOFF.md`,
-   run lint/typecheck/tests/build, and write the final report.
+6. Web (`apps/web`): real `/quests`, `/sessions`, `/lab` screens (TanStack Query, refetch after every mutation,
+   server clock for the timer, claim quiz, review mode, CSV preview/import/export) and the first-login import dialog
+   (Import / Not now / Download backup; write `studyverse-data-backup-<timestamp>` before importing).
+   No emoji art; React escaping only.
+7. `docs/DECISIONS.md` entries (see list at the bottom), `docs/HANDOFF.md`, final lint/typecheck/test/build, report.
+
+DECISIONS to log (made in code, not yet written down): tasks daily paid cap (10/day, counted by `rewardedAt`);
+`needsReview` questions stay in the game with a report action; ineligible sessions (<80% time or <0.5 focus) are
+stored as `abandoned` with `outcomeReason`; claim quiz is a snapshot (bank quizzes built at finish, review quizzes at
+creation, choices shuffled); a quiz with zero questions (empty bank) counts as a pass; quest counting
+(`sessions_claimed` and `study_minutes` at claim, `cards_reviewed` per applied review or review-session card, only
+due cards can be reviewed); review sessions use subject "Flashcards", difficulty easy; import maps (XP = one
+`legacy_import` ledger row, once per account, capped at 500 000, not leaderboard-eligible; tasks arrive rewarded;
+sessions are history only; skills re-derived from points; avatar images, emoji pictures, streak, energy, raid
+counters, attribute points NOT imported; raid history archived in `ImportBatch.report.archive`); CSV formula
+hardening (`=`,`+`,`-`,`@` prefixed on export, restored on import).
 
 ## Changes to Phase 3 files
 
