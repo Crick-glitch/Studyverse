@@ -17,10 +17,14 @@ export const baseConfig: AppConfig = {
 export async function buildTestApp(
   prisma: PrismaClient,
   overrides: Partial<AppConfig> = {},
+  clock?: () => Date,
 ): Promise<{ app: Express; keys: TestKeys }> {
   const keys = await createTestKeys();
   const verifyToken = createTokenVerifier({ supabaseUrl: TEST_SUPABASE_URL, keys: keys.keys });
-  return { app: createApp({ ...baseConfig, ...overrides }, { prisma, verifyToken }), keys };
+  return { app: createApp(
+      { ...baseConfig, ...overrides },
+      { prisma, verifyToken, ...(clock && { clock }) },
+    ), keys };
 }
 
 /** For tests that must never reach the database: any use throws. */

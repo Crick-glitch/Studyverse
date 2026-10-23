@@ -36,6 +36,11 @@ enum SessionStatus {
   abandoned
 }
 
+enum SessionKind {
+  study
+  review
+}
+
 enum BattleMode {
   raid
   practice
@@ -95,36 +100,37 @@ model PlayerProfile {
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
-  progress           PlayerProgress?
-  xpTransactions     XpTransaction[]
-  tasks              Task[]
-  sessions           StudySession[]
-  decks              FlashcardDeck[]
-  flashcards         Flashcard[]
-  flashcardReviews   FlashcardReview[]
-  items              PlayerItem[]
-  equipment          Equipment?
-  skills             PlayerSkill[]
-  battles            Battle[]
-  achievements       PlayerAchievement[]
-  quests             PlayerQuest[]
-  importBatches      ImportBatch[]
+  progress         PlayerProgress?
+  xpTransactions   XpTransaction[]
+  tasks            Task[]
+  sessions         StudySession[]
+  decks            FlashcardDeck[]
+  flashcards       Flashcard[]
+  flashcardReviews FlashcardReview[]
+  items            PlayerItem[]
+  equipment        Equipment?
+  skills           PlayerSkill[]
+  battles          Battle[]
+  achievements     PlayerAchievement[]
+  quests           PlayerQuest[]
+  importBatches    ImportBatch[]
+  questionReports  QuestionReport[]
 }
 
 model PlayerProgress {
-  id             String        @id @default(uuid()) @db.Uuid
-  userId         String        @unique @db.Uuid
-  level          Int           @default(1)
-  totalXp        Int           @default(0)
-  currentLevelXp Int           @default(0)
-  streak         Int           @default(0)
-  lastActiveDate DateTime?     @db.Date
-  studyEnergy    Int           @default(0)
-  skillPoints    Int           @default(0)
-  raidWins       Int           @default(0)
-  raidLosses     Int           @default(0)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @unique @db.Uuid
+  level          Int       @default(1)
+  totalXp        Int       @default(0)
+  currentLevelXp Int       @default(0)
+  streak         Int       @default(0)
+  lastActiveDate DateTime? @db.Date
+  studyEnergy    Int       @default(0)
+  skillPoints    Int       @default(0)
+  raidWins       Int       @default(0)
+  raidLosses     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   user PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -176,6 +182,10 @@ model StudySession {
   difficulty         Difficulty    @default(medium)
   plannedMinutes     Int
   status             SessionStatus @default(created)
+  /// study = timed focus session; review = built from due flashcards (claim quiz uses those cards).
+  kind               SessionKind   @default(study)
+  /// Why a finished session paid nothing (e.g. "not_enough_time", "not_enough_focus", "stale").
+  outcomeReason      String?       @db.VarChar(40)
   startedAt          DateTime?
   /// Set while paused; cleared on resume (its length is added to pausedTotalSec).
   pausedAt           DateTime?
@@ -211,24 +221,51 @@ model Question {
 
   claimQuestions SessionClaimQuestion[]
   battleTurns    BattleTurn[]
+  reports        QuestionReport[]
 
   @@index([subject, difficulty])
 }
 
+/// One question of a session's claim quiz. The text/choices/answer are SNAPSHOTS taken when the quiz is
+/// built (the quiz is stable across refreshes even if a flashcard is edited or deleted). correctIndex is
+/// never sent to the browser before the quiz is submitted.
 model SessionClaimQuestion {
-  id            String    @id @default(uuid()) @db.Uuid
-  sessionId     String    @db.Uuid
-  questionId    String    @db.Uuid
+  id            String   @id @default(uuid()) @db.Uuid
+  sessionId     String   @db.Uuid
+  /// Set for question-bank questions.
+  questionId    String?  @db.Uuid
+  /// Set for review sessions built from flashcards (nulled if the card is later deleted).
+  cardId        String?  @db.Uuid
   position      Int
-  presentedAt   DateTime  @default(now())
+  text          String
+  choices       String[]
+  correctIndex  Int
+  presentedAt   DateTime @default(now())
   selectedIndex Int?
   correct       Boolean?
 
   session  StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  question Question     @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  question Question?    @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  card     Flashcard?   @relation(fields: [cardId], references: [id], onDelete: SetNull)
 
   @@unique([sessionId, position])
   @@index([questionId])
+  @@index([cardId])
+}
+
+/// A player's "report this question" (wrong answer, bad wording, ...). One report per player per question.
+model QuestionReport {
+  id         String   @id @default(uuid()) @db.Uuid
+  questionId String   @db.Uuid
+  userId     String   @db.Uuid
+  reason     String?  @db.VarChar(300)
+  createdAt  DateTime @default(now())
+
+  question Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, userId])
+  @@index([userId])
 }
 
 model FlashcardDeck {
@@ -262,9 +299,10 @@ model Flashcard {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  deck    FlashcardDeck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  user    PlayerProfile     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviews FlashcardReview[]
+  deck           FlashcardDeck          @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  user           PlayerProfile          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviews        FlashcardReview[]
+  claimQuestions SessionClaimQuestion[]
 
   @@index([deckId])
   @@index([userId, dueAt])
@@ -327,11 +365,11 @@ model Equipment {
   armorItemId  String?  @db.Uuid
   updatedAt    DateTime @updatedAt
 
-  user PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// (weaponItemId, userId) -> PlayerItem(id, userId): an equipped item must belong to the owner.
   /// NoAction (not SetNull) because SetNull would also null the NOT NULL userId column.
-  weapon PlayerItem? @relation("EquipmentWeapon", fields: [weaponItemId, userId], references: [id, userId], onDelete: NoAction)
-  armor  PlayerItem? @relation("EquipmentArmor", fields: [armorItemId, userId], references: [id, userId], onDelete: NoAction)
+  weapon PlayerItem?   @relation("EquipmentWeapon", fields: [weaponItemId, userId], references: [id, userId], onDelete: NoAction)
+  armor  PlayerItem?   @relation("EquipmentArmor", fields: [armorItemId, userId], references: [id, userId], onDelete: NoAction)
 
   @@index([weaponItemId])
   @@index([armorItemId])
@@ -364,28 +402,28 @@ model PlayerSkill {
 }
 
 model Battle {
-  id                String       @id @default(uuid()) @db.Uuid
-  userId            String       @db.Uuid
-  status            BattleStatus @default(active)
-  mode              BattleMode
-  subject           String       @db.VarChar(40)
-  tier              Int          @default(1)
-  enemySlug         String       @db.VarChar(60)
-  enemyMaxHp        Int
-  enemyHp           Int
-  playerMaxHp       Int
-  playerHp          Int
-  turn              Int          @default(1)
-  comboStreak       Int          @default(0)
-  focus             Int          @default(0)
-  seed              Int
+  id               String       @id @default(uuid()) @db.Uuid
+  userId           String       @db.Uuid
+  status           BattleStatus @default(active)
+  mode             BattleMode
+  subject          String       @db.VarChar(40)
+  tier             Int          @default(1)
+  enemySlug        String       @db.VarChar(60)
+  enemyMaxHp       Int
+  enemyHp          Int
+  playerMaxHp      Int
+  playerHp         Int
+  turn             Int          @default(1)
+  comboStreak      Int          @default(0)
+  focus            Int          @default(0)
+  seed             Int
   /// Engine bookkeeping that must survive a refresh (current intent, re-queued questions, once-per-battle flags).
-  engineState       Json         @default("{}")
+  engineState      Json         @default("{}")
   /// Client Idempotency-Key for POST /battles; a double-click returns the same battle.
-  idempotencyKey    String?      @db.VarChar(80)
-  startedAt         DateTime     @default(now())
-  endedAt           DateTime?
-  rewardsGrantedAt  DateTime?
+  idempotencyKey   String?      @db.VarChar(80)
+  startedAt        DateTime     @default(now())
+  endedAt          DateTime?
+  rewardsGrantedAt DateTime?
 
   user  PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
   turns BattleTurn[]
@@ -416,11 +454,11 @@ model BattleTurn {
 }
 
 model Achievement {
-  id          String   @id @default(uuid()) @db.Uuid
-  slug        String   @unique @db.VarChar(60)
-  name        String   @db.VarChar(80)
+  id          String  @id @default(uuid()) @db.Uuid
+  slug        String  @unique @db.VarChar(60)
+  name        String  @db.VarChar(80)
   description String
-  spriteKey   String?  @db.VarChar(80)
+  spriteKey   String? @db.VarChar(80)
 
   unlocks PlayerAchievement[]
 }
@@ -454,15 +492,15 @@ model QuestDefinition {
 }
 
 model PlayerQuest {
-  id         String    @id @default(uuid()) @db.Uuid
-  userId     String    @db.Uuid
-  questId    String    @db.Uuid
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  questId   String    @db.Uuid
   /// Which day/week this instance belongs to, e.g. "2026-10-22" or "2026-W43" (UTC).
-  periodKey  String    @db.VarChar(20)
-  progress   Int       @default(0)
-  claimedAt  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  periodKey String    @db.VarChar(20)
+  progress  Int       @default(0)
+  claimedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   user  PlayerProfile   @relation(fields: [userId], references: [id], onDelete: Cascade)
   quest QuestDefinition @relation(fields: [questId], references: [id], onDelete: Restrict)

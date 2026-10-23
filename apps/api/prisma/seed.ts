@@ -9,7 +9,11 @@ if (!url) {
 }
 const prisma = createPrisma(url);
 runSeed(prisma)
-  .then((counts) => console.log('Seed complete:', counts))
+  .then(({ questions, ...counts }) => {
+    console.log('Seed complete:', { ...counts, questionsStored: questions.stored });
+    console.log(`Question bank: ${questions.stored} of ${questions.sourceCount} stored, ${questions.flagged} flagged needsReview.`);
+    for (const s of questions.skipped) console.warn(`  skipped: ${s.reason}`);
+  })
   .catch((err) => {
     console.error(err);
     process.exitCode = 1;

@@ -66,7 +66,7 @@ describe.skipIf(!hasTestDb)('database schema (PostgreSQL)', () => {
     const tables = await prisma.$queryRaw<{ relname: string; relrowsecurity: boolean }[]>`
       SELECT relname, relrowsecurity FROM pg_class
       WHERE relnamespace = 'public'::regnamespace AND relkind = 'r'`;
-    expect(tables.length).toBe(22);
+    expect(tables.length).toBe(23);
     expect(tables.filter((t) => !t.relrowsecurity)).toEqual([]);
     const policies = await prisma.$queryRaw<
       { n: bigint }[]

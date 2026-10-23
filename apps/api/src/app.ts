@@ -11,6 +11,7 @@ import { createRateLimiters } from './middleware/rateLimit.js';
 import { requestId } from './middleware/requestId.js';
 import { healthRouter } from './routes/health.js';
 import { playerRouter } from './routes/player.js';
+import { sessionsRouter } from './routes/sessions.js';
 
 export type AppConfig = Pick<
   Config,
@@ -26,6 +27,8 @@ export type AppConfig = Pick<
 export interface AppDeps {
   prisma: PrismaClient;
   verifyToken: TokenVerifier;
+  /** Injectable clock (tests move time without sleeping). Defaults to the real time. */
+  clock?: () => Date;
 }
 
 export function createApp(config: AppConfig, deps: AppDeps): Express {
@@ -51,9 +54,14 @@ export function createApp(config: AppConfig, deps: AppDeps): Express {
   // Public
   app.use('/api/v1', healthRouter);
 
-  // Everything below requires a verified Supabase token.
+  // Everything below requires a verified Supabase token (verified once, before any private router).
   const auth = requireAuth(deps.verifyToken);
-  app.use('/api/v1', limiters.auth, auth, playerRouter(deps.prisma));
+  const clock = deps.clock ?? (() => new Date());
+  // The stricter auth-adjacent limit applies only to the profile routes, not to every private route.
+  app.use(['/api/v1/me', '/api/v1/profile', '/api/v1/progress'], limiters.auth);
+  app.use('/api/v1', auth);
+  app.use('/api/v1', playerRouter(deps.prisma));
+  app.use('/api/v1', sessionsRouter(deps.prisma, clock));
 
   app.use(notFound);
   app.use(errorHandler);
