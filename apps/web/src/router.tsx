@@ -1,5 +1,8 @@
 import { createBrowserRouter, createMemoryRouter, type RouteObject } from 'react-router-dom';
 import { RequireAuth } from './auth/RequireAuth';
+import { LabPage } from './features/lab/LabPage';
+import { QuestBoardPage } from './features/quests/QuestBoardPage';
+import { SessionsPage } from './features/sessions/SessionsPage';
 import { AppLayout } from './layouts/AppLayout';
 import { BattleLayout } from './layouts/BattleLayout';
 import { ComingSoon } from './pages/ComingSoon';
@@ -23,36 +26,9 @@ export const routes: RouteObject[] = [
               />
             ),
           },
-          {
-            path: 'quests',
-            element: (
-              <ComingSoon
-                title="Quest Board"
-                phase="Phase 4 and 6"
-                description="Personal tasks and daily/weekly adventure quests."
-              />
-            ),
-          },
-          {
-            path: 'sessions',
-            element: (
-              <ComingSoon
-                title="Study Sessions"
-                phase="Phase 4"
-                description="Server-timed study sessions with a claim quiz."
-              />
-            ),
-          },
-          {
-            path: 'lab',
-            element: (
-              <ComingSoon
-                title="Lab"
-                phase="Phase 4"
-                description="Decks, flashcards, spaced-repetition review and CSV import/export."
-              />
-            ),
-          },
+          { path: 'quests', element: <QuestBoardPage /> },
+          { path: 'sessions', element: <SessionsPage /> },
+          { path: 'lab', element: <LabPage /> },
           {
             path: 'camp',
             element: (

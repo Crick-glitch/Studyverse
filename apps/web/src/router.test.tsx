@@ -6,6 +6,7 @@ import { AuthContext, type AuthValue } from './auth/AuthContext';
 import { createTestRouter } from './router';
 
 vi.mock('./lib/api', () => ({
+  errorMessage: (e: unknown) => (e instanceof Error ? e.message : 'error'),
   api: {
     me: vi.fn(() =>
       Promise.resolve({
@@ -32,6 +33,13 @@ vi.mock('./lib/api', () => ({
         },
       }),
     ),
+    tasks: { list: vi.fn(() => Promise.resolve([])) },
+    quests: { list: vi.fn(() => Promise.resolve([])) },
+    sessions: {
+      active: vi.fn(() => Promise.resolve({ session: null, serverNow: '2026-01-01T00:00:00Z' })),
+      list: vi.fn(() => Promise.resolve([])),
+    },
+    decks: { list: vi.fn(() => Promise.resolve([])) },
   },
 }));
 
@@ -60,9 +68,6 @@ function renderAt(path: string, status: AuthValue['status'] = 'signedIn') {
 
 const placeholders: [string, string][] = [
   ['/', 'Dashboard'],
-  ['/quests', 'Quest Board'],
-  ['/sessions', 'Study Sessions'],
-  ['/lab', 'Lab'],
   ['/camp', 'Camp'],
   ['/dungeons', 'Dungeons'],
   ['/battle/abc', 'Battle'],
@@ -78,6 +83,19 @@ describe('route shell (signed in)', () => {
     expect(screen.getByText(/Coming in a later phase/)).toBeTruthy();
   });
 
+  // Phase 4: these three are real screens that talk to the API (mocked above), not placeholders.
+  const real: [string, string, RegExp][] = [
+    ['/quests', 'Quest Board', /No tasks here yet/],
+    ['/sessions', 'Study Sessions', /Plan a session/],
+    ['/lab', 'Lab', /No decks yet/],
+  ];
+  it.each(real)('%s is a real screen with an empty state', async (path, title, empty) => {
+    renderAt(path);
+    expect(screen.getByRole('heading', { level: 1, name: title })).toBeTruthy();
+    expect(screen.queryByText(/Coming in a later phase/)).toBeNull();
+    await waitFor(() => expect(screen.getAllByText(empty).length).toBeGreaterThan(0));
+  });
+
   it('battle route has no main navigation', () => {
     renderAt('/battle/abc');
     expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
@@ -90,7 +108,7 @@ describe('route shell (signed in)', () => {
 });
 
 describe('authentication guard', () => {
-  it.each(placeholders.map(([p]) => [p]))(
+  it.each([...placeholders.map(([p]) => [p]), ['/quests'], ['/sessions'], ['/lab']])(
     '%s redirects to the login screen when signed out',
     (path) => {
       renderAt(path as string, 'signedOut');

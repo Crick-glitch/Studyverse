@@ -1,0 +1,213 @@
+/* Shared building blocks for feature screens. Colours come from tokens.css only. */
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+.pageTitle {
+  margin: 0;
+}
+.panel {
+  padding: var(--space-4);
+  background: var(--forest-700);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+.panel > h2,
+.panel > h3 {
+  margin-top: 0;
+}
+.stack {
+  display: grid;
+  gap: var(--space-3);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.spread {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+.grid2 {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+.field {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.label {
+  font-weight: 700;
+  color: var(--parchment-100);
+}
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--charcoal-800);
+  background: var(--parchment-100);
+  border: 2px solid var(--parchment-300);
+  border-radius: var(--radius);
+}
+.textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 2.5rem;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-weight: 700;
+  color: var(--parchment-100);
+  background: var(--charcoal-800);
+  border: 2px solid var(--parchment-300);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--gold-500);
+  color: var(--gold-500);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.primary {
+  color: var(--charcoal-800);
+  background: var(--gold-500);
+  border-color: var(--gold-500);
+}
+.primary:hover:not(:disabled) {
+  color: var(--charcoal-800);
+  background: var(--parchment-100);
+}
+.danger {
+  border-color: var(--ember-500);
+}
+.danger:hover:not(:disabled) {
+  color: var(--parchment-100);
+  background: var(--ember-500);
+  border-color: var(--ember-500);
+}
+.small {
+  min-height: 2rem;
+  padding: var(--space-1) var(--space-2);
+  font-size: 0.9rem;
+}
+.error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--parchment-100);
+  background: var(--charcoal-800);
+  border-left: 6px solid var(--ember-500);
+}
+.notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--parchment-100);
+  background: var(--charcoal-800);
+  border-left: 6px solid var(--moss-500);
+}
+.muted {
+  color: var(--parchment-300);
+  margin: 0;
+}
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  background: var(--charcoal-800);
+  border: 1px solid var(--parchment-300);
+  border-radius: var(--radius);
+}
+.itemMain {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 14rem;
+  overflow-wrap: anywhere;
+}
+.badge {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  color: var(--parchment-100);
+  border: 1px solid var(--teal-500);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.reward {
+  color: var(--gold-500);
+  font-weight: 700;
+}
+.bar {
+  width: 100%;
+  height: 0.9rem;
+  appearance: none;
+  border: 1px solid var(--parchment-300);
+  border-radius: var(--radius);
+  background: var(--charcoal-800);
+  overflow: hidden;
+}
+.bar::-webkit-progress-bar {
+  background: var(--charcoal-800);
+}
+.bar::-webkit-progress-value {
+  background: var(--gold-500);
+}
+.bar::-moz-progress-bar {
+  background: var(--gold-500);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.skeleton {
+  display: grid;
+  gap: var(--space-2);
+}
+.skeletonLine {
+  height: 1.2rem;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--charcoal-800), var(--forest-700), var(--charcoal-800));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}

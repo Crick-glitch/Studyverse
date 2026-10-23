@@ -13,6 +13,8 @@
     "db:migrate": "node scripts/require-db-env.mjs && prisma generate && prisma migrate dev",
     "db:deploy": "node scripts/require-db-env.mjs && prisma generate && prisma migrate deploy",
     "db:seed": "node scripts/require-db-env.mjs && prisma generate && tsx prisma/seed.ts",
+    "explanations:draft": "tsx src/seed/explanationsCli.ts draft",
+    "explanations:apply": "node scripts/require-db-env.mjs && prisma generate && tsx src/seed/explanationsCli.ts apply",
     "db:studio": "node scripts/require-db-env.mjs && prisma generate && prisma studio"
   },
   "dependencies": {

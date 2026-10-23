@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { LocalImportPrompt } from '../features/import/LocalImportPrompt';
 import { api } from '../lib/api';
 import styles from './AppLayout.module.css';
 
@@ -55,6 +56,12 @@ function PlayerChip() {
   );
 }
 
+/** Offers the old-save import once the player's id is known (never imports by itself). */
+function ImportGate() {
+  const me = useQuery({ queryKey: ['me'], queryFn: api.me });
+  return me.data ? <LocalImportPrompt userId={me.data.user.id} /> : null;
+}
+
 export function AppLayout() {
   const [open, setOpen] = useState(false);
   return (
@@ -91,6 +98,7 @@ export function AppLayout() {
       <main className={styles.main}>
         <Outlet />
       </main>
+      <ImportGate />
     </div>
   );
 }

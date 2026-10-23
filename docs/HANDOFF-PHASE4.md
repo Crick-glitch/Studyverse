@@ -1,70 +1,36 @@
-# Phase 4 handoff (partial): what is done, what is not
+# Phase 4 handoff: status
 
-Status: Phase 4 (`03-core-modules.md`): the **API half is done and tested**; the **web screens are not**. Phase 3 and the foundation are untouched except where
-noted under "Changes to Phase 3 files".
+**Phase 4 (`03-core-modules.md`) is complete in code. Its API half was run against local PostgreSQL 16 in an earlier session. Its web half and the explanations tooling were written in a session with no network, no `node_modules` and no database, so they have NOT been run.** Nothing in Phase 4 has been run against Supabase or in a browser.
 
-## Fixes for the two errors you hit
+## What exists
 
-1. `db:seed` failed with a missing `src/generated/prisma/client.js`: Prisma 7 does not generate the client
-   on its own. `apps/api/package.json` scripts `dev`, `build`, `typecheck`, `db:migrate`, `db:deploy`,
-   `db:seed`, `db:studio` now run `prisma generate` first. (You can also run `npx prisma generate` once.)
-2. `prisma.config.ts` "Cannot find name 'process'": the file was outside `tsconfig.json`'s `include`, so
-   the editor used a bare config. `apps/api/tsconfig.json` now includes `prisma`, `prisma.config.ts` and
-   `vitest.config.ts` (noEmit, used by the editor and `typecheck`); `tsconfig.build.json` is the emit config
-   used by `npm run build -w apps/api` (output still `dist/server.js`). Restart the TS server in VS Code
-   (Ctrl+Shift+P, "TypeScript: Restart TS Server") if the red underline stays.
-   The first `db:deploy` P1001 ("can't reach database") then success on retry was a transient network/pooler
-   hiccup, not a code problem.
+- API (`apps/api`): sessions, tasks, quests, question report, decks/cards/review/CSV, local import, question-bank seed, quest seed. 124 API tests passed locally earlier (shared 57).
+- Web (`apps/web`): real `/quests` (My Tasks + Adventure Quests), `/sessions` (planner, server-clock timer, claim quiz, outcome, history, review sessions), `/lab` (decks, batch card entry, edit/delete, review mode, CSV preview/import/export), first-login import dialog (`features/import`), shared `ui/` (Dialog with focus trap, Tabs, ConfirmDialog, state views).
+- Explanations tooling: `npm run explanations:draft` / `explanations:apply` (`apps/api/src/seed/explanations*.ts`).
+- Decisions 23 to 38 in `docs/DECISIONS.md`.
 
-## DONE (all of this ran: API suite 124 tests pass against local PostgreSQL 16, shared 57, eslint clean)
+## What was verified this session (and how)
 
-- Schema + migration `20261022120000_phase4_core_modules` (hand-written; the drift test passes locally).
-  **Run `npx prisma migrate dev` once on your machine (or `npm run db:deploy` for Supabase) and confirm no drift.**
-- `packages/shared`: balance, subjects, random, period, srs, rewards, choices, csv, avatars, Zod schemas + DTOs
-  (tasks, sessions, flashcards, quests, import, `questionReportSchema`). `ClaimResultDto.questions[]` now carries
-  `questionId` (so the UI can offer "Report this question").
-- API services + routes, all mounted in `app.ts` behind one auth step, all scoped to `req.user.id`:
-  - sessions (`/sessions`, `/sessions/active`, `/sessions/review`, `/sessions/:id/{start,pause,resume,finish,abandon}`,
-    `GET|POST /sessions/:id/claim`, `DELETE /sessions/:id`), server clock only, claim quiz snapshots, idempotent claim;
-  - tasks (`/tasks`, `/tasks/:id/{complete,reopen}`), quests (`/quests`, `/quests/:id/claim`),
-    `POST /questions/:id/report`;
-  - flashcards (`/decks`, `/decks/:id/cards`, `/cards/:id`, `/flashcards/due`, `/cards/:id/review`,
-    `/decks/:id/csv/{preview,import}`, `GET /decks/:id/csv`, `GET /flashcards/csv`);
-  - local import (`GET /import/local/preflight`, `POST /import/local`). CSV + import routes accept 2 MB JSON bodies
-    (everything else 100 KB) and use the import rate limiter.
-  - `AppDeps.clock` is injectable (tests move time without sleeping).
-- Seed: `seed/questionBank.ts` (vm sandbox, upsert by `legacyId`, flags `needsReview`, never edits), `seed/quests.ts`
-  (5 quests), both run by `runSeed`. The count is read from the file (148).
-- Tests (`apps/api/src`): `sessions.int`, `tasks-quests.int`, `flashcards.int`, `import.int`, `questionBank.int`.
-- Bugs found and fixed while testing: stale-session detection and the daily task cap compared the database clock
-  with the injected clock (both now use timestamps stamped from the same clock); the stricter auth rate limiter was
-  accidentally applied to every private route (now only `/me`, `/profile`, `/progress`).
+- Typecheck of all new web code (and its tests) against hand-written type stubs for React, TanStack Query, React Router and zod, plus the REAL shared DTO types: no errors in new files; a planted wrong field name was caught. This is NOT the repo's real `npm run typecheck`.
+- Unused-import scan of the new web files: clean after one fix.
+- The old question file really holds 148 entries (read with node `vm`).
 
-## TODO (in this order)
+## NOT verified (run these first, in order)
 
-6. Web (`apps/web`): real `/quests`, `/sessions`, `/lab` screens (TanStack Query, refetch after every mutation,
-   server clock for the timer, claim quiz, review mode, CSV preview/import/export) and the first-login import dialog
-   (Import / Not now / Download backup; write `studyverse-data-backup-<timestamp>` before importing).
-   No emoji art; React escaping only.
-7. `docs/DECISIONS.md` entries (see list at the bottom), `docs/HANDOFF.md`, final lint/typecheck/test/build, report.
+1. `npm install`
+2. `npm run format` (prettier was not available; the new files are hand-formatted and `prettier --check` may fail until this runs)
+3. `npm run lint`, `npm run typecheck`, `npm run build`
+4. `npm run test` (new web tests: router, Dialog, TasksPanel, CardsForm, useSessionClock, LocalImportPrompt, format; new API test: explanations). If a web test fails, suspect the test first: they were written without being run (fake-timer and focus tests are the likeliest to need a tweak).
+5. `cd apps/api && npx prisma migrate dev` once (must report no drift), then `npm run db:deploy` and `npm run db:seed` against Supabase.
+6. `npm run dev`, then in a browser: sign up, add a task and complete it, run a 10-minute session (the timer must survive a refresh), pass and fail a claim quiz, add 3 cards then a 4th (all must remain), review them, CSV import/export a deck, and import an old `studyverse-data` save.
 
-DECISIONS to log (made in code, not yet written down): tasks daily paid cap (10/day, counted by `rewardedAt`);
-`needsReview` questions stay in the game with a report action; ineligible sessions (<80% time or <0.5 focus) are
-stored as `abandoned` with `outcomeReason`; claim quiz is a snapshot (bank quizzes built at finish, review quizzes at
-creation, choices shuffled); a quiz with zero questions (empty bank) counts as a pass; quest counting
-(`sessions_claimed` and `study_minutes` at claim, `cards_reviewed` per applied review or review-session card, only
-due cards can be reviewed); review sessions use subject "Flashcards", difficulty easy; import maps (XP = one
-`legacy_import` ledger row, once per account, capped at 500 000, not leaderboard-eligible; tasks arrive rewarded;
-sessions are history only; skills re-derived from points; avatar images, emoji pictures, streak, energy, raid
-counters, attribute points NOT imported; raid history archived in `ImportBatch.report.archive`); CSV formula
-hardening (`=`,`+`,`-`,`@` prefixed on export, restored on import).
+## Known gaps / things to watch
 
-## Changes to Phase 3 files
+- Nothing in the UI is covered by Playwright yet (Phase 5/6 add the smoke tests).
+- `ClaimResultDto` has no per-question explanation field; "No explanation yet" display belongs to the battle screen (Phase 5).
+- The dashboard, camp, battle, stats, settings and leaderboard routes are still honest "Coming soon" placeholders.
+- Avatar upload and "Export my data" / "Reset progress" are Phase 6 (Settings).
 
-`apps/api/package.json` (scripts), `apps/api/tsconfig.json` (+ new `tsconfig.build.json`),
-`apps/api/prisma/schema.prisma` (Phase 4 additions; also re-formatted by `prisma format`),
-`apps/api/src/schema.int.test.ts` (table count 22 to 23), `packages/shared/src/index.ts` and `balance.ts`.
+## Next
 
-## Not verified
-
-Nothing in Phase 4 has run against Supabase or a browser. The new migration was only run on local PostgreSQL 16.
+Phase 5a/5b/6: `05-art-and-sprites.md` (sprite system) then `06-battle-screen.md`, then `07-camp-dashboard-stats-social.md`, then `08-verification-and-deploy.md`. Use `grantXp` for every reward; user id only from `req.user`.

@@ -1,3 +1,5 @@
+> **Current status: see `docs/HANDOFF-PHASE4.md` (Phase 4 done in code; follow its "run these first" list). The text below is the Phase 3 handoff and is kept for the Supabase setup steps.**
+
 # Handoff: where the rebuild stands
 
 ## Phase 1 (audit + foundation): done. Phase 3 (`02-database-auth-api.md`): done in code, NOT yet run against Supabase.
