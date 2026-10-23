@@ -123,8 +123,9 @@ export async function completeTask(
       await tx.task.update({ where: { id }, data: { status: 'completed', completedAt: now } });
       if (task.rewardedAt) note = 'already_paid';
       else {
-        const paidToday = await tx.xpTransaction.count({
-          where: { userId, sourceType: 'task', createdAt: { gte: startOfUtcDay(now) } },
+        // Counted with rewardedAt (stamped from the same clock as `now`), not the ledger's createdAt.
+        const paidToday = await tx.task.count({
+          where: { userId, rewardedAt: { gte: startOfUtcDay(now) } },
         });
         if (paidToday >= BALANCE.tasks.dailyRewardedCompletions) note = 'daily_cap_reached';
         else {

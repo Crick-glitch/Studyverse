@@ -10,7 +10,12 @@ import { errorHandler, notFound } from './middleware/error.js';
 import { createRateLimiters } from './middleware/rateLimit.js';
 import { requestId } from './middleware/requestId.js';
 import { healthRouter } from './routes/health.js';
+import { flashcardsRouter } from './routes/flashcards.js';
+import { importRouter } from './routes/import.js';
 import { playerRouter } from './routes/player.js';
+import { questionsRouter } from './routes/questions.js';
+import { questsRouter } from './routes/quests.js';
+import { tasksRouter } from './routes/tasks.js';
 import { sessionsRouter } from './routes/sessions.js';
 
 export type AppConfig = Pick<
@@ -46,7 +51,11 @@ export function createApp(config: AppConfig, deps: AppDeps): Express {
       },
     }),
   );
-  app.use(express.json({ limit: '100kb' }));
+  // 100 KB for everything, except the CSV and local-data import routes (they carry whole files).
+  const smallJson = express.json({ limit: '100kb' });
+  const bigJson = express.json({ limit: '2mb' });
+  const BIG_BODY = /^\/api\/v1\/(decks\/[^/]+\/csv\/(preview|import)|import\/local)$/;
+  app.use((req, res, next) => (BIG_BODY.test(req.path) ? bigJson : smallJson)(req, res, next));
 
   const limiters = createRateLimiters(config);
   app.use('/api/v1', limiters.general);
@@ -62,6 +71,11 @@ export function createApp(config: AppConfig, deps: AppDeps): Express {
   app.use('/api/v1', auth);
   app.use('/api/v1', playerRouter(deps.prisma));
   app.use('/api/v1', sessionsRouter(deps.prisma, clock));
+  app.use('/api/v1', tasksRouter(deps.prisma, clock));
+  app.use('/api/v1', questsRouter(deps.prisma, clock));
+  app.use('/api/v1', questionsRouter(deps.prisma));
+  app.use('/api/v1', flashcardsRouter(deps.prisma, clock, limiters.importData));
+  app.use('/api/v1', importRouter(deps.prisma, clock, limiters.importData));
 
   app.use(notFound);
   app.use(errorHandler);

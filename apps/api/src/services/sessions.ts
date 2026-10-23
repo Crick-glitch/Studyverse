@@ -554,6 +554,7 @@ function claimResultFromRows(
     levelsGained: extra.levelsGained,
     questions: rows.map((r) => ({
       position: r.position,
+      questionId: r.questionId,
       text: r.text,
       correct: r.correct === true,
       correctIndex: r.correctIndex,

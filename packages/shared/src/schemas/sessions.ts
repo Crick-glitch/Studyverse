@@ -115,6 +115,8 @@ export interface ClaimResultDto {
   levelsGained: number;
   questions: {
     position: number;
+    /** Bank question id, so the player can report it; null for flashcard-based questions. */
+    questionId: string | null;
     text: string;
     correct: boolean;
     correctIndex: number;
