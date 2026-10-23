@@ -88,7 +88,7 @@ export function LocalImportPrompt({ userId }: { userId: string }) {
   const parsed = raw === null ? null : parseLegacy(raw);
   const preflight = useQuery({
     queryKey: ['import', 'preflight'],
-    queryFn: api.import.preflight,
+    queryFn: () => api.import.preflight(),
     enabled: show,
     retry: false,
   });

@@ -5,6 +5,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext, type AuthValue } from './auth/AuthContext';
 import { createTestRouter } from './router';
 
+// The login screen must not depend on the developer's real apps/web/.env, so Supabase is mocked as "not configured".
+vi.mock('./lib/supabase', () => ({
+  supabase: null,
+  supabaseConfigError:
+    'Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in apps/web/.env.',
+}));
+
 vi.mock('./lib/api', () => ({
   errorMessage: (e: unknown) => (e instanceof Error ? e.message : 'error'),
   api: {

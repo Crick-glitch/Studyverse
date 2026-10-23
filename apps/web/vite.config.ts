@@ -5,5 +5,5 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [react()],
   server: { port: 5173 },
-  test: { environment: 'jsdom', globals: false },
+  test: { environment: 'jsdom', globals: false, setupFiles: ['./src/test-setup.ts'] },
 });
