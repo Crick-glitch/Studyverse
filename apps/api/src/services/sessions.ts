@@ -98,7 +98,9 @@ async function load(tx: Tx, userId: string, id: string): Promise<StudySession> {
 
 /** Ends an open pause at `now` (adds its length to pausedTotalSec). */
 function closePause(s: StudySession, now: Date): { pausedAt: null; pausedTotalSec: number } {
-  const extra = s.pausedAt ? Math.max(0, Math.round((now.getTime() - s.pausedAt.getTime()) / 1000)) : 0;
+  const extra = s.pausedAt
+    ? Math.max(0, Math.round((now.getTime() - s.pausedAt.getTime()) / 1000))
+    : 0;
   return { pausedAt: null, pausedTotalSec: s.pausedTotalSec + extra };
 }
 
@@ -253,7 +255,10 @@ export async function pauseSession(
     if (s.status === 'paused') return dto(tx, s, now, userId);
     if (s.status !== 'running')
       throw new AppError(409, 'SESSION_NOT_RUNNING', 'Only a running session can be paused.');
-    const updated = await tx.studySession.update({ where: { id }, data: { status: 'paused', pausedAt: now } });
+    const updated = await tx.studySession.update({
+      where: { id },
+      data: { status: 'paused', pausedAt: now },
+    });
     return dto(tx, updated, now, userId);
   });
 }
@@ -311,7 +316,11 @@ export async function deleteCreatedSession(
   if (res.count === 0) {
     const exists = await prisma.studySession.count({ where: { id, userId } });
     if (!exists) throw notFound();
-    throw new AppError(409, 'SESSION_NOT_DELETABLE', 'Only a session that has not started can be deleted.');
+    throw new AppError(
+      409,
+      'SESSION_NOT_DELETABLE',
+      'Only a session that has not started can be deleted.',
+    );
   }
 }
 
@@ -330,12 +339,17 @@ export async function finishSession(
   return withPlayerLock(prisma, userId, async (tx) => {
     const s = await load(tx, userId, id);
     if (s.status === 'finished' || s.status === 'claimed')
-      return { session: await dto(tx, s, now, userId), claimable: s.status === 'finished', ineligibleReason: null };
+      return {
+        session: await dto(tx, s, now, userId),
+        claimable: s.status === 'finished',
+        ineligibleReason: null,
+      };
     if (s.status === 'abandoned')
       return {
         session: await dto(tx, s, now, userId),
         claimable: false,
-        ineligibleReason: (s.outcomeReason === 'not_enough_time' || s.outcomeReason === 'not_enough_focus'
+        ineligibleReason: (s.outcomeReason === 'not_enough_time' ||
+        s.outcomeReason === 'not_enough_focus'
           ? s.outcomeReason
           : null) as SessionFinishResultDto['ineligibleReason'],
       };
@@ -346,14 +360,28 @@ export async function finishSession(
     const closed: StudySession = { ...s, ...pause, status: 'running', finishedAt: now };
     const elapsedSec = sessionElapsedSec(closed, now);
     const focus = focusRatio === undefined ? null : clampFocus(focusRatio);
-    const verdict = sessionEligibility({ elapsedSec, plannedMinutes: s.plannedMinutes, focusRatio: focus });
+    const verdict = sessionEligibility({
+      elapsedSec,
+      plannedMinutes: s.plannedMinutes,
+      focusRatio: focus,
+    });
 
     if (!verdict.eligible) {
       const updated = await tx.studySession.update({
         where: { id },
-        data: { ...pause, status: 'abandoned', finishedAt: now, focusRatioReported: focus, outcomeReason: verdict.reason },
+        data: {
+          ...pause,
+          status: 'abandoned',
+          finishedAt: now,
+          focusRatioReported: focus,
+          outcomeReason: verdict.reason,
+        },
       });
-      return { session: await dto(tx, updated, now, userId), claimable: false, ineligibleReason: verdict.reason };
+      return {
+        session: await dto(tx, updated, now, userId),
+        claimable: false,
+        ineligibleReason: verdict.reason,
+      };
     }
 
     // Study sessions build their quiz now; review sessions already hold theirs (built at creation).
@@ -362,7 +390,11 @@ export async function finishSession(
       where: { id },
       data: { ...pause, status: 'finished', finishedAt: now, focusRatioReported: focus },
     });
-    return { session: await dto(tx, updated, now, userId), claimable: true, ineligibleReason: null };
+    return {
+      session: await dto(tx, updated, now, userId),
+      claimable: true,
+      ineligibleReason: null,
+    };
   });
 }
 
@@ -396,7 +428,13 @@ function shuffleChoices(choices: string[], correctIndex: number, rng: () => numb
 async function pickBankQuestions(
   tx: Tx,
   userId: string,
-  opts: { subject: string; difficulty: StudySession['difficulty'] | null; count: number; seed: number; excludeIds?: string[] },
+  opts: {
+    subject: string;
+    difficulty: StudySession['difficulty'] | null;
+    count: number;
+    seed: number;
+    excludeIds?: string[];
+  },
 ): Promise<QuizRow[]> {
   const rng = seededRng(opts.seed);
   const subject = bankSubject(opts.subject);
@@ -418,10 +456,20 @@ async function pickBankQuestions(
   for (const where of tiers) {
     if (picked.length >= opts.count) break;
     const pool = (await tx.question.findMany({ where, take: 500 })).filter(
-      (q) => !taken.has(q.id) && q.choices.length >= 2 && q.correctIndex >= 0 && q.correctIndex < q.choices.length,
+      (q) =>
+        !taken.has(q.id) &&
+        q.choices.length >= 2 &&
+        q.correctIndex >= 0 &&
+        q.correctIndex < q.choices.length,
     );
-    const fresh = shuffled(pool.filter((q) => !recentIds.has(q.id)), rng);
-    const seen = shuffled(pool.filter((q) => recentIds.has(q.id)), rng);
+    const fresh = shuffled(
+      pool.filter((q) => !recentIds.has(q.id)),
+      rng,
+    );
+    const seen = shuffled(
+      pool.filter((q) => recentIds.has(q.id)),
+      rng,
+    );
     for (const q of [...fresh, ...seen]) {
       if (picked.length >= opts.count) break;
       taken.add(q.id);
@@ -471,7 +519,8 @@ export async function createReviewSession(
     }
     const dueWhere = { userId, dueAt: { lte: now }, ...(input.deckId && { deckId: input.deckId }) };
     const dueCount = await tx.flashcard.count({ where: dueWhere });
-    if (dueCount === 0) throw new AppError(409, 'NO_DUE_CARDS', 'No flashcards are due for review.');
+    if (dueCount === 0)
+      throw new AppError(409, 'NO_DUE_CARDS', 'No flashcards are due for review.');
     const waiting = await tx.studySession.count({ where: { userId, status: 'created' } });
     if (waiting >= BALANCE.sessions.maxCreatedAtOnce)
       throw new AppError(409, 'TOO_MANY_SESSIONS', 'You have too many sessions waiting.');
@@ -479,14 +528,20 @@ export async function createReviewSession(
     const s = await tx.studySession.create({
       data: {
         userId,
-        title: deckName ? `Review: ${deckName}`.slice(0, BALANCE.sessions.titleMaxLength) : 'Review session',
+        title: deckName
+          ? `Review: ${deckName}`.slice(0, BALANCE.sessions.titleMaxLength)
+          : 'Review session',
         subject: 'Flashcards',
         difficulty: 'easy',
         plannedMinutes: reviewSessionMinutes(dueCount),
         kind: 'review',
       },
     });
-    const dueCards = await tx.flashcard.findMany({ where: dueWhere, orderBy: { dueAt: 'asc' }, take: 40 });
+    const dueCards = await tx.flashcard.findMany({
+      where: dueWhere,
+      orderBy: { dueAt: 'asc' },
+      take: 40,
+    });
     const items = await buildCardQuizItems(tx, userId, dueCards, hashString(s.id));
     const want = BALANCE.sessions.claim.questionCount;
     const rows: QuizRow[] = items.slice(0, want).map((i) => ({
@@ -530,7 +585,11 @@ export async function getClaimQuiz(
     throw new AppError(409, 'SESSION_NOT_CLAIMABLE', 'This session has no claim quiz waiting.');
   return {
     session: await dto(prisma, s, now, userId),
-    questions: s.claimQuestions.map((q) => ({ position: q.position, text: q.text, choices: q.choices })),
+    questions: s.claimQuestions.map((q) => ({
+      position: q.position,
+      text: q.text,
+      choices: q.choices,
+    })),
   };
 }
 
@@ -605,7 +664,11 @@ export async function claimSession(
     const graded = s.claimQuestions.map((q) => {
       const sel = picked.get(q.position);
       const selectedIndex = sel !== undefined && sel < q.choices.length ? sel : null;
-      return { q, selectedIndex, correct: selectedIndex !== null && selectedIndex === q.correctIndex };
+      return {
+        q,
+        selectedIndex,
+        correct: selectedIndex !== null && selectedIndex === q.correctIndex,
+      };
     });
     for (const g of graded) {
       await tx.sessionClaimQuestion.update({
@@ -618,7 +681,8 @@ export async function claimSession(
       where: { id: s.id, userId, status: 'finished' },
       data: { status: 'claimed' },
     });
-    if (flipped.count === 0) throw new AppError(409, 'SESSION_NOT_CLAIMABLE', 'This session cannot be claimed.');
+    if (flipped.count === 0)
+      throw new AppError(409, 'SESSION_NOT_CLAIMABLE', 'This session cannot be claimed.');
 
     const mods = await getModifiers(tx, userId);
     const before = await tx.playerProgress.findUniqueOrThrow({ where: { userId } });

@@ -40,7 +40,8 @@ export function parseQuestionBank(source: string): unknown[] {
   const sandbox: { window: Record<string, unknown> } = { window: {} };
   vm.runInNewContext(source, sandbox, { timeout: 2000 });
   const bank: unknown = sandbox.window['QUESTION_BANK'];
-  if (!Array.isArray(bank)) throw new Error('questions.js did not define window.QUESTION_BANK as an array');
+  if (!Array.isArray(bank))
+    throw new Error('questions.js did not define window.QUESTION_BANK as an array');
   return JSON.parse(JSON.stringify(bank)) as unknown[];
 }
 
@@ -87,14 +88,25 @@ export function analyzeQuestions(raw: readonly unknown[]): Analysis[] {
   const seenText = new Map<string, string>();
   return raw.map((r, i): Analysis => {
     const q = r as Partial<LegacyQuestion> | null;
-    if (!q || typeof q !== 'object') return { usable: false, flags: [], problem: `entry ${i} is not an object` };
+    if (!q || typeof q !== 'object')
+      return { usable: false, flags: [], problem: `entry ${i} is not an object` };
     const label = typeof q.id === 'string' ? q.id : `entry ${i}`;
-    if (typeof q.id !== 'string' || !q.id) return { usable: false, flags: [], problem: `${label}: missing id` };
-    if (typeof q.text !== 'string' || !q.text.trim()) return { usable: false, flags: [], problem: `${label}: missing text` };
+    if (typeof q.id !== 'string' || !q.id)
+      return { usable: false, flags: [], problem: `${label}: missing id` };
+    if (typeof q.text !== 'string' || !q.text.trim())
+      return { usable: false, flags: [], problem: `${label}: missing text` };
     if (!(SUBJECTS as readonly string[]).includes(q.subject ?? ''))
-      return { usable: false, flags: [], problem: `${label}: unknown subject ${String(q.subject)}` };
+      return {
+        usable: false,
+        flags: [],
+        problem: `${label}: unknown subject ${String(q.subject)}`,
+      };
     if (!(DIFFICULTIES as readonly string[]).includes(q.difficulty ?? ''))
-      return { usable: false, flags: [], problem: `${label}: unknown difficulty ${String(q.difficulty)}` };
+      return {
+        usable: false,
+        flags: [],
+        problem: `${label}: unknown difficulty ${String(q.difficulty)}`,
+      };
     if (!Array.isArray(q.choices) || q.choices.some((c) => typeof c !== 'string'))
       return { usable: false, flags: [], problem: `${label}: choices are not a list of strings` };
     if (typeof q.correctIndex !== 'number' || !Number.isInteger(q.correctIndex))
@@ -102,8 +114,10 @@ export function analyzeQuestions(raw: readonly unknown[]): Analysis[] {
 
     const flags: string[] = [];
     if (q.choices.length !== 3) flags.push(`has ${q.choices.length} choices (expected 3)`);
-    if (q.correctIndex < 0 || q.correctIndex >= q.choices.length) flags.push('correctIndex is out of range');
-    if (new Set(q.choices.map(normalizeText)).size !== q.choices.length) flags.push('duplicate choices');
+    if (q.correctIndex < 0 || q.correctIndex >= q.choices.length)
+      flags.push('correctIndex is out of range');
+    if (new Set(q.choices.map(normalizeText)).size !== q.choices.length)
+      flags.push('duplicate choices');
     if (q.choices.some((c) => !c.trim())) flags.push('empty choice');
     const key = normalizeText(q.text);
     const twin = seenText.get(key);

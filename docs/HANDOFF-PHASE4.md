@@ -5,6 +5,7 @@ tests; everything marked TODO does not exist yet. Phase 3 and the foundation are
 noted under "Changes to Phase 3 files".
 
 ## Fixes for the two errors you hit
+
 1. `db:seed` failed with a missing `src/generated/prisma/client.js`: Prisma 7 does not generate the client
    on its own. `apps/api/package.json` scripts `dev`, `build`, `typecheck`, `db:migrate`, `db:deploy`,
    `db:seed`, `db:studio` now run `prisma generate` first. (You can also run `npx prisma generate` once.)
@@ -13,10 +14,11 @@ noted under "Changes to Phase 3 files".
    `vitest.config.ts` (noEmit, used by the editor and `typecheck`); `tsconfig.build.json` is the emit config
    used by `npm run build -w apps/api` (output still `dist/server.js`). Restart the TS server in VS Code
    (Ctrl+Shift+P, "TypeScript: Restart TS Server") if the red underline stays.
-The first `db:deploy` P1001 ("can't reach database") then success on retry was a transient network/pooler
-hiccup, not a code problem.
+   The first `db:deploy` P1001 ("can't reach database") then success on retry was a transient network/pooler
+   hiccup, not a code problem.
 
 ## DONE
+
 - Schema + migration `20261022120000_phase4_core_modules` (hand-written; drift test passes against local
   PostgreSQL 16): `SessionKind` enum, `StudySession.kind` / `outcomeReason`, `SessionClaimQuestion` now holds
   snapshots (`text`, `choices`, `correctIndex`, nullable `questionId`, new nullable `cardId`), new
@@ -34,6 +36,7 @@ hiccup, not a code problem.
 - Existing suites still pass: shared 57, API 48.
 
 ## TODO (in this order)
+
 1. `services/sessions.ts` + `routes/sessions.ts`: create, start (one running/paused at a time, stale auto-abandon),
    pause, resume, finish (server elapsed time, 80% rule, focus clamp, builds the claim quiz snapshot),
    `GET /sessions/active`, `GET /sessions/:id/claim` (no answers), `POST /sessions/:id/claim` (grade
@@ -70,9 +73,11 @@ hiccup, not a code problem.
    run lint/typecheck/tests/build, and write the final report.
 
 ## Changes to Phase 3 files
+
 `apps/api/package.json` (scripts), `apps/api/tsconfig.json` (+ new `tsconfig.build.json`),
 `apps/api/prisma/schema.prisma` (Phase 4 additions; also re-formatted by `prisma format`),
 `apps/api/src/schema.int.test.ts` (table count 22 to 23), `packages/shared/src/index.ts` and `balance.ts`.
 
 ## Not verified
+
 Nothing in Phase 4 has run against Supabase or a browser. The new migration was only run on local PostgreSQL 16.

@@ -46,7 +46,10 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
       const first = await api.post(`/tasks/${id}/complete`);
       expect(first.body.reward).toMatchObject({ xp: 25, note: 'paid' });
       expect(first.body.progress.totalXp).toBe(25);
-      expect((await api.post(`/tasks/${id}/complete`)).body.reward).toMatchObject({ xp: 0, note: 'already_paid' });
+      expect((await api.post(`/tasks/${id}/complete`)).body.reward).toMatchObject({
+        xp: 0,
+        note: 'already_paid',
+      });
       expect((await api.post(`/tasks/${id}/reopen`)).body.task.status).toBe('open');
       const again = await api.post(`/tasks/${id}/complete`);
       expect(again.body.reward).toMatchObject({ xp: 0, note: 'already_paid' });
@@ -57,10 +60,14 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
     it('concurrent completions pay once', async () => {
       const { id: userId, api } = await player();
       const id = await mk(api, 'race', 'hard');
-      const res = await Promise.all(Array.from({ length: 6 }, () => api.post(`/tasks/${id}/complete`)));
+      const res = await Promise.all(
+        Array.from({ length: 6 }, () => api.post(`/tasks/${id}/complete`)),
+      );
       expect(res.every((r) => r.status === 200)).toBe(true);
       expect(res.filter((r) => r.body.reward.note === 'paid')).toHaveLength(1);
-      expect((await prisma.playerProgress.findUniqueOrThrow({ where: { userId } })).totalXp).toBe(50);
+      expect((await prisma.playerProgress.findUniqueOrThrow({ where: { userId } })).totalXp).toBe(
+        50,
+      );
     });
 
     it(`only ${BALANCE.tasks.dailyRewardedCompletions} completions per UTC day pay (anti-farming); the rest still complete`, async () => {
@@ -70,11 +77,17 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
         const id = await mk(api, `t${i}`, 'easy');
         notes.push((await api.post(`/tasks/${id}/complete`)).body.reward.note);
       }
-      expect(notes.filter((n) => n === 'paid')).toHaveLength(BALANCE.tasks.dailyRewardedCompletions);
+      expect(notes.filter((n) => n === 'paid')).toHaveLength(
+        BALANCE.tasks.dailyRewardedCompletions,
+      );
       expect(notes.slice(-2)).toEqual(['daily_cap_reached', 'daily_cap_reached']);
-      expect((await api.get('/tasks?status=completed')).body.tasks).toHaveLength(BALANCE.tasks.dailyRewardedCompletions + 2);
+      expect((await api.get('/tasks?status=completed')).body.tasks).toHaveLength(
+        BALANCE.tasks.dailyRewardedCompletions + 2,
+      );
       // next UTC day: a task that did not pay can pay now
-      const unpaid = (await api.get('/tasks?status=completed')).body.tasks.find((t: { rewarded: boolean }) => !t.rewarded);
+      const unpaid = (await api.get('/tasks?status=completed')).body.tasks.find(
+        (t: { rewarded: boolean }) => !t.rewarded,
+      );
       now = new Date(now.getTime() + 24 * 3600_000);
       await api.post(`/tasks/${unpaid.id}/reopen`);
       expect((await api.post(`/tasks/${unpaid.id}/complete`)).body.reward.note).toBe('paid');
@@ -128,7 +141,11 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
         'weekly-study-minutes',
         'weekly-win-battles',
       ]);
-      expect(quests.every((q: { progress: number; claimable: boolean }) => q.progress === 0 && !q.claimable)).toBe(true);
+      expect(
+        quests.every(
+          (q: { progress: number; claimable: boolean }) => q.progress === 0 && !q.claimable,
+        ),
+      ).toBe(true);
     });
 
     const finishDailyBattle = async (userId: string) =>
@@ -136,10 +153,14 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
 
     it('cannot claim before it is complete; claims pay once (XP via the ledger, plus energy)', async () => {
       const { id: userId, api } = await player();
-      const q = (await api.get('/quests')).body.quests.find((x: { slug: string }) => x.slug === 'daily-win-battle');
+      const q = (await api.get('/quests')).body.quests.find(
+        (x: { slug: string }) => x.slug === 'daily-win-battle',
+      );
       expect((await api.post(`/quests/${q.id}/claim`)).status).toBe(409);
       await finishDailyBattle(userId);
-      const listed = (await api.get('/quests')).body.quests.find((x: { slug: string }) => x.slug === 'daily-win-battle');
+      const listed = (await api.get('/quests')).body.quests.find(
+        (x: { slug: string }) => x.slug === 'daily-win-battle',
+      );
       expect(listed).toMatchObject({ progress: 1, claimable: true, claimed: false });
       const claim = await api.post(`/quests/${q.id}/claim`);
       expect(claim.body).toMatchObject({ alreadyClaimed: false, xp: 30 });
@@ -153,8 +174,12 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
     it('concurrent claims pay once; the session quest also pays its energy once', async () => {
       const { id: userId, api } = await player();
       await prisma.$transaction((tx) => recordQuestEvent(tx, userId, 'sessions_claimed', 1, now));
-      const q = (await api.get('/quests')).body.quests.find((x: { slug: string }) => x.slug === 'daily-finish-session');
-      const res = await Promise.all(Array.from({ length: 5 }, () => api.post(`/quests/${q.id}/claim`)));
+      const q = (await api.get('/quests')).body.quests.find(
+        (x: { slug: string }) => x.slug === 'daily-finish-session',
+      );
+      const res = await Promise.all(
+        Array.from({ length: 5 }, () => api.post(`/quests/${q.id}/claim`)),
+      );
       expect(res.filter((r) => r.body.alreadyClaimed === false)).toHaveLength(1);
       const p = await prisma.playerProgress.findUniqueOrThrow({ where: { userId } });
       expect(p).toMatchObject({ totalXp: 30, studyEnergy: 1 });
@@ -163,7 +188,9 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
     it('progress never exceeds the target in the display, and cannot be set by the client', async () => {
       const { id: userId, api } = await player();
       for (let i = 0; i < 3; i++) await finishDailyBattle(userId);
-      const q = (await api.get('/quests')).body.quests.find((x: { slug: string }) => x.slug === 'daily-win-battle');
+      const q = (await api.get('/quests')).body.quests.find(
+        (x: { slug: string }) => x.slug === 'daily-win-battle',
+      );
       expect(q.progress).toBe(1);
       expect((await api.patch(`/quests/${q.id}`, { progress: 99 })).status).toBe(404);
     });
@@ -174,10 +201,12 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
       const before = (await api.get('/quests')).body.quests;
       now = new Date(now.getTime() + 24 * 3600_000);
       const after = (await api.get('/quests')).body.quests;
-      const daily = (qs: { slug: string; progress: number }[]) => qs.find((x) => x.slug === 'daily-win-battle');
+      const daily = (qs: { slug: string; progress: number }[]) =>
+        qs.find((x) => x.slug === 'daily-win-battle');
       expect(daily(before)?.progress).toBe(1);
       expect(daily(after)?.progress).toBe(0);
-      const weekly = (qs: { slug: string; progress: number }[]) => qs.find((x) => x.slug === 'weekly-win-battles');
+      const weekly = (qs: { slug: string; progress: number }[]) =>
+        qs.find((x) => x.slug === 'weekly-win-battles');
       // Oct 23 2026 is a Friday and Oct 24 a Saturday: same ISO week, so weekly progress is kept.
       expect(weekly(after)?.progress).toBe(weekly(before)?.progress);
       expect(weekly(after)?.progress).toBe(1);
@@ -187,7 +216,9 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
       const alice = await player();
       const bob = await player();
       await finishDailyBattle(alice.id);
-      const q = (await alice.api.get('/quests')).body.quests.find((x: { slug: string }) => x.slug === 'daily-win-battle');
+      const q = (await alice.api.get('/quests')).body.quests.find(
+        (x: { slug: string }) => x.slug === 'daily-win-battle',
+      );
       expect((await bob.api.post(`/quests/${q.id}/claim`)).status).toBe(404);
     });
   });
@@ -196,8 +227,12 @@ describe.skipIf(!hasTestDb)('tasks and quests (PostgreSQL)', () => {
     const { id: userId, api } = await player();
     const q = await prisma.question.findFirstOrThrow({ where: { legacyId: 'hist-h-007' } });
     expect(q.needsReview).toBe(true);
-    expect((await api.post(`/questions/${q.id}/report`, { reason: 'choices do not answer it' })).status).toBe(201);
-    expect((await api.post(`/questions/${q.id}/report`, { reason: 'still wrong' })).status).toBe(201);
+    expect(
+      (await api.post(`/questions/${q.id}/report`, { reason: 'choices do not answer it' })).status,
+    ).toBe(201);
+    expect((await api.post(`/questions/${q.id}/report`, { reason: 'still wrong' })).status).toBe(
+      201,
+    );
     const rows = await prisma.questionReport.findMany({ where: { userId } });
     expect(rows).toHaveLength(1);
     expect(rows[0]?.reason).toBe('still wrong');

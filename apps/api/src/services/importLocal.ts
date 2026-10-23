@@ -75,7 +75,8 @@ export async function importLocal(
       const earlier = await prisma.importBatch.findUnique({
         where: { userId_payloadHash: { userId, payloadHash: hash } },
       });
-      if (earlier?.report) return { ...(earlier.report as unknown as ImportReportDto), alreadyImported: true };
+      if (earlier?.report)
+        return { ...(earlier.report as unknown as ImportReportDto), alreadyImported: true };
     }
     throw err;
   }
@@ -120,7 +121,15 @@ async function run(
 
   const report: ImportReportDto = {
     alreadyImported: false,
-    imported: { xp: 0, tasks: 0, sessions: 0, flashcards: 0, skills: 0, items: 0, profileFields: [] },
+    imported: {
+      xp: 0,
+      tasks: 0,
+      sessions: 0,
+      flashcards: 0,
+      skills: 0,
+      items: 0,
+      profileFields: [],
+    },
     skipped: [],
     notImported: NOT_IMPORTED,
     notes: [],
@@ -198,7 +207,9 @@ async function run(
         where: { userId, outcomeReason: 'imported' },
         select: { title: true, subject: true, plannedMinutes: true, finishedAt: true },
       })
-    ).map((s) => `${s.title}|${s.subject}|${s.plannedMinutes}|${s.finishedAt?.toISOString() ?? ''}`),
+    ).map(
+      (s) => `${s.title}|${s.subject}|${s.plannedMinutes}|${s.finishedAt?.toISOString() ?? ''}`,
+    ),
   );
   bad = 0;
   dupes = 0;
@@ -246,7 +257,8 @@ async function run(
         (c) => normalizeText(c.question),
       ),
     );
-    let room = BALANCE.flashcards.maxCardsPerUser - (await tx.flashcard.count({ where: { userId } }));
+    let room =
+      BALANCE.flashcards.maxCardsPerUser - (await tx.flashcard.count({ where: { userId } }));
     bad = 0;
     dupes = 0;
     let full = 0;
@@ -303,9 +315,12 @@ async function run(
   );
   if (wanted.size > 0) {
     const have = new Set(
-      (await tx.playerSkill.findMany({ where: { userId }, select: { skill: { select: { slug: true } } } })).map(
-        (p) => p.skill.slug,
-      ),
+      (
+        await tx.playerSkill.findMany({
+          where: { userId },
+          select: { skill: { select: { slug: true } } },
+        })
+      ).map((p) => p.skill.slug),
     );
     let points = (await tx.playerProgress.findUniqueOrThrow({ where: { userId } })).skillPoints;
     let unlocked = 0;
@@ -319,13 +334,20 @@ async function run(
       const row = await tx.skillDefinition.findUnique({ where: { slug: def.slug } });
       if (!row) continue;
       await tx.playerSkill.create({ data: { userId, skillId: row.id } });
-      await tx.playerProgress.update({ where: { userId }, data: { skillPoints: { decrement: def.cost } } });
+      await tx.playerProgress.update({
+        where: { userId },
+        data: { skillPoints: { decrement: def.cost } },
+      });
       points -= def.cost;
       have.add(def.slug);
       unlocked += 1;
     }
     report.imported.skills = unlocked;
-    skip('skills', unaffordable, 'not enough skill points at your recalculated level, or a prerequisite was missing');
+    skip(
+      'skills',
+      unaffordable,
+      'not enough skill points at your recalculated level, or a prerequisite was missing',
+    );
     const unknown = [...wanted].filter((w) => !SKILLS.some((s) => s.slug === w)).length;
     skip('skills', unknown, 'unknown skill');
   }
@@ -357,7 +379,10 @@ async function run(
     await tx.equipment.upsert({
       where: { userId },
       update: slot === 'weapon' ? { weaponItemId: item.id } : { armorItemId: item.id },
-      create: { userId, ...(slot === 'weapon' ? { weaponItemId: item.id } : { armorItemId: item.id }) },
+      create: {
+        userId,
+        ...(slot === 'weapon' ? { weaponItemId: item.id } : { armorItemId: item.id }),
+      },
     });
     report.imported.items += 1;
   }
@@ -365,7 +390,11 @@ async function run(
   /* ---- profile: class, name (only while still the default), preset avatar ---- */
   const profile = await tx.playerProfile.findUniqueOrThrow({ where: { id: userId } });
   const patch: PrismaNs.PlayerProfileUpdateInput = {};
-  if (!profile.playerClass && payload.playerClass && ['warrior', 'tank', 'scholar'].includes(payload.playerClass)) {
+  if (
+    !profile.playerClass &&
+    payload.playerClass &&
+    ['warrior', 'tank', 'scholar'].includes(payload.playerClass)
+  ) {
     patch.playerClass = payload.playerClass as 'warrior' | 'tank' | 'scholar';
     report.imported.profileFields.push('class');
   }
@@ -390,10 +419,14 @@ async function run(
     patch.avatarKey = preset;
     report.imported.profileFields.push('avatar');
   }
-  if (Object.keys(patch).length > 0) await tx.playerProfile.update({ where: { id: userId }, data: patch });
+  if (Object.keys(patch).length > 0)
+    await tx.playerProfile.update({ where: { id: userId }, data: patch });
 
   const archive = payload.raidHistory.slice(0, L.maxRaidHistory);
-  if (archive.length > 0) report.notes.push(`${archive.length} old raid history entries were archived with this import (not shown in the game).`);
+  if (archive.length > 0)
+    report.notes.push(
+      `${archive.length} old raid history entries were archived with this import (not shown in the game).`,
+    );
 
   report.progress = await progressDto();
   await tx.importBatch.create({
@@ -401,7 +434,10 @@ async function run(
       userId,
       payloadHash: hash,
       status: 'completed',
-      report: { ...report, archive: { raidHistory: archive } } as unknown as PrismaNs.InputJsonValue,
+      report: {
+        ...report,
+        archive: { raidHistory: archive },
+      } as unknown as PrismaNs.InputJsonValue,
     },
   });
   return report;

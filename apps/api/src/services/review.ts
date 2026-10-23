@@ -38,12 +38,7 @@ export async function getDueQueue(
     prisma.flashcard.findMany({ where, orderBy: { dueAt: 'asc' }, take: q.limit }),
     prisma.flashcard.count({ where }),
   ]);
-  const quiz = await buildCardQuizItems(
-    prisma,
-    userId,
-    cards,
-    Math.floor(now.getTime() / 60_000),
-  );
+  const quiz = await buildCardQuizItems(prisma, userId, cards, Math.floor(now.getTime() / 60_000));
   const byId = new Map(quiz.map((i) => [i.card.id, i]));
   const items = cards.map((c): ReviewItemDto => {
     const base = {

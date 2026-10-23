@@ -7,9 +7,7 @@ import { QUESTS } from './quests.js';
  * Repeatable and safe to run twice: every row is upserted by its unique slug.
  * Also loads the old question bank (data/questions.js) and the quest definitions.
  */
-export async function runSeed(
-  prisma: PrismaClient,
-): Promise<{
+export async function runSeed(prisma: PrismaClient): Promise<{
   items: number;
   skills: number;
   achievements: number;

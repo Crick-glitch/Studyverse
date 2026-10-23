@@ -75,7 +75,12 @@ export function flashcardsRouter(
     '/decks/:id/cards',
     validate({ params: idParamSchema, body: cardsCreateSchema }),
     asyncHandler(async (req, res) => {
-      const cards = await decks.createCards(prisma, uid(req), id(req), req.valid.body as CardsCreate);
+      const cards = await decks.createCards(
+        prisma,
+        uid(req),
+        id(req),
+        req.valid.body as CardsCreate,
+      );
       res.status(201).json({ cards });
     }),
   );
@@ -83,7 +88,9 @@ export function flashcardsRouter(
     '/cards/:id',
     validate({ params: idParamSchema, body: cardPatchSchema }),
     asyncHandler(async (req, res) => {
-      res.json({ card: await decks.patchCard(prisma, uid(req), id(req), req.valid.body as CardPatch) });
+      res.json({
+        card: await decks.patchCard(prisma, uid(req), id(req), req.valid.body as CardPatch),
+      });
     }),
   );
   r.delete(
@@ -101,14 +108,25 @@ export function flashcardsRouter(
     asyncHandler(async (req, res) => {
       const q = req.valid.query as { deckId?: string; limit: number };
       const now = clock();
-      res.json({ ...(await review.getDueQueue(prisma, uid(req), q, now)), serverNow: now.toISOString() });
+      res.json({
+        ...(await review.getDueQueue(prisma, uid(req), q, now)),
+        serverNow: now.toISOString(),
+      });
     }),
   );
   r.post(
     '/cards/:id/review',
     validate({ params: idParamSchema, body: reviewSubmitSchema }),
     asyncHandler(async (req, res) => {
-      res.json(await review.submitReview(prisma, uid(req), id(req), req.valid.body as ReviewSubmit, clock()));
+      res.json(
+        await review.submitReview(
+          prisma,
+          uid(req),
+          id(req),
+          req.valid.body as ReviewSubmit,
+          clock(),
+        ),
+      );
     }),
   );
 
@@ -131,7 +149,12 @@ export function flashcardsRouter(
       res.json(await csv.importCsv(prisma, uid(req), id(req), text));
     }),
   );
-  const sendCsv = (deckId: string | undefined, includeReview: boolean, req: Express.Request, res: import('express').Response) =>
+  const sendCsv = (
+    deckId: string | undefined,
+    includeReview: boolean,
+    req: Express.Request,
+    res: import('express').Response,
+  ) =>
     csv.exportCsv(prisma, uid(req), deckId, includeReview).then(({ csv: body, filename }) => {
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

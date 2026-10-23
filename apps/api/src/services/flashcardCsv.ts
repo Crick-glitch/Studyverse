@@ -46,9 +46,12 @@ const toPreview = (a: Awaited<ReturnType<typeof analyse>>): CsvPreviewDto => ({
   duplicates: a.duplicates,
   errors: a.parsed.errors,
   fatal: a.parsed.fatal ?? null,
-  sample: a.fresh
-    .slice(0, 10)
-    .map((c) => ({ row: c.row, question: c.question, answer: c.answer, distractors: c.distractors })),
+  sample: a.fresh.slice(0, 10).map((c) => ({
+    row: c.row,
+    question: c.question,
+    answer: c.answer,
+    distractors: c.distractors,
+  })),
 });
 
 export async function previewCsv(
@@ -116,7 +119,11 @@ export async function exportCsv(
   if (deckId) {
     const deck = await prisma.flashcardDeck.findFirst({ where: { id: deckId, userId } });
     if (!deck) throw new AppError(404, 'DECK_NOT_FOUND', 'Deck not found');
-    name = deck.name.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '').slice(0, 40) || 'deck';
+    name =
+      deck.name
+        .replace(/[^\p{L}\p{N}]+/gu, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40) || 'deck';
   }
   const cards = await prisma.flashcard.findMany({
     where: { userId, ...(deckId && { deckId }) },

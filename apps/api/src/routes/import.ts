@@ -8,7 +8,11 @@ import { validate } from '../middleware/validate.js';
 import { importLocal, preflight } from '../services/importLocal.js';
 
 /** Local-data import (03-core-modules section 5). Never automatic: the web app asks the player first. */
-export function importRouter(prisma: PrismaClient, clock: () => Date, limiter: RequestHandler): Router {
+export function importRouter(
+  prisma: PrismaClient,
+  clock: () => Date,
+  limiter: RequestHandler,
+): Router {
   const r = Router();
   r.get(
     '/import/local/preflight',
@@ -21,7 +25,14 @@ export function importRouter(prisma: PrismaClient, clock: () => Date, limiter: R
     limiter,
     validate({ body: importRequestSchema }),
     asyncHandler(async (req, res) => {
-      res.json({ report: await importLocal(prisma, currentUser(req).id, req.valid.body as ImportRequest, clock()) });
+      res.json({
+        report: await importLocal(
+          prisma,
+          currentUser(req).id,
+          req.valid.body as ImportRequest,
+          clock(),
+        ),
+      });
     }),
   );
   return r;

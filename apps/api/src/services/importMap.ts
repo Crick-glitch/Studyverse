@@ -132,7 +132,8 @@ export function mapCard(raw: unknown): MappedCard | { error: string } {
 /** Old skill ids use underscores (power_strike); new slugs use hyphens. */
 export const legacySkillSlug = (id: string): string => id.trim().toLowerCase().replace(/_/g, '-');
 
-export const normalizedName = (v: string): string => normalizeText(v.replace(/[\u2018\u2019]/g, "'"));
+export const normalizedName = (v: string): string =>
+  normalizeText(v.replace(/[\u2018\u2019]/g, "'"));
 
 export const isBankSubject = (s: string): boolean =>
   (SUBJECTS as readonly string[]).includes(bankSubject(s));

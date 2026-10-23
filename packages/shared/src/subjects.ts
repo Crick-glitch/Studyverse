@@ -48,8 +48,8 @@ export const cleanTextSchema = (min: number, max: number, label: string) =>
         .string()
         .min(min, `${label} is required`)
         .max(max, `${label} is too long (max ${max})`)
-        // eslint-disable-next-line no-control-regex
         .refine(
+          // eslint-disable-next-line no-control-regex
           (v) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(v),
           `${label} contains invalid characters`,
         ),

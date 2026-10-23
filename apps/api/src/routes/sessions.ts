@@ -38,7 +38,10 @@ export function sessionsRouter(prisma: PrismaClient, clock: () => Date): Router 
     '/sessions/active',
     asyncHandler(async (req, res) => {
       const now = clock();
-      res.json({ session: await sessions.getActiveSession(prisma, uid(req), now), serverNow: now.toISOString() });
+      res.json({
+        session: await sessions.getActiveSession(prisma, uid(req), now),
+        serverNow: now.toISOString(),
+      });
     }),
   );
 
@@ -46,7 +49,12 @@ export function sessionsRouter(prisma: PrismaClient, clock: () => Date): Router 
     '/sessions',
     validate({ body: sessionCreateSchema }),
     asyncHandler(async (req, res) => {
-      const session = await sessions.createSession(prisma, uid(req), req.valid.body as SessionCreate, clock());
+      const session = await sessions.createSession(
+        prisma,
+        uid(req),
+        req.valid.body as SessionCreate,
+        clock(),
+      );
       res.status(201).json({ session });
     }),
   );
@@ -117,7 +125,13 @@ export function sessionsRouter(prisma: PrismaClient, clock: () => Date): Router 
     validate({ params: idParamSchema, body: sessionClaimSchema }),
     asyncHandler(async (req, res) => {
       res.json(
-        await sessions.claimSession(prisma, uid(req), id(req), req.valid.body as SessionClaim, clock()),
+        await sessions.claimSession(
+          prisma,
+          uid(req),
+          id(req),
+          req.valid.body as SessionClaim,
+          clock(),
+        ),
       );
     }),
   );

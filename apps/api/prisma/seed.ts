@@ -11,7 +11,9 @@ const prisma = createPrisma(url);
 runSeed(prisma)
   .then(({ questions, ...counts }) => {
     console.log('Seed complete:', { ...counts, questionsStored: questions.stored });
-    console.log(`Question bank: ${questions.stored} of ${questions.sourceCount} stored, ${questions.flagged} flagged needsReview.`);
+    console.log(
+      `Question bank: ${questions.stored} of ${questions.sourceCount} stored, ${questions.flagged} flagged needsReview.`,
+    );
     for (const s of questions.skipped) console.warn(`  skipped: ${s.reason}`);
   })
   .catch((err) => {

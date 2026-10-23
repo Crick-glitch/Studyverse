@@ -33,7 +33,12 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
   type Api = Awaited<ReturnType<typeof player>>['api'];
 
   async function newSession(api: Api, minutes = 10, difficulty = 'medium', subject = 'Math') {
-    const res = await api.post('/sessions', { title: 'Calc', subject, difficulty, plannedMinutes: minutes });
+    const res = await api.post('/sessions', {
+      title: 'Calc',
+      subject,
+      difficulty,
+      plannedMinutes: minutes,
+    });
     expect(res.status).toBe(201);
     return res.body.session.id as string;
   }
@@ -44,9 +49,15 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
   }
   /** The test reads the answers from the DB; the browser never can before submitting. */
   async function answerKey(sessionId: string) {
-    return prisma.sessionClaimQuestion.findMany({ where: { sessionId }, orderBy: { position: 'asc' } });
+    return prisma.sessionClaimQuestion.findMany({
+      where: { sessionId },
+      orderBy: { position: 'asc' },
+    });
   }
-  const answers = (key: { position: number; correctIndex: number; choices: string[] }[], right: number) =>
+  const answers = (
+    key: { position: number; correctIndex: number; choices: string[] }[],
+    right: number,
+  ) =>
     key.map((q, i) => ({
       position: q.position,
       selectedIndex: i < right ? q.correctIndex : (q.correctIndex + 1) % q.choices.length,
@@ -71,7 +82,9 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
     expect(res.body.progress.totalXp).toBe(res.body.xpAwarded);
     expect(res.body.progress.studyEnergy).toBe(1);
     expect(res.body.progress.streak).toBe(1);
-    const ledger = await prisma.xpTransaction.findMany({ where: { userId, sourceType: 'session' } });
+    const ledger = await prisma.xpTransaction.findMany({
+      where: { userId, sourceType: 'session' },
+    });
     expect(ledger).toHaveLength(1);
     expect(ledger[0]?.sourceId).toBe(id);
   });
@@ -81,7 +94,11 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
     const id = await newSession(api, 10);
     const fin = await runToFinish(api, id, 7); // 70%
     expect(fin.body).toMatchObject({ claimable: false, ineligibleReason: 'not_enough_time' });
-    expect(fin.body.session).toMatchObject({ status: 'abandoned', outcomeReason: 'not_enough_time', xpAwarded: 0 });
+    expect(fin.body.session).toMatchObject({
+      status: 'abandoned',
+      outcomeReason: 'not_enough_time',
+      xpAwarded: 0,
+    });
     expect((await api.post(`/sessions/${id}/claim`, { answers: [] })).status).toBe(409);
     expect(await prisma.xpTransaction.count({ where: { userId } })).toBe(0);
   });
@@ -148,7 +165,9 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
   it('focus is advisory but clamped: below 0.5 pays nothing, 0.5-0.8 pays 75%, above 1 is clamped', async () => {
     const low = await player();
     const lowId = await newSession(low.api);
-    expect((await runToFinish(low.api, lowId, 10, 0.3)).body.ineligibleReason).toBe('not_enough_focus');
+    expect((await runToFinish(low.api, lowId, 10, 0.3)).body.ineligibleReason).toBe(
+      'not_enough_focus',
+    );
 
     const mid = await player();
     const midId = await newSession(mid.api);
@@ -213,7 +232,9 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
     await runToFinish(api, id, 10);
     const key = await answerKey(id);
     const body = { answers: answers(key, 5) };
-    const results = await Promise.all(Array.from({ length: 6 }, () => api.post(`/sessions/${id}/claim`, body)));
+    const results = await Promise.all(
+      Array.from({ length: 6 }, () => api.post(`/sessions/${id}/claim`, body)),
+    );
     expect(results.every((r) => r.status === 200)).toBe(true);
     expect(results.filter((r) => r.body.alreadyClaimed === false)).toHaveLength(1);
     expect(await prisma.xpTransaction.count({ where: { userId, sourceType: 'session' } })).toBe(1);
@@ -229,7 +250,12 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
     const quiz = await api.get(`/sessions/${id}/claim`);
     expect(quiz.status).toBe(200);
     expect(quiz.body.questions).toHaveLength(5);
-    const everything = JSON.stringify([fin.body, quiz.body, (await api.get(`/sessions/${id}`)).body, (await api.get('/sessions/active')).body]);
+    const everything = JSON.stringify([
+      fin.body,
+      quiz.body,
+      (await api.get(`/sessions/${id}`)).body,
+      (await api.get('/sessions/active')).body,
+    ]);
     expect(everything).not.toMatch(/correctIndex|correct"|explanation|selectedIndex/);
     for (const q of quiz.body.questions) {
       expect(Object.keys(q).sort()).toEqual(['choices', 'position', 'text']);
@@ -269,7 +295,11 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
       ['post', `/sessions/${id}/abandon`],
       ['delete', `/sessions/${id}`],
     ] as const) {
-      const res = await (m === 'get' ? bob.api.get(p) : m === 'delete' ? bob.api.del(p) : bob.api.post(p, {}));
+      const res = await (m === 'get'
+        ? bob.api.get(p)
+        : m === 'delete'
+          ? bob.api.del(p)
+          : bob.api.post(p, {}));
       expect(res.status, `${m} ${p}`).toBe(404);
     }
     const claim = await bob.api.post(`/sessions/${id}/claim`, { answers: [] });
@@ -295,7 +325,10 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
   it('starting twice (double click) is harmless', async () => {
     const { api } = await player();
     const id = await newSession(api);
-    const [x, y] = await Promise.all([api.post(`/sessions/${id}/start`), api.post(`/sessions/${id}/start`)]);
+    const [x, y] = await Promise.all([
+      api.post(`/sessions/${id}/start`),
+      api.post(`/sessions/${id}/start`),
+    ]);
     expect([x.status, y.status]).toEqual([200, 200]);
     expect(x.body.session.startedAt).toBe(y.body.session.startedAt);
   });
@@ -306,7 +339,12 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
     await api.post(`/sessions/${id}/start`);
     advance(10 * MIN);
     const active = await api.get('/sessions/active');
-    expect(active.body.session).toMatchObject({ id, status: 'running', elapsedSec: 600, remainingSec: 900 });
+    expect(active.body.session).toMatchObject({
+      id,
+      status: 'running',
+      elapsedSec: 600,
+      remainingSec: 900,
+    });
     expect(active.body.serverNow).toBe(now.toISOString());
     // finished-but-unclaimed sessions are offered too, so a refresh during the quiz does not lose it
     advance(15 * MIN);
@@ -344,10 +382,17 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
   it('validates the plan: only 10/25/50 minutes, known subjects', async () => {
     const { api } = await player();
     expect((await api.post('/sessions', { plannedMinutes: 7 })).status).toBe(400);
-    expect((await api.post('/sessions', { plannedMinutes: 10, subject: 'Astrology' })).status).toBe(400);
+    expect((await api.post('/sessions', { plannedMinutes: 10, subject: 'Astrology' })).status).toBe(
+      400,
+    );
     expect((await api.post('/sessions', { plannedMinutes: 10, userId: 'x' })).status).toBe(400);
     const ok = await api.post('/sessions', { plannedMinutes: 25 });
-    expect(ok.body.session).toMatchObject({ title: 'Study session', subject: 'Other', difficulty: 'medium', plannedMinutes: 25 });
+    expect(ok.body.session).toMatchObject({
+      title: 'Study session',
+      subject: 'Other',
+      difficulty: 'medium',
+      plannedMinutes: 25,
+    });
   });
 
   it('a claimed session advances the daily and weekly quests it counts for', async () => {
@@ -380,12 +425,30 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
 
   describe('review sessions from due flashcards', () => {
     async function seedCards(userId: string, n: number) {
-      const deck = await prisma.flashcardDeck.create({ data: { userId, name: 'Capitals', subject: 'Other' } });
+      const deck = await prisma.flashcardDeck.create({
+        data: { userId, name: 'Capitals', subject: 'Other' },
+      });
       const cities = ['Paris', 'Rome', 'Madrid', 'Lisbon', 'Berlin', 'Vienna', 'Oslo', 'Prague'];
-      const countries = ['France', 'Italy', 'Spain', 'Portugal', 'Germany', 'Austria', 'Norway', 'Czechia'];
+      const countries = [
+        'France',
+        'Italy',
+        'Spain',
+        'Portugal',
+        'Germany',
+        'Austria',
+        'Norway',
+        'Czechia',
+      ];
       for (let i = 0; i < n; i++)
         await prisma.flashcard.create({
-          data: { deckId: deck.id, userId, question: `Capital of ${countries[i]}?`, answer: cities[i] as string, subject: 'Other', dueAt: new Date(now.getTime() - 1000) },
+          data: {
+            deckId: deck.id,
+            userId,
+            question: `Capital of ${countries[i]}?`,
+            answer: cities[i] as string,
+            subject: 'Other',
+            dueAt: new Date(now.getTime() - 1000),
+          },
         });
       return deck;
     }
@@ -403,7 +466,12 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
       const created = await api.post('/sessions/review', { startNow: true });
       expect(created.status).toBe(201);
       const s = created.body.session;
-      expect(s).toMatchObject({ kind: 'review', status: 'running', subject: 'Flashcards', plannedMinutes: 5 });
+      expect(s).toMatchObject({
+        kind: 'review',
+        status: 'running',
+        subject: 'Flashcards',
+        plannedMinutes: 5,
+      });
 
       const rows = await answerKey(s.id);
       expect(rows).toHaveLength(5);
@@ -425,7 +493,9 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
       const cardIds = rows.map((r) => r.cardId as string);
       const cards = await prisma.flashcard.findMany({ where: { id: { in: cardIds } } });
       expect(cards.every((c) => c.dueAt.getTime() > now.getTime())).toBe(true);
-      const q = await prisma.playerQuest.findFirst({ where: { userId, quest: { slug: 'daily-review-cards' } } });
+      const q = await prisma.playerQuest.findFirst({
+        where: { userId, quest: { slug: 'daily-review-cards' } },
+      });
       expect(q?.progress).toBe(5);
 
       // claiming again does not schedule the cards a second time
@@ -445,10 +515,20 @@ describe.skipIf(!hasTestDb)('study sessions (PostgreSQL, injected clock)', () =>
 
     it('cards that cannot form 3 plausible choices are skipped and the quiz is topped up from the bank', async () => {
       const { id: userId, api } = await player();
-      const deck = await prisma.flashcardDeck.create({ data: { userId, name: 'Tiny', subject: 'Math' } });
+      const deck = await prisma.flashcardDeck.create({
+        data: { userId, name: 'Tiny', subject: 'Math' },
+      });
       // Only ONE card in the whole account: it has no wrong answers to borrow, so it cannot be a quiz item.
       await prisma.flashcard.create({
-        data: { deckId: deck.id, userId, question: 'Lonely?', answer: 'yes', subject: 'Math', distractors: ['N/A', ''], dueAt: new Date(now.getTime() - 1000) },
+        data: {
+          deckId: deck.id,
+          userId,
+          question: 'Lonely?',
+          answer: 'yes',
+          subject: 'Math',
+          distractors: ['N/A', ''],
+          dueAt: new Date(now.getTime() - 1000),
+        },
       });
       const res = await api.post('/sessions/review', {});
       expect(res.status).toBe(201);

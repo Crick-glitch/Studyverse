@@ -22,21 +22,31 @@ export function tasksRouter(prisma: PrismaClient, clock: () => Date): Router {
     '/tasks',
     validate({ query: taskListQuerySchema }),
     asyncHandler(async (req, res) => {
-      res.json({ tasks: await tasks.listTasks(prisma, uid(req), req.valid.query as Parameters<typeof tasks.listTasks>[2]) });
+      res.json({
+        tasks: await tasks.listTasks(
+          prisma,
+          uid(req),
+          req.valid.query as Parameters<typeof tasks.listTasks>[2],
+        ),
+      });
     }),
   );
   r.post(
     '/tasks',
     validate({ body: taskCreateSchema }),
     asyncHandler(async (req, res) => {
-      res.status(201).json({ task: await tasks.createTask(prisma, uid(req), req.valid.body as TaskCreate) });
+      res
+        .status(201)
+        .json({ task: await tasks.createTask(prisma, uid(req), req.valid.body as TaskCreate) });
     }),
   );
   r.patch(
     '/tasks/:id',
     validate({ params: idParamSchema, body: taskPatchSchema }),
     asyncHandler(async (req, res) => {
-      res.json({ task: await tasks.updateTask(prisma, uid(req), id(req), req.valid.body as TaskPatch) });
+      res.json({
+        task: await tasks.updateTask(prisma, uid(req), id(req), req.valid.body as TaskPatch),
+      });
     }),
   );
   r.delete(
