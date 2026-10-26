@@ -47,3 +47,89 @@
 36. **Outcome screens live in page state.** After finishing or claiming, the result is held by the page so the refetch that clears the "active session" cannot wipe it before the player has read it.
 37. **Explanations are never invented.** `npm run explanations:draft` writes `docs/explanations-review.json` with empty `explanation` and `approved:false`; `npm run explanations:apply` stores only approved, non-empty entries and only the `explanation` column. The owner (or an AI assistant whose text the owner reviews) fills the file.
 38. **No new web dependencies in Phase 4.** Dialog, Tabs and the state views are small shared components in `apps/web/src/ui`; charts are not needed yet.
+
+## Phase 5 (art)
+- **All baseline art is original and procedural.** Why: the sandbox could not download from kenney.nl / opengameart.org / itch.io, and the CC0 packs found are 16x16 scale, which would clash with 48-96 px sprites. Alternative: vendor a pack later via manifest `image`/`sheet` entries (the components already support them and refuse non-local `src`).
+- **32-colour palette** = the 9 design tokens + lighter/darker steps (`features/art/palette.ts`). The 23 extra steps were added to `styles/tokens.css` (additive; nothing existing changed) and `palette.test.ts` fails if the two ever disagree.
+- **Material canvas + bake step.** Sprites are drawn with materials (skin, steel, teal...) and baked into palette-indexed grids with top-left shading and a 1px outline; flash (hit) and gray (defeat) are bake options. Why: one shading language for ~150 sprites and cheap state variants. Alternative: hand-typed grids per sprite (too slow, inconsistent).
+- **Heroes are layered** (`shadow, back, body, armor, weapon`); armour and weapon layers are replaceable per item slug so equipment visibly changes the hero. `hit` is a recoil pose; the white flash is a separate `flash` option.
+- **Enemies share one composer** (`sprites/enemy-kit.ts`): each enemy is one drawing function; `idle/attack/hit/defeat` (+ `phase2` for bosses) come from a pose object plus a lunge/recoil shift. Phase 2 is a material remap plus extra details (cracks, wisps, spikes), so it is cheap and always matches the idle silhouette. Defeat is `topple` (rotate), `melt` (ghosts squash to a puddle) or `collapse` (the wyrm sags).
+- **Lunge and recoil are clamped by the kit** so the outline can never reach the canvas edge. Why: the first pass clipped tails, scarves and weapons on `attack`/`hit`; hand-trimming each sprite is fragile. A test now checks every enemy, state and flash variant for edge contact. Consequence: some `attack` shifts are only 1-2 px; larger lunges are the battle screen's job (Anime.js moves the whole sprite).
+- **Silhouette test uses Jaccard distance >= 0.2** between idle outlines (feet row and above). A recolour scores 0 and two creatures on one template score under 0.1; the closest real pair today (Bloom Brute / Mimic Tome, both wide) is 0.27. It is a crude shape check, not a judgement of quality.
+- **Item icons and rarity frames are separate manifest entries.** `ItemIcon` stacks `frame.<rarity>` (36 px) and the icon (32 px, 2 px inset). Why: a manifest entry must have one size, and either piece can then be re-drawn or replaced by a vendored pack independently. (An earlier "tile" state broke that rule; the manifest test caught it.)
+- **Backgrounds are flat colour bands**, no outline or edge shading, three layers (far/mid/near) per scene so the battle screen can offset layers by whole pixels. Floor line is y=128 and the centre stays clear. Fixed scenes are 320x180, shown at integer scale; a narrower parent crops the edges instead of scaling by a fraction.
+- **Effects are flat, outline-free frame sheets** (slash 4, impact 4, spark 4, heal 5, shield 4, guard-shatter 5, victory 5, level-up 6). Reduced motion holds one frame.
+- **Manifest** (`features/art/manifest.ts`): `{ kind: 'grid' | 'sheet' | 'svg' | 'image', size, scale, anchor, license, source, ... }`. Gameplay and UI code only know keys (`hero.warrior`, `monster.gearwork-golem`, `weapon.quillblade`, `dungeon.archive`, `effect.slash`, `ui.flame.2`). Components accept an optional `manifest` prop so tests and tools can supply their own.
+- **Sprite never throws on bad input**: unknown key, unknown state, or a non-local `src` renders an obviously unfinished labelled placeholder (never an emoji).
+- **Integer scale is enforced in code**, not just by convention: `integerScale()` rounds and, in development, warns.
+- **Legacy emoji avatars** (student, wizard, elf, scientist, teacher, shield) map to the six pixel busts through `LEGACY_AVATAR_EMOJI`, written with `\u` escapes so no emoji character exists in source. Phase 4's local-data import can use it.
+- **Display font:** Pixelify Sans (OFL) via `@fontsource`, latin 400/600/700, imported only by the UI kit. Body font stays Lato. `--font-pixel` and `--pixel` (3px) are tokens.
+- **UI kit borders are stepped box-shadows** (notched corners) and sizes are multiples of `--pixel`, so edges land on whole pixels with no image assets. Bars are fixed-size blocks, not percentage widths, for the same reason. Locked skill nodes stay focusable (`aria-disabled`) so their effect text can be read.
+- **`/dev/art` is development-only.** The lazy import sits inside a function only called when `import.meta.env.DEV` is true; the production build was checked and contains no DevArtPage chunk.
+- **No-emoji test scope:** scans all non-test source under `apps/web/src` with `node:fs` (Vite's `?raw` returns nothing for `.css` under Vitest). Arrows (U+2190-21FF) are allowed; emoji, dingbats, misc symbols and geometric shapes are not. The only non-ASCII symbol in the app today is the arrow in `CsvPanel.tsx`.
+
+## Art quality pass (after Phase 5)
+
+- **Frames are an index within a state, not new states.** `enemyStates()` is asserted to be exactly idle/attack/hit/defeat, and
+  the manifest/DevArt consumers iterate states. Heroes and enemies take `frame` (idle 0-1, attack 0-2 = wind-up, impact,
+  recovery). Alternative rejected: `attack-windup` etc. as states (breaks the enemy test and every state loop).
+- **The still frame of `attack` is the impact.** Thumbnails, contact sheets, tests and reduced motion all show the strike
+  (`STILL_FRAME` in `sprites/frames.ts`). Playback order is still wind-up, impact, recovery.
+- **Heroes: new `face` and `offhand` layers.** `face` is a flat, outline-free decal so eyes/brows/mouth/glasses never disturb the
+  skin shading (the shader rims every pixel next to a different material, which speckled faces). `offhand` carries the Tank's
+  shield and the Scholar's book. Weapon and armour stay replaceable layers keyed by item slug.
+- **Class default gear** (`CLASS_GEAR`): Warrior iron sword + leather armour, Tank iron sword + iron plate, Scholar scribe's staff
+  + scholar's robe. Only used when no equipment is given; equipment still overrides.
+- **Heroes stand 2 px right of the pose table origin** (`HERO_X0`; manifest anchor x 24 -> 26) so capes, bedrolls and recoil
+  have room on the left. A weapon shrinks its reach until its whole drawing, widths included, fits the canvas.
+- **No new palette colours.** Added flat skin tones (`fSkin7/5/3`) to MATERIALS using existing swatches; palette stays at 32.
+- **Optional `rim` form shading** on `Canvas.bake` / `EnemyDef.rim`, used only on the Shadow Assassin, Inkwraith and Hollow Mage
+  (near-black or flat silhouettes). Tried on the Dragon Hatchling: it looked speckled, so it was reverted.
+- **Enemy frames are generic first**: idle 2 = upper body settles 1 px (2 px for bosses) with the feet planted; attack =
+  coil back + squash, lunge, halfway return. Draw functions can opt in via `pose.wind` / `pose.idle2` (none do yet).
+- **Unverified here:** Pixelify Sans (font files unavailable in the sandbox), real vitest/jsdom runs, eslint, `vite build`.
+
+## Phase 5b (restyle and navigation)
+
+- **One pixel look, reached by CSS composition.** `ui/common.module.css` keeps every class name the screens already use and now
+  `composes` recipes from `features/art/kit/kit.module.css` (panel, button variants, input, entry, scroll, chip, alert,
+  skeleton, rule). Why: ~55 buttons and ~17 panels across screens would otherwise be rewritten by hand (some panels are
+  `<form>`/`<fieldset>`, which `PixelPanel` cannot be), with more risk to the existing tests for no visible gain. Markup,
+  labels and ARIA roles did not change: all 282 earlier tests pass untouched. New structure (sidebar, HUD, login, page
+  headers, bars) uses the kit components directly. Alternative: convert every JSX site to `PixelButton`/`PixelPanel`.
+- **Sidebar and drawer.** Desktop: sticky left sidebar, collapsible to icons. The saved choice (`localStorage` key
+  `studyverse.sidebar-collapsed`, read and written inside try/catch) wins; with no choice it starts icons-only at 1100px
+  and below. At 640px and below it becomes a slide-in drawer opened from the HUD. Why 640 and not 768: the spec wants a
+  drawer on phones and an icons-only sidebar on tablets, so a tablet keeps a permanent nav. The three widths stay in step
+  in `layouts/useSidebar.ts` and the three `layouts/*.module.css` files (comments say so).
+- **Drawer accessibility.** `ui/useFocusTrap.ts` (Tab/Shift+Tab cycle, Escape) is a second copy of what `Dialog` does inline;
+  `Dialog` was left alone. While the drawer is open the page column is `inert`; closing returns focus to the menu button, and
+  following a link moves focus to `<main>` (a skip link also exists). Link text stays in the DOM when only icons show
+  (visually hidden + `title`), so accessible names never change.
+- **HUD.** Everything comes from `GET /me` (name, level, `currentLevelXp / xpForNextLevel`, energy, streak). Energy is an icon
+  plus the real count, not "pips": energy has no cap in `balance.ts`, so a fixed number of pips would misstate it. The two
+  small numbers (energy, streak) use the body font because the pixel font's small "5" reads as "S"; big readouts (the
+  session timer) keep the pixel font, where digits are clear.
+- **XP crest.** The level number moved from the middle of the shield to a small plate at its lower right. The crest art has a
+  star in the middle, which hid the number (found by looking at a rendered screenshot, not by a test).
+- **Typography.** Headings and HUD use Pixelify Sans via `--font-pixel`; `--font-display` is now an alias of it. Cinzel is no
+  longer imported (the dependency is still in `package.json`; remove it in session 08 cleanup). Paragraphs, inputs, quiz and
+  card text stay on Lato.
+- **Native controls.** `<progress>` became `PixelBar` (same `progressbar` role and name). Checkboxes are sunken parchment
+  squares with a gold block when ticked; radios are a pixel circle so they never look like checkboxes. The select arrow and the
+  radio art are inline SVG data URIs, whose colours must be literal hex (CSS variables cannot reach a data URI); each is
+  commented with the token it matches.
+- **Fieldset legends** are laid out as a normal first line (`float` trick in `global.css`) because the kit draws frames
+  outside the box and a default legend straddled the frame line.
+- **Login** is a title screen: the existing camp scene (`scene.camp`) at the smallest whole scale that covers the window
+  (2 to 6), a parchment card on top. Still one `<h1>Log in</h1>`, same labels, same alert behaviour.
+- **Contrast.** Computed from `tokens.css`, not assumed. Lowest pairing used is gold-500 on forest-700 at 5.2:1; everything else
+  is 6.4:1 or higher (all AA for body text).
+- **Screenshot tool.** `npm run shots -w apps/web` starts Vite against a mocked API and Supabase session
+  (`scripts/mock-api.mjs`, made-up data, dev only) and screenshots every route at 390 / 768 / 1280, then checks each for
+  horizontal overflow, console errors and tap targets under 40px. It needs a Chromium Playwright can launch
+  (`npx playwright install chromium`, or `PW_CHROMIUM_PATH`). Output is in `docs/screens/`. ESLint gets a block for these
+  `.mjs` files (Node + browser globals, because `page.evaluate` callbacks run in the page).
+- **Verified here (earlier notes said these could not run):** `npm install`, `build:shared`, ESLint, `tsc`, real Vitest with
+  jsdom (including `Sprite.frames.test.tsx`), `vite build`, and Chromium rendering. Still not run: the API workspace tests
+  (they need `prisma generate`, and nothing in the API changed).

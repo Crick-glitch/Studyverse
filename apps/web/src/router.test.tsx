@@ -135,6 +135,13 @@ describe('authentication guard', () => {
   });
 });
 
+describe('development art review route', () => {
+  it('is reachable without signing in and shows the manifest', async () => {
+    renderAt('/dev/art', 'signedOut');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Art review' }, { timeout: 15000 })).toBeTruthy();
+  }, 20000);
+});
+
 describe('login screen', () => {
   it('shows a clear message when Supabase is not configured', () => {
     renderAt('/login', 'signedOut');

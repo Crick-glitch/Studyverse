@@ -1,4 +1,8 @@
-/* Shared building blocks for feature screens. Colours come from tokens.css only. */
+/*
+ * Shared building blocks for feature screens (05b). Every look here is composed from the pixel kit
+ * (features/art/kit/kit.module.css), so there is one pixel style in the app and screens keep their markup.
+ * Colours come from tokens.css only.
+ */
 .page {
   display: grid;
   gap: var(--space-4);
@@ -6,18 +10,35 @@
 .pageTitle {
   margin: 0;
 }
+.pageHeader {
+  display: grid;
+  gap: var(--space-2);
+}
+.pageHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.rule {
+  composes: rule from '../features/art/kit/kit.module.css';
+}
+
 .panel {
-  padding: var(--space-4);
-  background: var(--forest-700);
-  border: var(--border);
-  border-radius: var(--radius);
+  composes: panel from '../features/art/kit/kit.module.css';
+  --panel-pad: var(--space-4);
 }
 .panel > h2,
 .panel > h3 {
   margin-top: 0;
 }
+@media (max-width: 480px) {
+  .panel {
+    --panel-pad: var(--space-3);
+  }
+}
 .stack {
   display: grid;
+  align-content: start; /* a stretched panel keeps its rows together instead of spreading them */
   gap: var(--space-3);
 }
 .row {
@@ -47,80 +68,35 @@
   font-weight: 700;
   color: var(--parchment-100);
 }
-.input,
-.select,
-.textarea {
-  width: 100%;
-  min-height: 2.5rem;
-  padding: var(--space-2) var(--space-3);
-  font: inherit;
-  color: var(--charcoal-800);
-  background: var(--parchment-100);
-  border: 2px solid var(--parchment-300);
-  border-radius: var(--radius);
+
+.input {
+  composes: input from '../features/art/kit/kit.module.css';
+}
+.select {
+  composes: input select from '../features/art/kit/kit.module.css';
 }
 .textarea {
-  min-height: 5rem;
-  resize: vertical;
+  composes: input textarea from '../features/art/kit/kit.module.css';
 }
+
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 2.5rem;
-  padding: var(--space-2) var(--space-3);
-  font: inherit;
-  font-weight: 700;
-  color: var(--parchment-100);
-  background: var(--charcoal-800);
-  border: 2px solid var(--parchment-300);
-  border-radius: var(--radius);
-  cursor: pointer;
-}
-.btn:hover:not(:disabled) {
-  border-color: var(--gold-500);
-  color: var(--gold-500);
-}
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+  composes: button from '../features/art/kit/kit.module.css';
 }
 .primary {
-  color: var(--charcoal-800);
-  background: var(--gold-500);
-  border-color: var(--gold-500);
-}
-.primary:hover:not(:disabled) {
-  color: var(--charcoal-800);
-  background: var(--parchment-100);
+  composes: primary from '../features/art/kit/kit.module.css';
 }
 .danger {
-  border-color: var(--ember-500);
-}
-.danger:hover:not(:disabled) {
-  color: var(--parchment-100);
-  background: var(--ember-500);
-  border-color: var(--ember-500);
+  composes: danger from '../features/art/kit/kit.module.css';
 }
 .small {
-  min-height: 2rem;
-  padding: var(--space-1) var(--space-2);
-  font-size: 0.9rem;
+  composes: small from '../features/art/kit/kit.module.css';
 }
+
 .error {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  color: var(--parchment-100);
-  background: var(--charcoal-800);
-  border-left: 6px solid var(--ember-500);
+  composes: alert alertError from '../features/art/kit/kit.module.css';
 }
 .notice {
-  margin: 0;
-  padding: var(--space-2) var(--space-3);
-  color: var(--parchment-100);
-  background: var(--charcoal-800);
-  border-left: 6px solid var(--moss-500);
+  composes: alert alertNotice from '../features/art/kit/kit.module.css';
 }
 .muted {
   color: var(--parchment-300);
@@ -134,15 +110,12 @@
   list-style: none;
 }
 .item {
+  composes: entry from '../features/art/kit/kit.module.css';
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2) var(--space-3);
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3);
-  background: var(--charcoal-800);
-  border: 1px solid var(--parchment-300);
-  border-radius: var(--radius);
 }
 .itemMain {
   display: grid;
@@ -151,36 +124,22 @@
   flex: 1 1 14rem;
   overflow-wrap: anywhere;
 }
+/* Quest scrolls: parchment rows with dark ink. Add next to .item. */
+.scroll {
+  composes: scroll from '../features/art/kit/kit.module.css';
+}
+.scroll .muted {
+  color: var(--scroll-muted);
+}
+.scroll .reward {
+  color: var(--scroll-accent);
+}
 .badge {
-  display: inline-block;
-  padding: 0 var(--space-2);
-  color: var(--parchment-100);
-  border: 1px solid var(--teal-500);
-  border-radius: var(--radius);
-  font-size: 0.85rem;
-  font-weight: 700;
+  composes: chip from '../features/art/kit/kit.module.css';
 }
 .reward {
   color: var(--gold-500);
   font-weight: 700;
-}
-.bar {
-  width: 100%;
-  height: 0.9rem;
-  appearance: none;
-  border: 1px solid var(--parchment-300);
-  border-radius: var(--radius);
-  background: var(--charcoal-800);
-  overflow: hidden;
-}
-.bar::-webkit-progress-bar {
-  background: var(--charcoal-800);
-}
-.bar::-webkit-progress-value {
-  background: var(--gold-500);
-}
-.bar::-moz-progress-bar {
-  background: var(--gold-500);
 }
 .srOnly {
   position: absolute;
@@ -195,19 +154,36 @@
   gap: var(--space-2);
 }
 .skeletonLine {
-  height: 1.2rem;
-  border-radius: var(--radius);
-  background: linear-gradient(90deg, var(--charcoal-800), var(--forest-700), var(--charcoal-800));
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+  composes: skeletonLine from '../features/art/kit/kit.module.css';
 }
-@keyframes shimmer {
-  to {
-    background-position: -200% 0;
-  }
+/* Pixel-font numerals for timers and other HUD-style readouts. */
+.readout {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 9vw, 3.2rem);
+  line-height: 1.1;
+  color: var(--gold-300);
 }
-@media (prefers-reduced-motion: reduce) {
-  .skeletonLine {
-    animation: none;
-  }
+.plain {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.flush {
+  margin: 0;
+}
+.flushTop {
+  margin-top: 0;
+}
+.start {
+  justify-items: start;
+}
+.whitespace {
+  white-space: pre-wrap;
+}
+.question {
+  margin: 0;
+  font-size: 1.2rem;
+  white-space: pre-wrap;
 }

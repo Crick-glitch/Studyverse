@@ -1,4 +1,5 @@
 import common from '../../ui/common.module.css';
+import { PageHeader } from '../../ui/PageHeader';
 import { Tabs } from '../../ui/Tabs';
 import { QuestsPanel } from './QuestsPanel';
 import { TasksPanel } from './TasksPanel';
@@ -6,9 +7,9 @@ import { TasksPanel } from './TasksPanel';
 export function QuestBoardPage() {
   return (
     <section className={common.page} aria-labelledby="quests-title">
-      <h1 id="quests-title" className={common.pageTitle}>
+      <PageHeader id="quests-title" icon="quests">
         Quest Board
-      </h1>
+      </PageHeader>
       <div className={common.panel}>
         <Tabs
           label="Quest board sections"

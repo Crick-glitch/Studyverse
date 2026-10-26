@@ -102,10 +102,10 @@ export function ReviewMode({ deckId, onExit }: { deckId: string | undefined; onE
         {back}
       </div>
       <span className={common.badge}>{item.subject}</span>
-      <p style={{ fontSize: '1.2rem', whiteSpace: 'pre-wrap' }}>{item.question}</p>
+      <p className={common.question}>{item.question}</p>
 
       {item.mode === 'choice' && item.choices && (
-        <fieldset className={common.stack} style={{ border: 0, padding: 0, margin: 0 }}>
+        <fieldset className={`${common.stack} ${common.plain}`}>
           <legend className={common.srOnly}>Choose an answer</legend>
           {item.choices.map((c, i) => (
             <label key={i} className={common.row}>

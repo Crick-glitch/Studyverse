@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { api, errorMessage } from '../../lib/api';
 import common from '../../ui/common.module.css';
+import { PageHeader } from '../../ui/PageHeader';
 import { ErrorState, Skeleton } from '../../ui/StateViews';
 import { ActiveSession } from './ActiveSession';
 import { ClaimQuiz } from './ClaimQuiz';
@@ -43,9 +44,9 @@ export function SessionsPage() {
 
   return (
     <section className={common.page} aria-labelledby="sessions-title">
-      <h1 id="sessions-title" className={common.pageTitle}>
+      <PageHeader id="sessions-title" icon="sessions">
         Study Sessions
-      </h1>
+      </PageHeader>
       {body}
       <SessionHistory />
     </section>

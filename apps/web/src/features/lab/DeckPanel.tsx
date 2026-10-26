@@ -107,7 +107,7 @@ export function DeckPanel({
     <div className={common.stack}>
       <div className={`${common.panel} ${common.stack}`}>
         <div className={common.spread}>
-          <h2 style={{ margin: 0 }}>{deck.name}</h2>
+          <h2 className={common.flush}>{deck.name}</h2>
           <div className={common.row}>
             <button type="button" className={`${common.btn} ${common.primary}`} disabled={deck.dueCount === 0} onClick={onReview}>
               Review this deck ({deck.dueCount} due)
@@ -142,7 +142,7 @@ export function DeckPanel({
             {cards.data.map((c) => (
               <li key={c.id} className={common.item}>
                 <div className={common.itemMain}>
-                  <strong style={{ whiteSpace: 'pre-wrap' }}>{c.question}</strong>
+                  <strong className={common.whitespace}>{c.question}</strong>
                   <span>Answer: {c.answer}</span>
                   {c.distractors.length > 0 && (
                     <span className={common.muted}>Wrong answers: {c.distractors.join(' · ')}</span>

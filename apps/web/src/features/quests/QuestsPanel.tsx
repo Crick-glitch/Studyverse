@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { api, errorMessage } from '../../lib/api';
 import { formatDateTime } from '../../lib/format';
 import common from '../../ui/common.module.css';
+import { PixelBar } from '../art/kit';
 import { EmptyState, ErrorState, Skeleton } from '../../ui/StateViews';
 
 function QuestRow({
@@ -18,15 +19,16 @@ function QuestRow({
   const shown = Math.min(quest.progress, quest.target);
   const reward = `${quest.rewardXp} XP${quest.rewardEnergy > 0 ? ` and ${quest.rewardEnergy} energy` : ''}`;
   return (
-    <li className={common.item}>
+    <li className={`${common.item} ${common.scroll}`}>
       <div className={common.itemMain}>
         <strong>{quest.title}</strong>
         <span className={common.muted}>{quest.description}</span>
-        <progress
-          className={common.bar}
-          max={quest.target}
+        <PixelBar
+          tone="xp"
           value={shown}
-          aria-label={`${quest.title}: ${shown} of ${quest.target}`}
+          max={quest.target}
+          showNumbers={false}
+          label={`${quest.title}: ${shown} of ${quest.target}`}
         />
         <span className={common.row}>
           <span>

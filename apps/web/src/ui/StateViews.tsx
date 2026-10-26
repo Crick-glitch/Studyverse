@@ -16,15 +16,10 @@ export function Skeleton({ lines = 3, label = 'Loading' }: { lines?: number; lab
 /** A failed request always offers a retry, never a silent blank screen. */
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className={common.error}>
-      <p style={{ margin: 0 }}>{message}</p>
+    <div role="alert" className={`${common.error} ${common.stack} ${common.start}`}>
+      <p className={common.flush}>{message}</p>
       {onRetry && (
-        <button
-          type="button"
-          className={`${common.btn} ${common.small}`}
-          style={{ marginTop: 'var(--space-2)' }}
-          onClick={onRetry}
-        >
+        <button type="button" className={`${common.btn} ${common.small}`} onClick={onRetry}>
           Try again
         </button>
       )}

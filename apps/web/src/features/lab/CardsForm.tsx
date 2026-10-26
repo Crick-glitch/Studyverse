@@ -101,7 +101,7 @@ export function CardsForm({ deck }: { deck: DeckDto }) {
         </label>
       </div>
       {rows.map((r, i) => (
-        <fieldset key={r.key} className={common.panel} style={{ margin: 0 }}>
+        <fieldset key={r.key} className={common.panel}>
           <legend>Card {i + 1}</legend>
           <div className={common.grid2}>
             <label className={common.field}>

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, createMemoryRouter, type RouteObject } from 'react-router-dom';
 import { RequireAuth } from './auth/RequireAuth';
 import { LabPage } from './features/lab/LabPage';
@@ -8,8 +9,24 @@ import { BattleLayout } from './layouts/BattleLayout';
 import { ComingSoon } from './pages/ComingSoon';
 import { Login } from './pages/Login';
 
+// Development-only art review. The `lazy` import lives inside a function that is only called when
+// `import.meta.env.DEV` is true, so production builds drop the whole chunk.
+function devArtRoute(): RouteObject {
+  const DevArtPage = lazy(() => import('./features/art/dev/DevArtPage'));
+  return {
+    path: 'dev/art',
+    element: (
+      <Suspense fallback={<p>Loading art review...</p>}>
+        <DevArtPage />
+      </Suspense>
+    ),
+  };
+}
+const devRoutes: RouteObject[] = import.meta.env.DEV ? [devArtRoute()] : [];
+
 export const routes: RouteObject[] = [
   { path: 'login', element: <Login /> },
+  ...devRoutes,
   {
     element: <RequireAuth />,
     children: [
@@ -21,6 +38,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Dashboard"
+                icon="dashboard"
                 phase="Phase 6"
                 description="Level, XP, streak, active session, quests and your next best action will appear here once the API and game systems exist."
               />
@@ -34,6 +52,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Camp"
+                icon="camp"
                 phase="Phase 6"
                 description="Hero, class, inventory and skill tree."
               />
@@ -44,6 +63,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Dungeons"
+                icon="dungeons"
                 phase="Phase 5"
                 description="Dungeon select, energy cost and boss gates."
               />
@@ -54,6 +74,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Stats"
+                icon="stats"
                 phase="Phase 6"
                 description="Real study, accuracy and battle statistics."
               />
@@ -64,6 +85,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Leaderboard"
+                icon="leaderboard"
                 phase="Phase 6"
                 description="Opt-in, public-only ranking from server-verified XP."
               />
@@ -74,6 +96,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Settings"
+                icon="settings"
                 phase="Phase 6"
                 description="Sound, animation, privacy, data export and reset."
               />
@@ -99,6 +122,7 @@ export const routes: RouteObject[] = [
             element: (
               <ComingSoon
                 title="Battle"
+                icon="dungeons"
                 phase="Phase 5"
                 description="Full-screen, server-authoritative battle screen."
               />

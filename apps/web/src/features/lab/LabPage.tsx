@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { api, errorMessage } from '../../lib/api';
 import { saveBlob } from '../../lib/download';
 import common from '../../ui/common.module.css';
+import { PageHeader } from '../../ui/PageHeader';
 import { EmptyState, ErrorState, Skeleton } from '../../ui/StateViews';
 import { DeckPanel } from './DeckPanel';
 import { ReviewMode } from './ReviewMode';
@@ -81,9 +82,9 @@ export function LabPage() {
   if (review)
     return (
       <section className={common.page} aria-labelledby="lab-title">
-        <h1 id="lab-title" className={common.pageTitle}>
+        <PageHeader id="lab-title" icon="lab">
           Lab: review
-        </h1>
+        </PageHeader>
         <ReviewMode
           deckId={review === 'all' ? undefined : (deckId ?? undefined)}
           onExit={() => open({ review: null })}
@@ -95,12 +96,12 @@ export function LabPage() {
   const totalDue = (decks.data ?? []).reduce((n, d) => n + d.dueCount, 0);
   return (
     <section className={common.page} aria-labelledby="lab-title">
-      <h1 id="lab-title" className={common.pageTitle}>
+      <PageHeader id="lab-title" icon="lab">
         Lab
-      </h1>
+      </PageHeader>
       <div className={`${common.panel} ${common.stack}`}>
         <div className={common.spread}>
-          <h2 style={{ margin: 0 }}>Your decks</h2>
+          <h2 className={common.flush}>Your decks</h2>
           <button
             type="button"
             className={`${common.btn} ${common.primary}`}

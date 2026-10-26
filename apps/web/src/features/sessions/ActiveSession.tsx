@@ -5,6 +5,7 @@ import { api, errorMessage } from '../../lib/api';
 import { formatClock } from '../../lib/format';
 import common from '../../ui/common.module.css';
 import { ConfirmDialog } from '../../ui/ConfirmDialog';
+import { PixelBar } from '../art/kit';
 import type { Outcome } from './types';
 import { useCountdown, useFocusTracker } from './useSessionClock';
 
@@ -65,18 +66,15 @@ export function ActiveSession({ session, onChanged, onOutcome }: Props) {
         <p>This session is planned but the timer has not started.</p>
       ) : (
         <>
-          <p
-            role="timer"
-            aria-label="Time remaining"
-            style={{ fontFamily: 'var(--font-display)', fontSize: '3rem', margin: 0 }}
-          >
+          <p role="timer" aria-label="Time remaining" className={common.readout}>
             {formatClock(remaining)}
           </p>
-          <progress
-            className={common.bar}
-            max={total}
+          <PixelBar
+            tone="xp"
             value={Math.min(total, total - remaining)}
-            aria-label="Session progress"
+            max={total}
+            showNumbers={false}
+            label="Session progress"
           />
           <p className={common.muted}>
             {session.status === 'paused'

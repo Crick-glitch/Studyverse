@@ -63,11 +63,11 @@ export function ClaimQuiz({
         </p>
       )}
       {questions.map((q, i) => (
-        <fieldset key={q.position} className={common.panel} style={{ margin: 0 }}>
+        <fieldset key={q.position} className={common.panel}>
           <legend>
             Question {i + 1} of {questions.length}
           </legend>
-          <p style={{ marginTop: 0 }}>{q.text}</p>
+          <p className={common.flushTop}>{q.text}</p>
           <div className={common.stack}>
             {q.choices.map((c, ci) => (
               <label key={ci} className={common.row}>

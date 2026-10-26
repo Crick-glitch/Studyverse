@@ -10,7 +10,34 @@
   --ember-500: #c4532f;
   --moss-500: #6b8e3d;
 
-  --font-display: 'Cinzel', Georgia, serif;
+  /* Palette steps used by the pixel art (05-art-and-sprites.md). Kept in sync with features/art/palette.ts by a test. */
+  --forest-500: #2f5a47;
+  --charcoal-950: #121418;
+  --charcoal-600: #4b5058;
+  --charcoal-400: #8a9099;
+  --charcoal-200: #c9cdd3;
+  --teal-700: #26504f;
+  --teal-300: #8ccdc3;
+  --parchment-50: #fbf5e2;
+  --parchment-500: #a89260;
+  --gold-700: #8f6f1c;
+  --gold-300: #f0d77a;
+  --ember-700: #7a2a18;
+  --ember-300: #ec8e62;
+  --moss-700: #3d5a28;
+  --moss-300: #a8c46e;
+  --skin-700: #a86f4c;
+  --skin-500: #d9a074;
+  --skin-300: #f0c9a0;
+  --wood-700: #5e3b22;
+  --wood-500: #8a5a35;
+  --violet-700: #3b2a5a;
+  --violet-500: #6b4c8a;
+  --violet-300: #a68bc4;
+  --font-pixel: 'Pixelify Sans', Georgia, serif;
+  --pixel: 3px;
+
+  --font-display: var(--font-pixel); /* headings and HUD only; body text stays on --font-body */
   --font-body: 'Lato', system-ui, sans-serif;
 
   --space-1: 0.25rem;
@@ -20,4 +47,5 @@
   --space-5: 2.5rem;
   --radius: 4px;
   --border: 2px solid var(--parchment-300);
+  --tap: 44px; /* minimum touch target (05b asks for at least 40px) */
 }

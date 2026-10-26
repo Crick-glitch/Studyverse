@@ -10,7 +10,9 @@ export function useCountdown(s: Pick<SessionDto, 'status' | 'remainingSec' | 'se
   const [, setTick] = useState(0);
   const anchor = useMemo(
     () => ({ at: performance.now(), remaining: s.remainingSec, running: s.status === 'running' }),
-    // serverNow changes on every response, which is exactly when the anchor must be reset.
+    // serverNow is not read inside the memo on purpose: it changes on every server response, which is
+    // exactly when the timer anchor (performance.now()) must be reset, even if status/remainingSec repeat.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional reset trigger, see comment above
     [s.serverNow, s.status, s.remainingSec],
   );
   useEffect(() => {

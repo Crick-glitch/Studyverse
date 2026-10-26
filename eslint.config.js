@@ -12,6 +12,11 @@ export default tseslint.config(
     languageOptions: { globals: globals.node },
   },
   {
+    // Dev tools run by Node; the functions passed to page.evaluate() run inside the browser, so both sets of globals apply.
+    files: ['apps/web/scripts/**/*.mjs'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
+  },
+  {
     files: ['apps/web/**/*.{ts,tsx}'],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-hooks': reactHooks },

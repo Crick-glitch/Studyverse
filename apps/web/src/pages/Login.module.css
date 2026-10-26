@@ -1,62 +1,72 @@
+/* Title-screen style login: the camp scene sits behind a parchment card. */
 .wrap {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: var(--space-3);
+  padding: var(--space-4) var(--space-3);
+  overflow: hidden;
+  background: var(--violet-700); /* the scene's sky colour, so a tall window never shows a seam */
+}
+.backdrop {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: -1;
+  display: flex;
+  justify-content: center;
+}
+.column {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+  width: min(26rem, 100%);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: clamp(2rem, 8vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--gold-300);
+  text-shadow: var(--pixel) var(--pixel) 0 var(--charcoal-950);
 }
 .panel {
-  width: min(26rem, 100%);
-  background: var(--parchment-100);
-  color: var(--charcoal-800);
-  border: var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-4);
+  width: calc(100% - var(--pixel) * 2);
+  --panel-pad: var(--space-4);
 }
 .panel h1 {
-  font-family: var(--font-display);
-  margin: 0 0 var(--space-3);
+  color: var(--wood-700);
 }
 .field {
   display: grid;
   gap: var(--space-1);
-  margin-bottom: var(--space-3);
+}
+.field label {
+  font-weight: 700;
 }
 .field input {
-  padding: var(--space-2);
-  border: 2px solid var(--charcoal-800);
-  border-radius: var(--radius);
-  background: #fff;
-  font: inherit;
+  background-color: var(--parchment-50);
 }
 .actions {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
 }
-.button {
+.error,
+.notice {
+  margin: 0 0 var(--space-3);
   padding: var(--space-2) var(--space-3);
-  border: 2px solid var(--charcoal-800);
-  border-radius: var(--radius);
-  background: var(--gold-500);
-  color: var(--charcoal-800);
-  font: inherit;
   font-weight: 700;
-  cursor: pointer;
-}
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.secondary {
-  background: transparent;
+  background: var(--charcoal-800);
+  color: var(--parchment-50);
 }
 .error {
-  color: #8a2d12;
-  font-weight: 700;
-  margin: 0 0 var(--space-3);
+  border-left: calc(var(--pixel) * 2) solid var(--ember-500);
 }
 .notice {
-  color: var(--forest-700);
-  font-weight: 700;
-  margin: 0 0 var(--space-3);
+  border-left: calc(var(--pixel) * 2) solid var(--moss-500);
 }

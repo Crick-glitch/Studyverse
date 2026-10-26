@@ -1,18 +1,12 @@
 .panel {
   max-width: 40rem;
   margin: var(--space-5) auto;
-  padding: var(--space-4);
-  background: var(--forest-700);
-  border: var(--border);
-  border-radius: var(--radius);
 }
-
 .badge {
   display: inline-block;
-  margin: 0 0 var(--space-3);
+  margin: var(--space-3) 0;
   padding: var(--space-1) var(--space-3);
-  background: var(--charcoal-800);
-  border: 1px solid var(--gold-500);
-  color: var(--parchment-100);
+  background: var(--charcoal-950);
+  color: var(--gold-300);
   font-weight: 700;
 }

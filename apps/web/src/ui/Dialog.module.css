@@ -5,20 +5,22 @@
   display: grid;
   place-items: center;
   padding: var(--space-3);
-  background: rgb(15 31 26 / 0.85);
+  background: rgb(18 20 24 / 0.88);
 }
 .dialog {
-  width: min(100%, 36rem);
+  composes: panel from '../features/art/kit/kit.module.css';
+  --panel-pad: var(--space-4);
+  width: min(100% - var(--pixel) * 2, 36rem);
   max-height: 90vh;
   overflow-y: auto;
-  padding: var(--space-4);
-  background: var(--forest-700);
-  border: 3px solid var(--gold-500);
-  border-radius: var(--radius);
-  color: var(--parchment-100);
 }
 .title {
   margin-top: 0;
+}
+@media (max-width: 480px) {
+  .dialog {
+    --panel-pad: var(--space-3);
+  }
 }
 .actions {
   display: flex;

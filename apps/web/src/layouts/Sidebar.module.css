@@ -1,0 +1,170 @@
+/* Game-menu sidebar. Desktop: sticky column, collapsible to icons. Phone: slide-in drawer. */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 15rem;
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--space-3) var(--space-2);
+  overflow-y: auto;
+  background: var(--charcoal-950);
+  border-right: var(--pixel) solid var(--gold-700);
+  box-shadow: inset calc(var(--pixel) * -1) 0 0 0 var(--charcoal-600);
+  transition: width 160ms steps(5, end);
+}
+.sidebar[data-collapsed='true'] {
+  width: 5.25rem;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  border-bottom: var(--pixel) dashed var(--gold-700);
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--gold-300);
+}
+.sidebar[data-collapsed='true'] .top {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.nav {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.link,
+.collapse {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: calc(100% - var(--pixel) * 2);
+  min-height: 48px;
+  margin: var(--pixel);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--parchment-100);
+  font-family: var(--font-pixel);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+.link:hover,
+.collapse:hover {
+  background: var(--forest-700);
+  color: var(--gold-300);
+}
+/* The page you are on: a framed, filled slot. aria-current is set by the router. */
+.link[aria-current='page'] {
+  background: var(--forest-500);
+  color: var(--parchment-50);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--gold-500),
+    0 var(--pixel) 0 0 var(--gold-500),
+    calc(var(--pixel) * -1) 0 0 0 var(--gold-500),
+    var(--pixel) 0 0 0 var(--gold-500);
+}
+.link:focus-visible,
+.collapse:focus-visible,
+.iconButton:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 2px;
+}
+.collapse {
+  flex: none;
+  color: var(--parchment-300);
+  font-size: 0.95rem;
+}
+
+/* Icons only: keep the text for screen readers. */
+.sidebar[data-collapsed='true'] .label,
+.sidebar[data-collapsed='true'] .brandText {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.sidebar[data-collapsed='true'] .link,
+.sidebar[data-collapsed='true'] .collapse {
+  justify-content: center;
+  padding: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.iconButton {
+  display: inline-grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: transparent;
+  color: var(--parchment-100);
+  cursor: pointer;
+}
+.iconButton:hover {
+  color: var(--gold-300);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(18 20 24 / 0.75);
+}
+
+/* Phone layout: the sidebar becomes a drawer. Keep 640px in step with MOBILE_QUERY in useSidebar.ts. */
+@media (max-width: 640px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 50;
+    width: min(18rem, 85vw);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 200ms steps(6, end),
+      visibility 0s linear 200ms;
+  }
+  .sidebar[data-open='true'] {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}
