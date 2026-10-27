@@ -11,6 +11,8 @@ Every file group, where it came from and under what terms. All pixel art in the 
 | Scenes: Archive, Sunken Library, Clockwork Foundry battle backgrounds; camp; dungeon-select map (320x180, far/mid/near) | 5 scenes, 15 layers | Original | StudyVerse project | Project code license | Phase 5 | `sprites/scenes.ts`, `scenes-hub.ts`, `scene-kit.ts` |
 | Avatar busts (6, 32 px) and class portraits (3, 40 px) | 9 | Original | StudyVerse project | Project code license | Phase 5 | `sprites/avatars.ts` (portraits are cropped hero layers) |
 | UI art: 9 navigation icons, streak flame levels 0-4, XP crest, energy bolt | 16 | Original | StudyVerse project | Project code license | Phase 5 | `sprites/icons.ts` |
+| Hotbar and HUD art: campfire (Home), satchel (Menu), HUD portrait frame | 3 | Original | StudyVerse project | Project code license | Phase 5c | `sprites/icons.ts` (`ui.campfire`, `ui.satchel`, `ui.portrait-frame`) |
+| Lato (body font) | npm `@fontsource/lato` | Lato Project Authors | SIL OFL 1.1 (**to confirm against the package's LICENSE file**) | Phase 1 | none |
 | Palette (32 colours), drawing toolkit | n/a | Original | StudyVerse project | Project code license | Phase 5 | `palette.ts`, `draw/canvas.ts`, `grid.ts`; mirrored in `styles/tokens.css` |
 | Pixelify Sans (display font) | npm `@fontsource/pixelify-sans` 5.3.0 (design: Pixelify Sans Project Authors, https://github.com/eifetx/Pixelify-Sans) | Pixelify Sans Project Authors | SIL OFL 1.1 (copy: `apps/web/public/assets/vendor/pixelify-sans/OFL.txt`) | Phase 5 | none |
 

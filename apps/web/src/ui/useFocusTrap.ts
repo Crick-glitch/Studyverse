@@ -5,7 +5,7 @@ const FOCUSABLE =
 
 /**
  * While `active`, Tab and Shift+Tab cycle inside `ref` and Escape calls `onEscape`.
- * (Dialog has its own copy of this; the mobile navigation drawer is the second user.)
+ * (Dialog has its own copy of this; the Menu overlay is the second user.)
  */
 export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean, onEscape: () => void): void {
   useEffect(() => {
