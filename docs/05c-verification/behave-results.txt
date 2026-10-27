@@ -1,0 +1,116 @@
+PASS  hotbar nav "Main" exists
+PASS  five links + Menu button
+PASS  Quests has aria-current=page at /quests
+PASS  others have no aria-current
+PASS  badge names: Quests
+PASS  badge names: Library 12 due (visual 9+)
+PASS  badge names: Adventure energy pip
+PASS  Home and Study have no badge text
+PASS  no aria-live in hotbar
+PASS  click Study -> /sessions, aria-current moves
+PASS  tooltips show the key
+PASS  badge colours are gold, not red
+PASS  no badge for zero, energy below 3 shows no pip
+PASS  no "!" on portrait without skill points
+PASS  summary error: hotbar still works, no badges
+PASS  summary error: no session chip
+PASS  key 3 -> /sessions
+PASS  key 4 -> /lab
+PASS  key 5 -> /dungeons
+PASS  key 2 -> /quests
+PASS  key 1 -> /
+PASS  key h -> /camp
+PASS  key H -> /camp
+PASS  Ctrl/Alt/Meta + digit ignored
+PASS  typing in a field does not trigger shortcuts
+PASS  M opens the menu
+PASS  digits do nothing while the menu is open
+PASS  Escape closes
+PASS  menu button collapsed
+PASS  dialog has aria-modal
+PASS  focus moved into the dialog
+PASS  background is inert
+PASS  dialog itself is not inert
+PASS  Tab x14 never leaves the dialog
+PASS  Shift+Tab x14 never leaves the dialog
+PASS  menu lists Progress, Leaderboard, Settings
+PASS  Escape closes and focus returns to the Menu slot
+PASS  inert lifted after close
+PASS  close button returns focus to Menu slot
+PASS  backdrop click closes
+PASS  following a link closes the menu and goes there
+PASS  credits collapsed then expands
+PASS  credits text is shown
+PASS  Sign out calls signOut
+PASS  toggle starts on
+PASS  stored as 0
+PASS  with shortcuts off nothing happens
+PASS  tooltips drop the key when off
+PASS  still off after reload (new page state)
+PASS  stored 1 = on
+PASS  chip exists and links to /sessions
+PASS  chip counts down from the server value
+PASS  study slot shows the Resume pill + name
+PASS  paused chip says Paused and does not tick
+PASS  360px: HUD height 56 <= 56
+PASS  360px: no horizontal scroll
+PASS  360px: hotbar targets >= 44px (min 47x64)
+PASS  360px: no clipped hotbar labels
+PASS  360px: HUD parts do not overlap
+PASS  360px: last field clear of the hotbar when scrolled to the end (gap 22px)
+PASS  390px: HUD height 56 <= 56
+PASS  390px: no horizontal scroll
+PASS  390px: hotbar targets >= 44px (min 52x64)
+PASS  390px: no clipped hotbar labels
+PASS  390px: HUD parts do not overlap
+PASS  390px: last field clear of the hotbar when scrolled to the end (gap 22px)
+PASS  768px: HUD height 64 <= 64
+PASS  768px: no horizontal scroll
+PASS  768px: hotbar targets >= 44px (min 90x64)
+PASS  768px: no clipped hotbar labels
+PASS  768px: HUD parts do not overlap
+PASS  768px: last field clear of the hotbar when scrolled to the end (gap 185px)
+PASS  1280px: HUD height 64 <= 64
+PASS  1280px: no horizontal scroll
+PASS  1280px: hotbar targets >= 44px (min 90x64)
+PASS  1280px: no clipped hotbar labels
+PASS  1280px: HUD parts do not overlap
+PASS  1280px: last field clear of the hotbar when scrolled to the end (gap 13px)
+PASS  390px: hub scale is 1 (integer)
+PASS  390px: scene is 320x180
+PASS  390px: six prop links (the campfire is not one)
+PASS  390px: every prop target >= 44x44 (min 44)
+PASS  390px: targets stay inside the scene
+PASS  390px: Dashboard heading is above the fold
+PASS  390px: no horizontal scroll on Home
+PASS  768px: hub scale is 2 (integer)
+PASS  768px: scene is 640x360
+PASS  768px: six prop links (the campfire is not one)
+PASS  768px: every prop target >= 44x44 (min 48)
+PASS  768px: targets stay inside the scene
+PASS  768px: Dashboard heading is above the fold
+PASS  768px: no horizontal scroll on Home
+PASS  1280px: hub scale is 2 (integer)
+PASS  1280px: scene is 640x360
+PASS  1280px: six prop links (the campfire is not one)
+PASS  1280px: every prop target >= 44x44 (min 48)
+PASS  1280px: targets stay inside the scene
+PASS  1280px: Dashboard heading is above the fold
+PASS  1280px: no horizontal scroll on Home
+PASS  prop names include destination and live state
+PASS  prop links go to the right routes
+PASS  "Skip scene" is the first link in the scene
+PASS  Skip scene moves focus past the props
+PASS  clicking a prop navigates
+PASS  quiet state: gate open (not ready), tents idle, board idle, wagon idle
+PASS  quiet state: names carry no badge text
+PASS  active session: tent glows (state active) and name says so
+PASS  summary failed: props still links, quiet states, no invented numbers
+PASS  no wipe on first load
+PASS  wipe appears on a route change
+PASS  wipe ignores the pointer, lasts <= 300ms, step is a whole number of pixels
+PASS  page content is present immediately under the wipe
+PASS  reduced motion: the wipe is not drawn
+PASS  reduced motion: badges do not animate
+
+114/114 passed

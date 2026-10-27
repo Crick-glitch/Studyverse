@@ -12,6 +12,7 @@ import { Hotbar } from './Hotbar';
 import { type HotkeyAction, useHotkeys, useHotkeysSetting } from './hotkeys';
 import { Hud } from './Hud';
 import { MenuOverlay } from './MenuOverlay';
+import { TravelWipe } from './TravelWipe';
 
 /** Offers the old-save import once the player's id is known (never imports by itself). */
 function ImportGate() {
@@ -83,6 +84,7 @@ export function AppLayout() {
           }}
         />
       )}
+      <TravelWipe />
       <ImportGate />
     </div>
   );

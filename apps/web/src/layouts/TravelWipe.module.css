@@ -1,0 +1,24 @@
+.wipe {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--pixel) * -4);
+  width: calc(var(--pixel) * 4);
+  z-index: 90; /* above the page and hotbar, below the Menu */
+  pointer-events: none;
+  background: var(--gold-500);
+  box-shadow:
+    calc(var(--pixel) * -2) 0 0 0 var(--gold-700),
+    var(--pixel) 0 0 0 var(--gold-300);
+  animation: travel 300ms steps(8, end) both;
+}
+@keyframes travel {
+  to {
+    transform: translateX(calc(var(--step) * 8));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wipe {
+    display: none;
+  }
+}

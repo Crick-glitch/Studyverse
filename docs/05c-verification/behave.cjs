@@ -158,6 +158,61 @@ const q = (o) => encodeURIComponent(JSON.stringify(o));
     ok(`${w}px: last field clear of the hotbar when scrolled to the end (gap ${gap}px)`, gap >= 0, String(gap));
     await ctx.close();
   }
+
+  // 8. hub scene (Home)
+  for (const [w, h, scale] of [[390, 844, 1], [768, 1024, 2], [1280, 800, 2]]) {
+    ({ ctx, page } = await open('path=/', { width: w, height: h }));
+    const stage = await page.locator('section[aria-label=Camp] > div[data-scale]');
+    ok(`${w}px: hub scale is ${scale} (integer)`, (await stage.getAttribute('data-scale')) === String(scale));
+    const box = await stage.boundingBox();
+    ok(`${w}px: scene is ${320 * scale}x${180 * scale}`, Math.round(box.width) === 320 * scale && Math.round(box.height) === 180 * scale, JSON.stringify(box));
+    const links = await page.locator('section[aria-label=Camp] a[data-prop]').evaluateAll((els) => els.map((e) => ({ n: e.getAttribute('aria-label'), r: e.getBoundingClientRect().toJSON(), href: e.getAttribute('href') })));
+    ok(`${w}px: six prop links (the campfire is not one)`, links.length === 6, String(links.length));
+    ok(`${w}px: every prop target >= 44x44 (min ${Math.round(Math.min(...links.map((l) => Math.min(l.r.width, l.r.height))))})`, links.every((l) => l.r.width >= 44 && l.r.height >= 44));
+    ok(`${w}px: targets stay inside the scene`, links.every((l) => l.r.left >= box.x - 1 && l.r.right <= box.x + box.width + 1 && l.r.top >= box.y - 1 && l.r.bottom <= box.y + box.height + 1));
+    ok(`${w}px: Dashboard heading is above the fold`, await page.evaluate(() => document.querySelector('h1').getBoundingClientRect().top < innerHeight), String(await page.evaluate(() => document.querySelector('h1').getBoundingClientRect().top)));
+    ok(`${w}px: no horizontal scroll on Home`, (await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)) <= 0);
+    if (w === 1280) {
+      const names = links.map((l) => l.n).sort();
+      ok('prop names include destination and live state', JSON.stringify(names) === JSON.stringify(['Dungeon gate, Adventure, 4 energy, enough for a raid', 'Hero tent, Hero, 2 unspent skill points', 'Journal desk, Progress', 'Library wagon, Library, 12 cards due', 'Quest board, Quests, 1 quest ready to claim', 'Study tent, Study'].sort()), JSON.stringify(names));
+      ok('prop links go to the right routes', JSON.stringify(links.map((l) => l.href).sort()) === JSON.stringify(['/camp', '/dungeons', '/lab', '/quests', '/sessions', '/stats']));
+      const order = await page.evaluate(() => [...document.querySelectorAll('section[aria-label=Camp] a')].map((a) => a.textContent.trim() || a.getAttribute('aria-label')).slice(0, 2));
+      ok('"Skip scene" is the first link in the scene', order[0] === 'Skip scene', order.join('|'));
+      await page.getByRole('link', { name: 'Skip scene' }).focus(); await page.keyboard.press('Enter');
+      ok('Skip scene moves focus past the props', await page.evaluate(() => document.activeElement?.id === 'home-content'));
+      await page.getByRole('link', { name: /^Library wagon/ }).click(); await page.waitForTimeout(60);
+      ok('clicking a prop navigates', (await path(page)) === '/lab');
+    }
+    await ctx.close();
+  }
+  ({ ctx, page } = await open('path=/&scenario=' + q({ dueCards: 0, claimableQuests: 0, energy: 1, unspentSkillPoints: 0 })));
+  const quiet = await page.locator('section[aria-label=Camp] a[data-prop]').evaluateAll((els) => els.map((e) => `${e.dataset.prop}:${e.dataset.state}`).sort());
+  ok('quiet state: gate open (not ready), tents idle, board idle, wagon idle', JSON.stringify(quiet) === JSON.stringify(['gate:open', 'hero-tent:idle', 'journal-desk:idle', 'library-wagon:idle', 'quest-board:idle', 'study-tent:idle']), quiet.join(','));
+  ok('quiet state: names carry no badge text', (await page.getByRole('link', { name: 'Library wagon, Library', exact: true }).count()) === 1);
+  await ctx.close();
+  ({ ctx, page } = await open('path=/&scenario=' + q({ activeSession: SESSION })));
+  ok('active session: tent glows (state active) and name says so', (await page.locator('[data-prop=study-tent]').getAttribute('data-state')) === 'active' && (await page.getByRole('link', { name: 'Study tent, Study, session in progress, resume', exact: true }).count()) === 1);
+  await ctx.close();
+  ({ ctx, page } = await open('path=/&summary=error'));
+  ok('summary failed: props still links, quiet states, no invented numbers', (await page.locator('section[aria-label=Camp] a[data-prop]').count()) === 6 && (await page.getByRole('link', { name: 'Library wagon, Library', exact: true }).count()) === 1);
+  await ctx.close();
+
+  // 9. travel wipe
+  ({ ctx, page } = await open('path=/quests'));
+  ok('no wipe on first load', (await page.getByTestId('travel-wipe').count()) === 0);
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /^Study/ }).click(); await page.waitForTimeout(40);
+  const wipe = page.getByTestId('travel-wipe');
+  ok('wipe appears on a route change', (await wipe.count()) === 1);
+  const info = await wipe.evaluate((e) => { const cs = getComputedStyle(e); return { pe: cs.pointerEvents, dur: cs.animationDuration, pos: cs.position, step: parseFloat(e.style.getPropertyValue('--step')) }; });
+  ok('wipe ignores the pointer, lasts <= 300ms, step is a whole number of pixels', info.pe === 'none' && info.dur === '0.3s' && Number.isInteger(info.step), JSON.stringify(info));
+  ok('page content is present immediately under the wipe', (await page.getByRole('heading', { name: 'Page /sessions' }).count()) === 1);
+  await ctx.close();
+  { const c2 = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' }); const p2 = await c2.newPage(); await p2.goto('file:///tmp/h/index.html?path=/quests'); await p2.waitForSelector('header'); await p2.getByRole('link', { name: /^Study/ }).click(); await p2.waitForTimeout(60);
+    const disp = await p2.getByTestId('travel-wipe').evaluate((e) => getComputedStyle(e).display).catch(() => 'absent');
+    ok('reduced motion: the wipe is not drawn', disp === 'none' || disp === 'absent', disp);
+    const anim = await p2.locator('[class*=badge]').first().evaluate((e) => getComputedStyle(e).animationName).catch(() => 'none');
+    ok('reduced motion: badges do not animate', anim === 'none', anim); await c2.close(); }
+
   console.log(results.join('\n')); console.log(`\n${results.length - failed}/${results.length} passed`);
   await browser.close(); process.exit(failed ? 1 : 0);
 })();

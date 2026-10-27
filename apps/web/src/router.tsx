@@ -7,6 +7,7 @@ import { SessionsPage } from './features/sessions/SessionsPage';
 import { AppLayout } from './layouts/AppLayout';
 import { BattleLayout } from './layouts/BattleLayout';
 import { ComingSoon } from './pages/ComingSoon';
+import { HomePage } from './pages/HomePage';
 import { Login } from './pages/Login';
 
 // Development-only art review. The `lazy` import lives inside a function that is only called when
@@ -35,14 +36,7 @@ export const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: (
-              <ComingSoon
-                title="Dashboard"
-                icon="dashboard"
-                phase="Phase 6"
-                description="Level, XP, streak, active session, quests and your next best action will appear here once the API and game systems exist."
-              />
-            ),
+            element: <HomePage />,
           },
           { path: 'quests', element: <QuestBoardPage /> },
           { path: 'sessions', element: <SessionsPage /> },

@@ -25,7 +25,8 @@ describe('asset manifest', () => {
     expect(entries.filter((e) => e.key.startsWith('frame.'))).toHaveLength(3);
     expect(countGroup('avatar')).toBe(6 + 3);
     expect(entries.filter((e) => e.key.startsWith('dungeon.'))).toHaveLength(3);
-    expect(entries.filter((e) => e.key.startsWith('scene.'))).toHaveLength(2);
+    expect(entries.filter((e) => e.key.startsWith('scene.'))).toHaveLength(3); // camp, map and the prop-free hub
+    expect(entries.filter((e) => e.key.startsWith('prop.'))).toHaveLength(7); // the hub's gate, tents, board, desk, fire, wagon
     expect(countGroup('effect')).toBe(8);
     expect(entries.filter((e) => e.key.startsWith('ui.nav.'))).toHaveLength(9);
     expect(entries.filter((e) => e.key.startsWith('ui.flame.'))).toHaveLength(5);

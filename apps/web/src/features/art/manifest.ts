@@ -42,6 +42,7 @@ import {
   type ItemSlug,
 } from './sprites/items';
 import { DUNGEON_SCENES, dungeonScene, type DungeonSceneId } from './sprites/scenes';
+import { HUB_PROP_IDS, HUB_PROPS, MARKER_SIZE, hubPropGrid, markerGrid } from './sprites/hub-props';
 import { HUB_SCENES, hubScene, type HubSceneId } from './sprites/scenes-hub';
 import { SCENE_H, SCENE_W, type SceneLayer } from './sprites/scene-kit';
 
@@ -182,6 +183,18 @@ function build(): Record<string, AssetEntry> {
   for (const id of Object.keys(HUB_SCENES) as HubSceneId[]) {
     add({ key: `scene.${id}`, kind: 'grid', ...sceneBase, ...procedural('scenes-hub.ts'), layers: () => hubScene(id) });
   }
+  // The hub's objects: separate sprites cropped to their own box, painted over `scene.hub` (Home, 05c section 7).
+  for (const id of HUB_PROP_IDS) {
+    const { box, states } = HUB_PROPS[id];
+    add({
+      key: `prop.${id}`, group: 'scene', kind: 'grid', size: { w: box.w, h: box.h }, scale: 2, anchor: at(0, 0),
+      ...procedural('hub-props.ts'), states, grid: (state) => hubPropGrid(id, state),
+    });
+  }
+  add({
+    key: 'ui.marker', group: 'ui', kind: 'grid', size: { ...MARKER_SIZE }, scale: 2, anchor: at(4, 7),
+    ...procedural('hub-props.ts'), states: ['idle'], grid: () => markerGrid(),
+  });
   for (const id of EFFECT_IDS as readonly EffectId[]) {
     add({
       key: `effect.${id}`, group: 'effect', kind: 'sheet', size: { w: EFFECT_SIZE, h: EFFECT_SIZE }, scale: 4,

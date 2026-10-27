@@ -11,4 +11,6 @@ const eq = (a, b) => { if (Object.is(a, b)) return true; if (typeof a !== 'objec
 const sub = (a, b) => { if (typeof b !== 'object' || !b) return Object.is(a, b); if (typeof a !== 'object' || !a) return false; return Object.keys(b).every((k) => sub(a[k], b[k])); };
 export const expect = (actual, msg = '') => { const f = (ok, what) => { if (!ok) throw new Error(`${msg ? msg + ': ' : ''}expected ${JSON.stringify(actual)} ${what}`); };
   return { toBe: (e) => f(Object.is(actual, e), `toBe ${JSON.stringify(e)}`), toEqual: (e) => f(eq(actual, e), `toEqual ${JSON.stringify(e)}`),
-    toBeNull: () => f(actual === null, 'toBeNull'), toBeTruthy: () => f(!!actual, 'toBeTruthy'), toMatchObject: (e) => f(sub(actual, e), `toMatchObject ${JSON.stringify(e)}`) }; };
+    toBeNull: () => f(actual === null, 'toBeNull'), toBeTruthy: () => f(!!actual, 'toBeTruthy'), toMatchObject: (e) => f(sub(actual, e), `toMatchObject ${JSON.stringify(e)}`),
+    toBeUndefined: () => f(actual === undefined, 'toBeUndefined'), toBeDefined: () => f(actual !== undefined, 'toBeDefined'), toMatch: (e) => f(e.test(actual), `toMatch ${e}`), toBeGreaterThan: (e) => f(actual > e, `> ${e}`), toHaveLength: (e) => f(actual.length === e, `toHaveLength ${e}`), toBeFalsy: () => f(!actual, 'toBeFalsy'), toBeLessThan: (e) => f(actual < e, `< ${e}`),
+    toContain: (e) => f(actual.includes(e), `toContain ${JSON.stringify(e)}`), toBeGreaterThanOrEqual: (e) => f(actual >= e, `>= ${e}`), toBeLessThanOrEqual: (e) => f(actual <= e, `<= ${e}`) }; };

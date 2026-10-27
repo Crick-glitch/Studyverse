@@ -1,3 +1,5 @@
+> **Latest status: see `docs/HANDOFF-05C.md`** (session 05c, stopped early; checks not run). Older notes below.
+
 > **Current status: see `docs/HANDOFF-PHASE4.md` (Phase 4 done in code; follow its "run these first" list). The text below is the Phase 3 handoff and is kept for the Supabase setup steps.**
 
 # Handoff: where the rebuild stands

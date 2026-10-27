@@ -2,8 +2,12 @@ import { Canvas } from '../draw/canvas';
 import type { PixelGrid } from '../grid';
 import { arch, bakeScene, bands, newScene, pine, rng, SCENE_H, SCENE_W, type SceneLayers } from './scene-kit';
 
-/** The camp at dusk: tents, a book wagon, a campfire, the dungeon gate on a far hill. */
-function camp(): SceneLayers {
+/**
+ * The camp at dusk: tents, a book wagon, a campfire, the dungeon gate on a far hill. With `props` false it is the empty
+ * camp (meadow, hills, trees, fence): the Home hub paints its tents, board, desk, fire, wagon and gate as separate,
+ * state-reactive sprites (`hub-props.ts`) on top of it.
+ */
+function camp(props = true): SceneLayers {
   const s = newScene();
   const r = rng(51);
   bands(s.far, 0, 112, ['fViolet7', 'fViolet7', 'violet', 'violet', 'fEmber5', 'fEmber', 'fGold']);
@@ -17,36 +21,41 @@ function camp(): SceneLayers {
     const h2 = 112 + Math.round(Math.sin(x / 23 + 2) * 5);
     s.far.rect(x, h2, 1, SCENE_H - h2, 'fForest7');
   }
-  s.far.rect(268, 66, 30, 40, 'fForest7');
-  arch(s.far, 283, 106, 16, 24, 'fForest');
-  s.far.rect(266, 62, 4, 6, 'fForest7'); s.far.rect(280, 58, 4, 10, 'fForest7'); s.far.rect(294, 62, 4, 6, 'fForest7');
+  if (props) {
+    s.far.rect(268, 66, 30, 40, 'fForest7');
+    arch(s.far, 283, 106, 16, 24, 'fForest');
+    s.far.rect(266, 62, 4, 6, 'fForest7'); s.far.rect(280, 58, 4, 10, 'fForest7'); s.far.rect(294, 62, 4, 6, 'fForest7');
+  }
   // mid: meadow, pines, tents, wagon, campfire
   s.mid.rect(0, 122, SCENE_W, SCENE_H - 122, 'fMoss7');
   bands(s.mid, 122, SCENE_H, ['fMoss7', 'fMoss7', 'fMoss5', 'fMoss7', 'fForest7']);
   s.mid.rect(0, 122, SCENE_W, 2, 'fMoss5');
-  for (const [x, h] of [[12, 80], [38, 96], [286, 90], [308, 74], [150, 54], [180, 48]] as const) pine(s.mid, x, 124, h, 'fForest7');
-  s.mid.poly([[44, 94], [84, 140], [4, 140]], 'parch');
-  s.mid.poly([[44, 94], [84, 140], [64, 140]], 'fParch3');
-  s.mid.poly([[44, 112], [54, 140], [34, 140]], 'fForest');
-  s.mid.rect(43, 86, 2, 10, 'fWood5'); s.mid.rect(45, 86, 9, 5, 'ember');
-  // wagon with a bookshelf
-  s.mid.rect(236, 106, 54, 28, 'wood');
-  s.mid.rect(239, 109, 48, 22, 'fForest');
-  for (let x = 240; x < 284; x += 4) s.mid.rect(x, 110 + (x % 3), 3, 9 - (x % 3), (['fEmber7', 'fTeal7', 'fGold7', 'fViolet7'] as const)[(x / 4) % 4] ?? 'fEmber7');
-  s.mid.rect(239, 120, 48, 2, 'fWood5');
-  s.mid.disc(246, 138, 9, 'fWood7'); s.mid.disc(246, 138, 4, 'fWood5');
-  s.mid.disc(282, 138, 9, 'fWood7'); s.mid.disc(282, 138, 4, 'fWood5');
-  s.mid.poly([[290, 114], [310, 122], [290, 124]], 'fWood5');
-  // quest board
-  s.mid.rect(106, 100, 3, 38, 'fWood7'); s.mid.rect(142, 100, 3, 38, 'fWood7');
-  s.mid.rect(102, 94, 46, 28, 'wood');
-  s.mid.rect(105, 97, 40, 22, 'fWood5');
-  for (const [x, y] of [[108, 100], [122, 102], [134, 99], [112, 110], [128, 111]] as const) { s.mid.rect(x, y, 9, 8, 'fParch'); s.mid.rect(x + 1, y + 2, 7, 1, 'fParch5'); s.mid.px(x + 4, y, 'fEmber5'); }
-  // campfire
-  s.mid.rect(188, 138, 22, 4, 'fWood7');
-  s.mid.poly([[199, 118], [207, 138], [191, 138]], 'fEmber5');
-  s.mid.poly([[199, 124], [204, 138], [194, 138]], 'fGold');
-  s.mid.poly([[199, 130], [201, 138], [197, 138]], 'fParch');
+  // (the hub has no pine at x=286: it would stand in front of the gate you can click)
+  for (const [x, h] of [[12, 80], [38, 96], [286, 90], [308, 74], [150, 54], [180, 48]] as const) if (props || x !== 286) pine(s.mid, x, 124, h, 'fForest7');
+  if (props) {
+    s.mid.poly([[44, 94], [84, 140], [4, 140]], 'parch');
+    s.mid.poly([[44, 94], [84, 140], [64, 140]], 'fParch3');
+    s.mid.poly([[44, 112], [54, 140], [34, 140]], 'fForest');
+    s.mid.rect(43, 86, 2, 10, 'fWood5'); s.mid.rect(45, 86, 9, 5, 'ember');
+    // wagon with a bookshelf
+    s.mid.rect(236, 106, 54, 28, 'wood');
+    s.mid.rect(239, 109, 48, 22, 'fForest');
+    for (let x = 240; x < 284; x += 4) s.mid.rect(x, 110 + (x % 3), 3, 9 - (x % 3), (['fEmber7', 'fTeal7', 'fGold7', 'fViolet7'] as const)[(x / 4) % 4] ?? 'fEmber7');
+    s.mid.rect(239, 120, 48, 2, 'fWood5');
+    s.mid.disc(246, 138, 9, 'fWood7'); s.mid.disc(246, 138, 4, 'fWood5');
+    s.mid.disc(282, 138, 9, 'fWood7'); s.mid.disc(282, 138, 4, 'fWood5');
+    s.mid.poly([[290, 114], [310, 122], [290, 124]], 'fWood5');
+    // quest board
+    s.mid.rect(106, 100, 3, 38, 'fWood7'); s.mid.rect(142, 100, 3, 38, 'fWood7');
+    s.mid.rect(102, 94, 46, 28, 'wood');
+    s.mid.rect(105, 97, 40, 22, 'fWood5');
+    for (const [x, y] of [[108, 100], [122, 102], [134, 99], [112, 110], [128, 111]] as const) { s.mid.rect(x, y, 9, 8, 'fParch'); s.mid.rect(x + 1, y + 2, 7, 1, 'fParch5'); s.mid.px(x + 4, y, 'fEmber5'); }
+    // campfire
+    s.mid.rect(188, 138, 22, 4, 'fWood7');
+    s.mid.poly([[199, 118], [207, 138], [191, 138]], 'fEmber5');
+    s.mid.poly([[199, 124], [204, 138], [194, 138]], 'fGold');
+    s.mid.poly([[199, 130], [201, 138], [197, 138]], 'fParch');
+  }
   // near: foreground grass and a fence
   for (let x = 0; x < SCENE_W; x += 5) {
     const h = 5 + Math.floor(r() * 9);
@@ -111,7 +120,7 @@ function map(): SceneLayers {
   return s;
 }
 
-export const HUB_SCENES = { camp, map } as const;
+export const HUB_SCENES = { camp: () => camp(true), hub: () => camp(false), map } as const;
 export type HubSceneId = keyof typeof HUB_SCENES;
 const cache = new Map<string, Record<'far' | 'mid' | 'near', PixelGrid>>();
 export function hubScene(id: HubSceneId): Record<'far' | 'mid' | 'near', PixelGrid> {

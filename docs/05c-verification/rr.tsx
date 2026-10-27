@@ -18,8 +18,10 @@ export function NavLink({ to, end, className, children, onClick, ...rest }: any)
   return <a href={to} aria-current={active ? 'page' : undefined} className={typeof className === 'function' ? className({ isActive: active }) : className}
     onClick={(e) => { e.preventDefault(); onClick?.(e); navigate(to); }} {...rest}>{children}</a>;
 }
+import { HomePage } from '/home/claude/work/repo/apps/web/src/pages/HomePage';
 export function Outlet() {
   const { path } = React.useContext(Ctx);
+  if (path === '/') return <><HomePage /><label>Last field <input id="last-field" /></label></>;
   return <div><h1>Page {path}</h1>{Array.from({ length: 14 }, (_, i) => <p key={i}>Filler paragraph {i} so the page scrolls under the HUD and the hotbar.</p>)}
     <label>Last field <input id="last-field" /></label></div>;
 }

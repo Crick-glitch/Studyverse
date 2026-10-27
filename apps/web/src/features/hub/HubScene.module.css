@@ -1,0 +1,62 @@
+.hub {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+}
+/* The scene is a fixed integer-scaled picture; props sit at whole-pixel offsets inside it. */
+.stage {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  background: var(--forest-900);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--gold-700),
+    0 var(--pixel) 0 0 var(--gold-700),
+    calc(var(--pixel) * -1) 0 0 0 var(--gold-700),
+    var(--pixel) 0 0 0 var(--gold-700);
+}
+.layer,
+.prop,
+.marker {
+  position: absolute;
+  line-height: 0;
+}
+.layer {
+  inset: 0;
+}
+/* Lifted by one art pixel (whole screen pixels) on hover and focus; never the only way to find a destination. */
+.prop[data-lift='true'] {
+  transform: translateY(calc(var(--s) * -1));
+}
+.hit {
+  position: absolute;
+  display: block;
+  background: transparent;
+  text-decoration: none;
+}
+.hit:hover,
+.hit:focus-visible {
+  outline: 3px solid var(--gold-300);
+  outline-offset: -3px;
+}
+.hit:focus-visible {
+  outline-color: var(--parchment-50);
+  box-shadow: inset 0 0 0 6px var(--charcoal-950);
+}
+.marker {
+  z-index: 1; /* static: no bobbing, so it needs no reduced-motion rule */
+}
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+}
+.skip:focus {
+  position: static;
+  padding: var(--space-1) var(--space-3);
+  background: var(--gold-500);
+  color: var(--charcoal-950);
+  font-family: var(--font-pixel);
+  font-weight: 700;
+}
