@@ -45,6 +45,11 @@ export const BALANCE = {
     staleOpenHours: 24,
     titleMaxLength: 120,
   },
+  /**
+   * Raids (04-rpg-design-spec): one raid costs this much study energy. The battle API (session 06) spends it;
+   * until then it only drives the Adventure badge on the hotbar ("you have enough energy").
+   */
+  raid: { energyCost: 3 },
   /** XP modifiers that apply to session rewards (04-rpg-design-spec). */
   xpBonus: { scholarClass: 0.15, scholarInsightSkill: 0.12 },
 

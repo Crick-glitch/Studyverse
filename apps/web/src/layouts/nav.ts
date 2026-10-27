@@ -1,22 +1,41 @@
-import type { NavIconId } from '../features/art/sprites/icons';
+import { ROUTES } from '@studyverse/shared';
 
-export interface NavItem {
+export type HotbarId = 'home' | 'quests' | 'study' | 'library' | 'adventure';
+
+export interface HotbarSlot {
+  id: HotbarId;
   to: string;
   label: string;
-  icon: NavIconId;
-  /** Match only the exact path (the dashboard lives at "/"). */
+  /** The key that jumps here (also shown in the slot's tooltip). */
+  hotkey: string;
+  /** Manifest key of the pixel icon. */
+  sprite: string;
+  /** Match only the exact path (Home lives at "/"). */
   end?: boolean;
 }
 
-/** Every route that appears in the sidebar, in order. The pixel icon is looked up by the same id in the manifest. */
-export const NAV: readonly NavItem[] = [
-  { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
-  { to: '/quests', label: 'Quest Board', icon: 'quests' },
-  { to: '/sessions', label: 'Sessions', icon: 'sessions' },
-  { to: '/lab', label: 'Lab', icon: 'lab' },
-  { to: '/camp', label: 'Camp', icon: 'camp' },
-  { to: '/dungeons', label: 'Dungeons', icon: 'dungeons' },
-  { to: '/stats', label: 'Stats', icon: 'stats' },
-  { to: '/leaderboard', label: 'Leaderboard', icon: 'leaderboard' },
-  { to: '/settings', label: 'Settings', icon: 'settings' },
+/** The five things you do daily, in hotbar order (05c section 2). Slot n answers to key n. */
+export const HOTBAR: readonly HotbarSlot[] = [
+  { id: 'home', to: ROUTES.dashboard, label: 'Home', hotkey: '1', sprite: 'ui.campfire', end: true },
+  { id: 'quests', to: ROUTES.quests, label: 'Quests', hotkey: '2', sprite: 'ui.nav.quests' },
+  { id: 'study', to: ROUTES.sessions, label: 'Study', hotkey: '3', sprite: 'ui.nav.sessions' },
+  { id: 'library', to: ROUTES.lab, label: 'Library', hotkey: '4', sprite: 'ui.nav.lab' },
+  { id: 'adventure', to: ROUTES.dungeons, label: 'Adventure', hotkey: '5', sprite: 'ui.nav.dungeons' },
+];
+
+export const MENU_HOTKEY = 'M';
+export const HERO_HOTKEY = 'H';
+/** The Hero screen (opened from the HUD portrait). */
+export const HERO_ROUTE = ROUTES.camp;
+
+export interface MenuLink {
+  to: string;
+  label: string;
+  sprite: string;
+}
+/** Everything else, in the Menu overlay. Same routes as before; only the labels follow the game's wording. */
+export const MENU_LINKS: readonly MenuLink[] = [
+  { to: ROUTES.stats, label: 'Progress', sprite: 'ui.nav.stats' },
+  { to: ROUTES.leaderboard, label: 'Leaderboard', sprite: 'ui.nav.leaderboard' },
+  { to: ROUTES.settings, label: 'Settings', sprite: 'ui.nav.settings' },
 ];

@@ -8,6 +8,14 @@
   box-sizing: border-box;
 }
 
+/* Focused fields and in-page anchors must never land under the sticky HUD or the fixed hotbar (05c section 2). */
+html:has([data-hud]) {
+  scroll-padding-top: calc(var(--hud-h) + var(--space-3));
+}
+html:has([data-hotbar]) {
+  scroll-padding-bottom: calc(var(--hotbar-h) + env(safe-area-inset-bottom, 0px) + var(--space-3));
+}
+
 body {
   margin: 0;
   background: var(--forest-900);

@@ -36,17 +36,16 @@ const browser = await chromium.launch({
 
 const problems = [];
 
-async function open(vp, { signedIn = true, scenario = {}, legacy = false, collapsed } = {}) {
+async function open(vp, { signedIn = true, scenario = {}, legacy = false } = {}) {
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1 });
   await ctx.addInitScript(
-    ([key, session, signed, legacySave, coll]) => {
+    ([key, session, signed, legacySave]) => {
       try {
         if (signed) localStorage.setItem(key, JSON.stringify(session));
         if (legacySave) localStorage.setItem('studyverse-data', JSON.stringify({ level: 3, totalXP: 400, tasks: [], flashcards: [], sessions: [] }));
-        if (coll === true || coll === false) localStorage.setItem('studyverse.sidebar-collapsed', coll ? '1' : '0'); // undefined arrives as null
       } catch { /* ignore */ }
     },
-    [STORAGE_KEY, fakeSession(), signedIn, legacy, collapsed],
+    [STORAGE_KEY, fakeSession(), signedIn, legacy],
   );
   await ctx.route(`${API_BASE}/**`, async (route) => {
     const req = route.request();
@@ -106,9 +105,12 @@ for (const vp of VIEWPORTS) {
     await shot(vp, name, path);
   }
 }
-// navigation states
-await shot(VIEWPORTS[2], 'sidebar-collapsed', '/quests', { collapsed: true });
-await shot(VIEWPORTS[0], 'drawer-open', '/quests', {}, async (p) => { await p.getByRole('button', { name: 'Open menu' }).click(); await p.waitForTimeout(400); });
+// navigation states (05c): the Menu overlay, a running session in the HUD, a quiet hotbar, a paused chip
+for (const vp of VIEWPORTS) {
+  await shot(vp, 'menu-open', '/quests', {}, async (p) => { await p.getByRole('button', { name: 'Menu' }).click(); await p.waitForTimeout(400); });
+  await shot(vp, 'hud-session', '/lab', { scenario: { session: runningSession() } });
+  await shot(vp, 'hotbar-quiet', '/', { scenario: { summary: { dueCards: 0, claimableQuests: 0, energy: 0, unspentSkillPoints: 0 } } });
+}
 
 await browser.close();
 await server.close();

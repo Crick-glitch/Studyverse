@@ -1,83 +1,76 @@
 import { useQuery } from '@tanstack/react-query';
-import { Menu } from 'lucide-react';
-import type { RefObject } from 'react';
-import { useAuth } from '../auth/AuthContext';
+import type { SummaryDto } from '@studyverse/shared';
 import { Sprite } from '../features/art/components/Sprite';
-import { PixelBar, PixelButton, StreakFlame, XpCrest } from '../features/art/kit';
+import { PixelBar, StreakFlame } from '../features/art/kit';
 import { api } from '../lib/api';
-import { SIDEBAR_ID } from './Sidebar';
+import { HeroPortrait, LevelPlate, portraitSource } from './HeroPortrait';
+import { SessionChip } from './SessionChip';
 import styles from './Hud.module.css';
 
 interface Props {
-  drawerOpen: boolean;
-  onMenu: () => void;
-  menuRef: RefObject<HTMLButtonElement>;
-  /** Fewer XP bar segments on a phone so the bar never forces a horizontal scroll. */
+  /** Phone layout: fewer XP bar segments (fewest while the session chip is showing), a smaller chip, no name. */
   compact: boolean;
+  summary: SummaryDto | undefined;
+  /** Whether keyboard shortcuts are on (only changes the portrait's tooltip). */
+  hotkeys: boolean;
 }
 
-/** Top bar: who you are and where you stand. Every number comes from GET /me; nothing is invented. */
-export function Hud({ drawerOpen, onMenu, menuRef, compact }: Props) {
-  const { signOut } = useAuth();
+const CLASS_NAME = { warrior: 'Warrior', tank: 'Tank', scholar: 'Scholar' } as const;
+
+/**
+ * The always-on bar: who you are and what is running. Portrait (a link to the Hero screen), level, XP,
+ * energy, streak flame and, only while a session runs, the session chip. Everything comes from GET /me and
+ * GET /summary; nothing is invented. Sign-out lives in the Menu, not here.
+ */
+export function Hud({ compact, summary, hotkeys }: Props) {
   const me = useQuery({ queryKey: ['me'], queryFn: api.me });
   const progress = me.data?.progress;
+  const profile = me.data?.profile;
   return (
-    <header className={styles.hud}>
-      <button
-        ref={menuRef}
-        type="button"
-        className={styles.menu}
-        aria-expanded={drawerOpen}
-        aria-controls={SIDEBAR_ID}
-        onClick={onMenu}
-      >
-        <Menu aria-hidden size={22} />
-        <span className={styles.srOnly}>Open menu</span>
-      </button>
-
-      <div className={styles.player}>
-        {me.isPending && <span className={styles.status}>Loading…</span>}
-        {me.isError && (
-          <span role="alert" className={styles.status} title={me.error.message}>
-            Profile unavailable
-          </span>
-        )}
-        {me.data && progress && (
-          <>
-            <XpCrest level={progress.level} scale={2} />
-            <div className={styles.identity}>
-              <span className={styles.name}>
-                {me.data.profile.displayName} · Lv {progress.level}
-              </span>
-              <PixelBar
-                tone="xp"
-                label="XP to next level"
-                value={progress.currentLevelXp}
-                max={progress.xpForNextLevel}
-                segments={compact ? 10 : 20}
-              />
-            </div>
-          </>
-        )}
-      </div>
-
-      {progress && (
-        <div className={styles.stats}>
-          <span className={styles.stat}>
-            <Sprite id="ui.energy" scale={2} decorative />
-            <span aria-hidden="true">{progress.studyEnergy}</span>
-            <span className={styles.srOnly}>Study energy: {progress.studyEnergy}</span>
-          </span>
-          <span className={styles.stat}>
-            <StreakFlame streak={progress.streak} scale={2} />
-            <span aria-hidden="true">{progress.streak}</span>
-          </span>
-        </div>
+    <header className={styles.hud} data-hud>
+      {me.isPending && <span className={styles.status}>Loading…</span>}
+      {me.isError && (
+        <span role="alert" className={styles.status} title={me.error.message}>
+          Profile unavailable
+        </span>
       )}
-
-      <PixelButton className={styles.logout} onClick={() => void signOut()}>
-        Log out
-      </PixelButton>
+      {profile && progress && (
+        <>
+          <HeroPortrait
+            source={portraitSource(profile)}
+            skillPoints={summary?.unspentSkillPoints ?? 0}
+            hotkeys={hotkeys}
+          />
+          <LevelPlate level={progress.level} />
+          <div className={styles.identity}>
+            {/* Visible on desktop; on a phone only screen readers get the name and class. */}
+            <span className={styles.name}>
+              {profile.displayName} · Lv {progress.level}
+              {profile.playerClass ? <span className={styles.cls}> {CLASS_NAME[profile.playerClass]}</span> : null}
+            </span>
+            <PixelBar
+              tone="xp"
+              label="XP to next level"
+              value={progress.currentLevelXp}
+              max={progress.xpForNextLevel}
+              segments={compact ? (summary?.activeSession ? 5 : 8) : 20}
+              showNumbers={!compact}
+            />
+          </div>
+          <div className={styles.stats}>
+            <span className={styles.stat}>
+              <Sprite id="ui.energy" scale={2} decorative />
+              <span aria-hidden="true">{progress.studyEnergy}</span>
+              <span className={styles.srOnly}>Study energy: {progress.studyEnergy}</span>
+            </span>
+            <span className={styles.stat}>
+              <StreakFlame streak={progress.streak} scale={2} />
+              <span aria-hidden="true">{progress.streak}</span>
+            </span>
+          </div>
+        </>
+      )}
+      {summary?.activeSession && <SessionChip session={summary.activeSession} serverNow={summary.serverNow} compact={compact} />}
     </header>
   );
 }

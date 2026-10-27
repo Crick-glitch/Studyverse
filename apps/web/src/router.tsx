@@ -51,10 +51,10 @@ export const routes: RouteObject[] = [
             path: 'camp',
             element: (
               <ComingSoon
-                title="Camp"
+                title="Hero"
                 icon="camp"
                 phase="Phase 6"
-                description="Hero, class, inventory and skill tree."
+                description="Your hero: class, inventory, skill tree and cosmetics."
               />
             ),
           },
@@ -62,7 +62,7 @@ export const routes: RouteObject[] = [
             path: 'dungeons',
             element: (
               <ComingSoon
-                title="Dungeons"
+                title="Adventure"
                 icon="dungeons"
                 phase="Phase 5"
                 description="Dungeon select, energy cost and boss gates."
@@ -73,7 +73,7 @@ export const routes: RouteObject[] = [
             path: 'stats',
             element: (
               <ComingSoon
-                title="Stats"
+                title="Progress"
                 icon="stats"
                 phase="Phase 6"
                 description="Real study, accuracy and battle statistics."

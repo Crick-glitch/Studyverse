@@ -77,11 +77,25 @@ const claimQuestions = [
   { position: 1, text: 'What is the limit of 1/x as x grows without bound?', choices: ['0', '1', 'It does not exist'] },
 ];
 
-/** scenario: { session?: SessionDto|null, importPrompt?: bool } */
+/** The counts behind the hotbar badges. A running session in the scenario shows up as the HUD chip. */
+function summary(scenario) {
+  const s = scenario.session && ['running', 'paused'].includes(scenario.session.status) ? scenario.session : null;
+  return {
+    dueCards: 12, claimableQuests: 1, energy: 4, unspentSkillPoints: 2, serverNow: iso(0),
+    activeSession: s && {
+      id: s.id, status: s.status, startedAt: s.startedAt, pausedAt: s.pausedAt, plannedSeconds: s.plannedMinutes * 60,
+      pausedTotalSec: 0, remainingSec: s.remainingSec,
+    },
+    ...scenario.summary,
+  };
+}
+
+/** scenario: { session?: SessionDto|null, summary?: Partial<SummaryDto>, importPrompt?: bool } */
 export function respond(method, pathname, scenario = {}) {
   const p = pathname.replace(/^\/api\/v1/, '');
   if (method === 'GET') {
     if (p === '/me') return me;
+    if (p === '/summary') return summary(scenario);
     if (p === '/tasks') return { tasks };
     if (p === '/quests') return { quests };
     if (p === '/sessions/active') return { session: scenario.session ?? null, serverNow: iso(0) };

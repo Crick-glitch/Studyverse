@@ -22,12 +22,16 @@ import {
   CREST_SIZE,
   ENERGY_SIZE,
   FLAME_LEVELS,
+  HOTBAR_ART_IDS,
   ICON_SIZE,
   NAV_ICON_IDS,
+  PORTRAIT_FRAME_SIZE,
   crestGrid,
   energyGrid,
   flameGrid,
+  hotbarArtGrid,
   navIconGrid,
+  portraitFrameGrid,
 } from './sprites/icons';
 import {
   FRAME_SIZE,
@@ -203,6 +207,16 @@ function build(): Record<string, AssetEntry> {
   add({
     key: 'ui.energy', group: 'ui', kind: 'grid', size: { w: ENERGY_SIZE, h: ENERGY_SIZE }, scale: 2, anchor: at(7, 7),
     ...procedural('icons.ts'), states: ['idle'], grid: () => energyGrid(),
+  });
+  for (const id of HOTBAR_ART_IDS) {
+    add({
+      key: `ui.${id}`, group: 'ui', kind: 'grid', size: { w: ICON_SIZE, h: ICON_SIZE }, scale: 2, anchor: at(8, 8),
+      ...procedural('icons.ts'), states: ['idle'], grid: () => hotbarArtGrid(id),
+    });
+  }
+  add({
+    key: 'ui.portrait-frame', group: 'ui', kind: 'grid', size: { w: PORTRAIT_FRAME_SIZE, h: PORTRAIT_FRAME_SIZE }, scale: 2,
+    anchor: at(12, 12), ...procedural('icons.ts'), states: ['idle'], grid: () => portraitFrameGrid(),
   });
   return m;
 }

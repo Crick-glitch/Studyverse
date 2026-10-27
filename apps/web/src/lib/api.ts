@@ -22,6 +22,7 @@ import type {
   SessionCreate,
   SessionDto,
   SessionFinishResultDto,
+  SummaryDto,
   TaskCompleteResultDto,
   TaskCreate,
   TaskDto,
@@ -110,6 +111,8 @@ export interface TaskFilters {
 export const api = {
   me: () => apiFetch<MeDto>('/me'),
   progress: () => apiFetch<{ progress: ProgressDto }>('/progress'),
+  /** Counts for the hotbar badges and the HUD session chip (no content, only numbers). */
+  summary: () => apiFetch<SummaryDto>('/summary'),
   patchProfile: (patch: ProfilePatch) =>
     apiFetch<{ profile: ProfileDto }>('/profile', json('PATCH', patch)),
 

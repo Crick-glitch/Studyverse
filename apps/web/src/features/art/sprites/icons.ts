@@ -19,6 +19,12 @@ export const FLAME_LEVELS = [0, 1, 2, 3, 4] as const;
 export type FlameLevel = (typeof FLAME_LEVELS)[number];
 export const CREST_SIZE = 24;
 export const ENERGY_SIZE = 14;
+/** Hotbar art (05c): the Home campfire and the Menu satchel are 16 px like the nav icons. */
+export const HOTBAR_ART_IDS = ['campfire', 'satchel'] as const;
+export type HotbarArtId = (typeof HOTBAR_ART_IDS)[number];
+/** The HUD portrait frame: a gold ring with an 18 x 18 window (art pixels) for the hero bust. */
+export const PORTRAIT_FRAME_SIZE = 24;
+export const PORTRAIT_WINDOW = { x: 3, y: 3, w: 18, h: 18 } as const;
 
 const mk = (n = ICON_SIZE): Canvas => new Canvas(n, n);
 
@@ -121,6 +127,39 @@ function energy(): Canvas {
   return c;
 }
 
+/** Home: three stones, two crossed logs and a small flame. (The streak flame is a different art: this one is a place.) */
+function campfire(): Canvas {
+  const c = mk();
+  for (const x of [2, 4, 10, 12]) c.rect(x, 13, 2, 2, 'iron');
+  c.line(3, 12, 12, 14, 'wood', 2);
+  c.line(4, 14, 13, 12, 'wood', 2);
+  teardrop(c, 8, 1, 12, 4, 0, 'ember');
+  teardrop(c, 8, 4, 12, 2.6, 0, 'gold');
+  teardrop(c, 8, 7, 12, 1.2, 0, 'fGold');
+  return c;
+}
+
+/** Menu: a leather satchel with a flap, a buckle and a carrying loop. */
+function satchel(): Canvas {
+  const c = mk();
+  c.rect(5, 2, 6, 1, 'wood'); c.rect(5, 2, 1, 4, 'wood'); c.rect(10, 2, 1, 4, 'wood');
+  c.rect(2, 5, 12, 9, 'wood');
+  c.poly([[2, 5], [14, 5], [14, 9], [8, 12], [2, 9]], 'fWood5');
+  c.rect(2, 9, 12, 1, 'fWood7');
+  c.rect(7, 9, 3, 3, 'gold'); c.px(8, 10, 'ink');
+  return c;
+}
+
+/** A gold ring with a notched outer corner and an 18 x 18 window; the portrait shows through the middle. */
+function portraitFrame(): Canvas {
+  const c = mk(PORTRAIT_FRAME_SIZE);
+  c.rect(1, 1, 22, 22, 'gold');
+  c.clear(PORTRAIT_WINDOW.x, PORTRAIT_WINDOW.y, PORTRAIT_WINDOW.w, PORTRAIT_WINDOW.h);
+  for (const [x, y] of [[1, 1], [22, 1], [1, 22], [22, 22]] as const) c.clear(x, y, 1, 1); // notched corners
+  for (const [x, y] of [[2, 2], [21, 2], [2, 21], [21, 21]] as const) c.px(x, y, 'fGold7'); // rivets
+  return c;
+}
+
 const cache = new Map<string, PixelGrid>();
 const memo = (key: string, build: () => Canvas): PixelGrid => {
   const hit = cache.get(key);
@@ -134,3 +173,5 @@ export const navIconGrid = (id: NavIconId): PixelGrid => memo(`nav:${id}`, () =>
 export const flameGrid = (level: FlameLevel): PixelGrid => memo(`flame:${level}`, () => flame(level));
 export const crestGrid = (): PixelGrid => memo('crest', crest);
 export const energyGrid = (): PixelGrid => memo('energy', energy);
+export const hotbarArtGrid = (id: HotbarArtId): PixelGrid => memo(`hotbar:${id}`, id === 'campfire' ? campfire : satchel);
+export const portraitFrameGrid = (): PixelGrid => memo('portrait-frame', portraitFrame);
