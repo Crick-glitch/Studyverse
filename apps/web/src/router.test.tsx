@@ -40,6 +40,16 @@ vi.mock('./lib/api', () => ({
         },
       }),
     ),
+    summary: vi.fn(() =>
+      Promise.resolve({
+        dueCards: 0,
+        claimableQuests: 0,
+        activeSession: null,
+        energy: 0,
+        unspentSkillPoints: 0,
+        serverNow: '2026-01-01T00:00:00Z',
+      }),
+    ),
     tasks: { list: vi.fn(() => Promise.resolve([])) },
     quests: { list: vi.fn(() => Promise.resolve([])) },
     sessions: {
@@ -75,10 +85,10 @@ function renderAt(path: string, status: AuthValue['status'] = 'signedIn') {
 
 const placeholders: [string, string][] = [
   ['/', 'Dashboard'],
-  ['/camp', 'Camp'],
-  ['/dungeons', 'Dungeons'],
+  ['/camp', 'Hero'],
+  ['/dungeons', 'Adventure'],
   ['/battle/abc', 'Battle'],
-  ['/stats', 'Stats'],
+  ['/stats', 'Progress'],
   ['/leaderboard', 'Leaderboard'],
   ['/settings', 'Settings'],
 ];
@@ -106,6 +116,25 @@ describe('route shell (signed in)', () => {
   it('battle route has no main navigation', () => {
     renderAt('/battle/abc');
     expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+  });
+
+  it('login has no hotbar and no HUD', () => {
+    renderAt('/login', 'signedOut');
+    expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+    expect(screen.queryByRole('banner')).toBeNull();
+  });
+
+  it('every signed-in screen has the hotbar with the five daily destinations plus Menu', () => {
+    renderAt('/quests');
+    const nav = screen.getByRole('navigation', { name: 'Main' });
+    expect(Array.from(nav.querySelectorAll('a')).map((a) => a.getAttribute('href'))).toEqual([
+      '/',
+      '/quests',
+      '/sessions',
+      '/lab',
+      '/dungeons',
+    ]);
+    expect(nav.querySelector('button')?.textContent).toBe('Menu');
   });
 
   it('shows the real player name and level from the API', async () => {

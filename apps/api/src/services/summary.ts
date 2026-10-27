@@ -2,7 +2,7 @@ import { BALANCE, periodKey, type SummaryDto } from '@studyverse/shared';
 import type { StudySession } from '../generated/prisma/client.js';
 import type { PrismaClient } from '../lib/prisma.js';
 import { ensurePlayer } from './player.js';
-import { sessionElapsedSec } from './sessions.js';
+import { sessionElapsedSec } from './sessionTime.js';
 
 type OpenSessionRow = Pick<
   StudySession,

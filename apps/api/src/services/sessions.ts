@@ -27,33 +27,15 @@ import type { Prisma, PrismaClient } from '../lib/prisma.js';
 import { grantXp } from '../lib/xp.js';
 import { applyCardReview } from './cardReview.js';
 import { buildCardQuizItems } from './cardChoices.js';
+import { sessionElapsedSec } from './sessionTime.js';
 import { ensurePlayer, toProgressDto } from './player.js';
 import { recordQuestEvent } from './quests.js';
 import { addEnergy, getModifiers, touchStreak } from './streak.js';
 
 type Tx = Prisma.TransactionClient;
-type TimedSession = Pick<
-  StudySession,
-  'status' | 'startedAt' | 'pausedAt' | 'pausedTotalSec' | 'finishedAt' | 'plannedMinutes'
->;
-
 const notFound = () => new AppError(404, 'SESSION_NOT_FOUND', 'Session not found');
 
-/**
- * Seconds of focus time so far, measured with SERVER timestamps only: (end - start) minus paused time,
- * capped at the plan. `end` is now while running, the pause moment while paused, finishedAt afterwards.
- */
-export function sessionElapsedSec(s: TimedSession, now: Date): number {
-  if (!s.startedAt) return 0;
-  const endMs =
-    s.status === 'running'
-      ? now.getTime()
-      : s.status === 'paused'
-        ? (s.pausedAt ?? now).getTime()
-        : (s.finishedAt ?? now).getTime();
-  const raw = Math.floor((endMs - s.startedAt.getTime()) / 1000) - s.pausedTotalSec;
-  return Math.max(0, Math.min(s.plannedMinutes * 60, raw));
-}
+export { sessionElapsedSec };
 
 export function toSessionDto(s: StudySession, now: Date, streak: number): SessionDto {
   const elapsedSec = sessionElapsedSec(s, now);
