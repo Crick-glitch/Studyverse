@@ -1,6 +1,8 @@
 const esbuild = require('/home/claude/.npm-global/lib/node_modules/tsx/node_modules/esbuild');
 const G = '/home/claude/.npm-global/lib/node_modules';
 const R = '/home/claude/work/repo';
+// entry.tsx imports ./global-nofont.css: the app's real global.css without the @import lines (fonts are not installable offline; tokens.css is imported separately).
+require('fs').writeFileSync('/tmp/h/global-nofont.css', require('fs').readFileSync(R + '/apps/web/src/styles/global.css', 'utf8').split('\n').filter((l) => !l.startsWith('@import')).join('\n'));
 esbuild.build({
   entryPoints: ['/tmp/h/entry.tsx'], bundle: true, outfile: '/tmp/h/out/app.js', format: 'iife', jsx: 'automatic',
   define: { 'process.env.NODE_ENV': '"development"' }, logLevel: 'error', sourcemap: false,

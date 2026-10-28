@@ -51,10 +51,15 @@
   position: absolute;
   left: -9999px;
   top: auto;
+  /* A real 44px target in every state, also while parked off-screen (the shots audit measures it there). */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-3);
 }
 .skip:focus {
   position: static;
-  padding: var(--space-1) var(--space-3);
+  padding: 0 var(--space-3);
   background: var(--gold-500);
   color: var(--charcoal-950);
   font-family: var(--font-pixel);

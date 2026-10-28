@@ -1,44 +1,89 @@
-# Handoff: session 05c (game-style navigation), STOPPED EARLY on the owner's request
+# Handoff: session 05c (game-style navigation), second pass. STILL NOT VERIFIED BY THE REAL TOOLCHAIN
 
-## Done (evidence in brackets)
-- **P0 built:** `GET /api/v1/summary` (shared `SummaryDto`, `services/summary.ts`, `routes/summary.ts`, registered in `app.ts`);
-  slim HUD (portrait link to `/camp` with "!" for skill points, level, XP bar, energy, flame, session chip with server-time countdown);
-  bottom hotbar (Home/Quests/Study/Library/Adventure + Menu) with live badges and hidden text equivalents; hotkeys 1-5, M, H with the on/off switch;
-  Menu overlay (Progress, Leaderboard, Settings, Credits, shortcut toggle, Sign out; focus trap, inert background, focus return);
-  sidebar, `useSidebar`, the drawer and `studyverse.sidebar-collapsed` DELETED; new sprites `ui.campfire`, `ui.satchel`, `ui.portrait-frame`.
-- **P1 built:** Home hub scene (`scene.hub` + seven prop sprites `prop.*` with states, `ui.marker`), `HubScene`, `HomePage`, state-reactive names; travel wipe.
-- Browser harness: 114/114 behaviour checks in Chromium; 53/53 pure test cases through a shim; art contact sheet looked at; screenshots viewed at 390/768/1280 (see `docs/05c-verification/`).
+**The network was off again** (DNS for registry.npmjs.org does not resolve; `vitest`, `vite`, `jsdom`, `eslint`, `zod`, `react-router`,
+`@testing-library/*` and Prisma are not on disk). So `npm install` and everything that needs it **did not run**:
+`npm run lint`, `typecheck`, `test` (web, shared, api), `build`, `npm run shots`, `prisma generate`.
+Nothing below should be read as "the project's checks pass". They have not been run on the 05c code by anyone.
 
-## NOT RUN (do these first)
-In this session's sandbox (no network) none of these ran:
-`npm install`, `npm run lint`, `npm run typecheck` (only a shimmed `tsc`, which found no real type errors in the new files but had no React types),
-`npm run test` (web, shared AND api), `npm run build`, `npm run shots -w apps/web`, `prisma generate`, any API test.
-**Baseline was not re-verified** (you reported eslint/tsc clean, vite build ok, web 297/297, shared 57/57). Expect to fix small lint/type nits.
+## What this pass did
+**1. Read every unrun web test line by line against its component** (the three failure areas you predicted, plus the rest):
+`AppLayout.test.tsx`, `HubScene.test.tsx`, `TravelWipe.test.tsx`, `queryClient.test.ts`, `router.test.tsx`, `useMediaQuery.test.tsx`.
+- *jsdom `matchMedia`*: the source (`useMediaQuery`, `useReducedMotion`) is already guarded with `typeof window.matchMedia === 'function'`,
+  and every test that installs a fake also deletes it in `afterEach`. No defect found.
+- *Session-chip countdown tests*: they use the same `vi.spyOn(performance, 'now')` mechanism as the baseline `useSessionClock.test.ts`
+  (which passed), the anchor is taken when the chip mounts, and a 500 ms tick re-reads the clock. On paper they pass (13:00 -> 12:57 after +3 s).
+- *Accessible names*: each expected string (`Library, 12 cards due`, `Hero, 2 unspent skill points`, `Quests, 1 quest ready to claim`,
+  `Adventure, 4 energy, enough for a raid`, hub prop names, `Study session running...`) was traced to the code that builds it (`plural()`, `slotBadge()`,
+  `hubProps()`). They match.
+- `inert` is set as a **property** (`page.inert = menuOpen`); jsdom has no `inert`, so it becomes a plain expando and the tests read the property back
+  (works). In real Chromium it is the real thing (covered by the harness).
+- `LocalImportPrompt` (rendered for real by `AppLayout`'s `ImportGate`) guards every storage read, so the "storage blocked" test cannot crash it.
+- **Result: no definite defect found. That is "plausible on paper", not "passes".**
 
-## Tests (written, UNRUN under real Vitest)
-- API: `summary.test.ts` (pure + 401), `summary.int.test.ts` (needs `TEST_DATABASE_URL`).
-- Web new: `layouts/hotkeys.test.ts`, `badges.test.ts`, `HeroPortrait.test.ts`, `TravelWipe.test.tsx`, `features/hub/hubState.test.ts`, `HubScene.test.tsx`, `lib/queryClient.test.ts`.
-- **Replaced/changed (you asked for this list):**
-  1. `layouts/AppLayout.test.tsx`: ALL sidebar/drawer tests (collapse, persisted collapsed key, drawer open/close, Escape, focus trap, inert, `aria-current` in the sidebar) replaced by hotbar, hotkey, Menu-overlay tests. HUD tests KEPT (name/level/XP/energy/streak) except: the `Log out` button assertion and the "signs out from the HUD" test (sign-out moved to the Menu; covered by the Menu "Sign out" test). Added HUD tests: portrait link, "!" , session chip, paused chip, phone level plate.
-  2. `router.test.tsx`: placeholder headings `Camp`->`Hero`, `Dungeons`->`Adventure`, `Stats`->`Progress`; `api.summary` mock added; two tests added (login has no hotbar/HUD; hotbar destinations).
-  3. `features/art/manifest.test.ts`: scene count 2 -> 3 and a prop count (7).
-- Most likely first failures: jsdom `matchMedia` handling in `AppLayout`/`HubScene` tests, the two countdown tests (they mock `performance.now` and wait for the chip's 500 ms tick), and `findByRole` name strings.
+**2. Compiler pass** with the one real compiler available (global TypeScript 6.0.3), over `apps/web/src`, `packages/shared/src` and the API summary files,
+with the repo's `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, plus `noUnusedLocals/Parameters`. Every remaining diagnostic is caused by
+missing third-party types (React JSX runtime, `import.meta.env`, `PixelButtonProps` extending React attributes) and appears in untouched baseline files too.
+**None** of: unused symbols, undefined names, missing exports from local modules, missing `import type`. (Not a substitute for `tsc -b` with real types.)
+
+**3. API read against `schema.prisma`:** every field in `services/summary.ts` exists with that name and type; `periodKey` and
+`BALANCE.sessions.staleOpenHours` exist in shared; `buildTestApp(prisma, {}, clock)`, `noDb`, `createTestPrisma`, `hasTestDb`, `newPlayer`, `client`, `runSeed` exist
+with those signatures; auth middleware is mounted before the summary router, and `UNAUTHENTICATED` is the real error code. The `sessions.ts` refactor
+(`sessionElapsedSec` moved to `sessionTime.ts` and re-exported) is behaviour-preserving and nothing else used the removed `TimedSession` type.
+
+**4. Fixed (three real things):**
+- **ESLint would have failed on `docs/05c-verification/*`** (16 files with `any`, `require()` in `.cjs`, no globals). `eslint.config.js` now ignores `docs/**`.
+- **"Skip scene" link was 26 px tall while parked off-screen.** `route-shots.mjs`'s own audit flags targets under 40 px, so `npm run shots` would have exited non-zero on Home
+  at every width. `HubScene.module.css` now gives it a 44 px minimum height in every state. Found by running that audit's exact logic on the harness; after the fix 18/18 state x width
+  combinations are clean.
+- **`apps/api/.env.example` and `apps/web/.env.example` were missing** (the previous zip stripped `.env*` and git showed them deleted). Restored from git; they hold only public values/placeholders.
+
+**5. Executed for the first time:** `apps/web/scripts/mock-api.mjs` (the `/summary` shape equals the DTO's exact key set; `hud-session` and `hotbar-quiet` scenarios behave as `route-shots.mjs` assumes).
+Both `.mjs` scripts pass a syntax check and an unused/undefined-name check.
+
+**6. Re-ran the Chromium harness from the repo** (it was not reproducible from the zip: `global-nofont.css` was a lost scratch file; `build.cjs` now generates it).
+114/114 behaviour checks, 53/53 pure test cases through the shim, layout audit clean. See `docs/05c-verification/README.md` for exact reproduce steps and what it does **not** cover.
+
+**7. Looked at the screenshots** (harness renders: fallback fonts, stubbed data, **not** `npm run shots`): home hub, Menu, session chip, quiet hotbar at 390 / 768 / 1280.
+They read as a game UI. Details in "Honest look".
+
+## DO THESE FIRST (on a machine with network)
+```
+npm install
+npm run lint
+npm run typecheck
+npm run test                       # web, shared, api; for the DB tests set TEST_DATABASE_URL (database name must contain "test")
+npm run build
+PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome npm run shots -w apps/web   # regenerates docs/screens (still the PRE-05c set)
+```
+If something fails, where I would look first (ordered by my own risk estimate, which is a guess):
+1. `AppLayout.test.tsx`: any `findByRole(... name: ...)` that fails: dom-testing-library's name algorithm can differ from Chromium's on `title` vs content; compare with `hotbar().getAllByRole('link').map(a => a.getAttribute('aria-label'))`.
+2. `useFocusTrap` Tab tests: they rely on DOM order `close, 3 links, Credits, checkbox, Sign out`.
+3. React Router version-specific warnings are not failures. Real TanStack Query, `MemoryRouter` and Testing Library are exactly what the harness replaced, so the first run of those is the first run.
+4. API: `prisma generate` must run before `tsc -b`; `summary.int.test.ts` is skipped without `TEST_DATABASE_URL`.
+5. ESLint: I scanned the 44 touched TS/TSX files for `any`, `@ts-ignore`, empty blocks, `var`, `eval` (none) and for unused symbols via tsc (none). `react-hooks/exhaustive-deps` is the rule I could only check by reading (`AppLayout`, `HubScene`, `useFocusTrap`, `TravelWipe`; no issue seen).
 
 ## Not started
-- **P2:** quest tracker chip, per-screen location banners.
-- `docs/screens/` was NOT regenerated (the `shots` tool needs vite). `route-shots.mjs` and `mock-api.mjs` were edited for the new navigation (sidebar shots removed; menu-open, hud-session, hotbar-quiet added; `/summary` mocked) but never executed.
-- Next-action marker is built (`<HubScene nextAction=...>`) but nothing passes it until session 07.
-- Gate `locked` sprite is drawn but unused until session 06 unlock rules.
+- **P2** (quest tracker chip, per-screen location banners): the spec says only that and the owner has not said whether they want it. Not built.
+- **Session 06**: deliberately NOT started. The pack's own rule (README step 3) says not to start the next phase while checks have not passed, and 06 adds a migration,
+  a battle engine and routes on top of a baseline that has never been verified. Do the block above first.
+- Next-action hub marker is built but nothing passes it until session 07. Gate `locked` sprite is unused until session 06's unlock rules.
 
 ## Owner decisions / to confirm
-1. Lato licence line in the in-app Credits and `ASSETS.md` (written from knowledge): confirm against `node_modules/@fontsource/lato/LICENSE`.
-2. Avatar preset names in `packages/shared/src/avatars.ts` (mage/ranger/guardian) differ from the art ids (wizard/elf/knight): `portraitSource()` maps them; unify in session 07.
+1. Lato licence line in the in-app Credits and `ASSETS.md` (written from knowledge): confirm against `node_modules/@fontsource/lato/LICENSE` after `npm install`.
+2. Avatar preset names in `packages/shared/src/avatars.ts` (mage/ranger/guardian) differ from art ids (wizard/elf/knight); `portraitSource()` maps them; unify in session 07.
 3. Real screens still say "Lab", "Quest Board", "Study Sessions" while the hotbar says Library/Quests/Study: align in 07.
-4. Energy is shown as a count, not "pips" (05b decision kept).
-5. The summary adds `serverNow`, `pausedAt`, `remainingSec` beyond 05c's shape (see `docs/DECISIONS.md`, Phase 5c #1).
+4. Energy is a count, not "pips" (05b decision kept).
+5. The summary adds `serverNow`, `pausedAt`, `remainingSec` beyond 05c's shape (`docs/DECISIONS.md`, Phase 5c #1).
+6. **NEW: do you want P2?** And do you want the Menu to become a full-height journal on phones (see below)?
 
 ## Honest look
-The HUD, hotbar and Menu read as a game UI (gold-framed raised slots, pixel icons, portrait in a frame), and the hub scene has live props. Weakest parts: the HUD portrait is small (48 px, forced by the 64/56 px height limit); the campfire and satchel icons are plain; props are simple (flat shapes, no animation); the Menu is a flat parchment card. Upgrade first: the hub prop art and the HUD portrait (a purpose-drawn 18x18 face), then the Menu look.
+HUD, hotbar, Menu and hub scene read as a game interface: gold-framed raised slots, pixel icons, a portrait in a frame, a camp whose props are links, a calm quiet state with no badges,
+and a session chip that replaces some XP-bar segments instead of crowding the row. Weakest parts, in order:
+1. **Menu**: a flat parchment card; on a phone it is top-aligned and the bottom third is empty dark green (not full-screen as 05c describes). Upgrade first together with the hub props.
+2. **HUD portrait** is small (48 px, forced by the 56/64 px height limit); a purpose-drawn 18x18 face would help.
+3. Hub props are simple flat shapes with no animation; campfire and satchel icons are plain.
+4. "9+" badge slightly overlaps the flask icon on 390 px.
+5. "Skip scene" is in the flow when focused (`position: static` in the CSS), so it should shift the scene down by its own height; inferred from the CSS, not observed.
 
 ## Exact next prompt
-"Continue StudyVerse 05c from docs/HANDOFF-05C.md. Network may be on now: run `npm install`, then lint, typecheck, vitest (web, shared, api; api with TEST_DATABASE_URL if available), build. Fix everything that fails, starting with the tests listed under 'Most likely first failures'. Then run `npm run shots -w apps/web` (PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome) and LOOK at menu-open, hud-session, hotbar-quiet and the home hub at 390/768/1280. Then P2 (quest tracker chip, location banners) if wanted, then session 06."
+"Run the block under 'DO THESE FIRST' from docs/HANDOFF-05C.md and paste me every failure. Fix them in the order listed under 'where I would look first'. When lint, typecheck, test (web, shared, api) and build pass and you have looked at the new docs/screens (menu-open, hud-session, hotbar-quiet, dashboard at 390/768/1280), commit, then tell me whether to do P2 or go straight to session 06."

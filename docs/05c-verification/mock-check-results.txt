@@ -1,0 +1,6 @@
+PASS default: due 12, 1 quest, energy 4, 2 skill points, no session
+PASS hud-session: running session appears as activeSession (780 s left, 1500 planned)
+PASS hotbar-quiet: scenario.summary zeroes every count (no session)
+PASS a finished session is NOT reported as active
+PASS /me has displayName and xpForNextLevel for the HUD
+PASS unknown routes return undefined (-> 404 in route-shots)

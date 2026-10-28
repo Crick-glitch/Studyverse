@@ -158,3 +158,13 @@ Replaced the 05b sidebar and drawer with a HUD, a bottom hotbar, a Menu overlay 
 17. **Verification environment.** This session's sandbox had no network, so `npm install`, ESLint, Vitest and `vite build` could not run. Instead the real components were bundled with esbuild (with small stand-ins for the router, query client and API) and driven in Chromium by Playwright: `docs/05c-verification/`. That is evidence about the components, **not** a substitute for the project's own checks (see the handoff).
 18. **Home hub (P1).** `scene.hub` is the camp WITHOUT its tents, board, fire, wagon and gate (the old `scene.camp` is unchanged); `prop.*` sprites (seven, with states) are painted in scene coordinates and cropped to a box, so they line up exactly. The gate sits behind the trees (far layer), the rest in front of the meadow; the pine at x=286 is left out of the hub so it does not hide the gate. Props are links (aria-label = "Library wagon, Library, 12 cards due"); hit areas grow to at least 44 px; hover/focus lifts a prop by one art pixel and adds an outline; the scene is 2x on wide screens and 1x on phones. The campfire is not a link; its flame is the streak flame level. States come from `/summary` and `/me` only (`features/hub/hubState.ts`).
 19. **Travel wipe** is a thin gold bar that steps across in whole pixels (a rounded eighth of the width, 300 ms), on top of the page with `pointer-events: none`, so content is never delayed or hidden; not drawn under reduced motion.
+
+## Phase 5c continuation (second sandbox, still no network)
+1. **`docs/**` is excluded from ESLint.** The 05c verification harness (`docs/05c-verification/`) uses `any` in stubs, CommonJS scripts and
+   browser/Node globals; linting it would fail `npm run lint` for reasons unrelated to product code. Alternative: add per-folder globals and
+   fix every stub; rejected as effort without value.
+2. **"Skip scene" link has a 44 px minimum height in every state.** It was parked off-screen at 26 px tall, which the shots audit
+   (and the 05c 44 px intent) rejects. Kept the off-screen technique and the static-on-focus behaviour. Known minor trade-off: when it
+   takes focus it is in the flow and shifts the scene down by its own height; an overlay variant is possible later.
+3. **`.env.example` files restored.** The zip protocol strips `.env*`, which also removed the two committed `.env.example` files
+   (git showed them as deleted). They hold only public values and placeholders. Future zips must exclude `.env` and `.env.*` **except** `.env.example`.

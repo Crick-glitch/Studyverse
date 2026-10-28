@@ -4,7 +4,11 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/coverage/**', 'Studyverse/**', 'legacy/**', 'node_modules/**'] },
+  {
+    // docs/ holds evidence tooling (e.g. the 05c Chromium harness: stubs with `any`, CommonJS scripts, sandbox paths),
+    // not product code, so it is not linted.
+    ignores: ['**/dist/**', '**/coverage/**', 'Studyverse/**', 'legacy/**', 'node_modules/**', 'docs/**'],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
