@@ -10,3 +10,7 @@
   color: var(--gold-300);
   font-weight: 700;
 }
+
+.flush {
+  margin: 0;
+}

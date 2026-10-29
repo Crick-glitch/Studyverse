@@ -43,3 +43,19 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* In the desktop panel: a full-width row, icon and "Session" on the left, the time on the right. */
+.wide {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  gap: var(--space-2);
+}
+.wideLabel {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--parchment-100);
+}
+.wide .time {
+  text-align: right;
+}

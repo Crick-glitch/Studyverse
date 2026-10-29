@@ -37,12 +37,13 @@ interface Props {
   /** Unspent skill points: a "!" appears on the frame when there are any. */
   skillPoints: number;
   hotkeys: boolean;
+  /** Screen pixels per art pixel: 2 in the top bar (48 px frame), 3 in the desktop panel (72 px frame). */
+  scale?: number;
 }
 
-const SCALE = 2;
-
 /** HUD portrait: the hero bust in a gold frame. It is the link to the Hero screen; a gold "!" marks unspent skill points. */
-export function HeroPortrait({ source, skillPoints, hotkeys }: Props) {
+export function HeroPortrait({ source, skillPoints, hotkeys, scale = 2 }: Props) {
+  const SCALE = scale;
   const frame = PORTRAIT_FRAME_SIZE * SCALE;
   return (
     <Link

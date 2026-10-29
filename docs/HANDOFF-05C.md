@@ -1,4 +1,46 @@
-# Handoff: session 05c (game-style navigation), second pass. STILL NOT VERIFIED BY THE REAL TOOLCHAIN
+# Handoff: session 05c. VERIFIED by the real toolchain, then redesigned after a desktop design review
+
+## Status (latest)
+| Check | Result |
+|---|---|
+| `npm install` | pass (562 packages) |
+| `npm run lint` | pass |
+| `npm run typecheck` | pass (needs the Prisma stand-in below in a sandbox without `binaries.prisma.sh`) |
+| `npm run test` | pass: web 384, shared 57, API 138 (API run against a local PostgreSQL 16 via `TEST_DATABASE_URL`, not Supabase) |
+| `npm run build` | pass |
+| `npm run shots -w apps/web` | pass (no overflow, console errors, undersized targets, leftover travel wipe) |
+| `node scripts/design-shots.mjs <label>` | pass at 1440x900, 1280x800, 768x1024, 390x844, 360x800: no overflow, no clipping |
+
+**Sandbox only:** `prisma generate` was run with `PRISMA_SCHEMA_ENGINE_BINARY` pointing at a stub script and `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1`
+(the sandbox blocks `binaries.prisma.sh`). `prisma migrate` / `prisma validate` were NOT run; the test harness applied the migration SQL with `pg`. On your machine none of this is needed.
+
+### Bugs the real toolchain and a browser found (the 371 unit tests could not)
+1. **Travel wipe left a gold strip on screen after every route change** (CSS `fill-mode: both` parked the bar at the right edge) and **fired on first load in dev** (a `useRef` "first run" flag does not survive React StrictMode). Fixed; 3 tests added; `route-shots.mjs` now checks it in a real browser.
+2. **`flashcards.int.test.ts` was date-dependent**: cards get `dueAt = now()` from the database clock while the test pinned the app clock at 2026-10-23, so once the real date passed it every new card looked "not due" (6 failures). The test clock now starts mid-January of next year.
+3. **XP bar clipped on a 360 px phone with a running session**: the 5th (empty) segment was cut off, so an 80% bar looked 100% full. Now 4 segments at <=380 px and 8 px side padding; `design-shots.mjs` fails on any HUD/hotbar clipping.
+
+### Desktop design review (owner feedback on the 1280 px render)
+The first implementation followed 05c's desktop numbers literally (64 px HUD, ~640 px hotbar, 2x scene) and had never been looked at on a desktop. Measured at 1280x800: HUD + bottom hotbar = 156 px (20% of the height) while the page used 50-75% of the width;
+three unrelated alignment axes (HUD x=24..1416, content x=170..1270, hotbar x=400..1040 at 1440); a 48 px portrait and 17 px name were the smallest things in the HUD; energy and streak were bare numbers; the first content card started at y=488.
+New design (decisions in `docs/DECISIONS.md`, "Desktop design review"):
+- **>= 1024 px: a left "camp panel"** (264 px, `AppLayout` `data-rail`): player card (72 px portrait, name, level and class, full-width XP bar with numbers, labeled Energy and Streak, unspent skill points, session timer) above the same hotbar as a vertical slot list with visible key caps; Menu pinned to the bottom. The page gets the full height.
+- **< 1024 px: unchanged model** (top HUD bar + bottom hotbar), hotbar now full width on tablets, resource labels visible from 641 px up.
+- Home on desktop (>= 1280 px): camp scene and dashboard column side by side. Menu overlay: dimmed (not opaque), centred on desktop, full-height sheet with Sign out at the bottom on phones.
+
+### Not done / known issues
+- **05c P2 (quest tracker chip, location banners) and session 06 are NOT started.**
+- The lower half of Home is empty on desktop because the dashboard is still a placeholder (session 07), not because of the shell.
+- Hotbar says "Library" but the page title says "Lab" (and "Quests" vs "Quest Board", "Study" vs "Study Sessions"); other placeholders still use the old "Phase N" labels. Align in 07.
+- **Not tested:** landscape phones (e.g. 844x390: the compact layout would spend ~40% of the height on bars), windows shorter than 800 px high (the panel scrolls; only 800 and 900 high were measured), widths above 1440, Firefox/Safari, real touch devices, reduced-motion rendering.
+- Hero art (portrait) is still the weakest art; the scene stays 2x on large screens (could be 3x when content is wider than ~1000 px).
+- "Skip scene" in-flow-on-focus shift is still inferred from CSS, not observed.
+
+## Exact next prompt
+"Continue StudyVerse from docs/HANDOFF-05C.md. Start with 05c P2 (quest tracker chip, location banners) only if I say so; otherwise run session 06 (06-battle-screen.md) with Step 0 first, tests first, P0 before anything else."
+
+---
+
+## Older notes (kept for history; the "Status" section above is current)
 
 **The network was off again** (DNS for registry.npmjs.org does not resolve; `vitest`, `vite`, `jsdom`, `eslint`, `zod`, `react-router`,
 `@testing-library/*` and Prisma are not on disk). So `npm install` and everything that needs it **did not run**:
@@ -46,7 +88,7 @@ Both `.mjs` scripts pass a syntax check and an unused/undefined-name check.
 **7. Looked at the screenshots** (harness renders: fallback fonts, stubbed data, **not** `npm run shots`): home hub, Menu, session chip, quiet hotbar at 390 / 768 / 1280.
 They read as a game UI. Details in "Honest look".
 
-## DO THESE FIRST (on a machine with network)
+## (Historical) DO THESE FIRST: done, see "Status" above
 ```
 npm install
 npm run lint
@@ -76,7 +118,7 @@ If something fails, where I would look first (ordered by my own risk estimate, w
 5. The summary adds `serverNow`, `pausedAt`, `remainingSec` beyond 05c's shape (`docs/DECISIONS.md`, Phase 5c #1).
 6. **NEW: do you want P2?** And do you want the Menu to become a full-height journal on phones (see below)?
 
-## Honest look
+## Honest look (written BEFORE the desktop design review; superseded by the review section above)
 HUD, hotbar, Menu and hub scene read as a game interface: gold-framed raised slots, pixel icons, a portrait in a frame, a camp whose props are links, a calm quiet state with no badges,
 and a session chip that replaces some XP-bar segments instead of crowding the row. Weakest parts, in order:
 1. **Menu**: a flat parchment card; on a phone it is top-aligned and the bottom third is empty dark green (not full-screen as 05c describes). Upgrade first together with the hub props.

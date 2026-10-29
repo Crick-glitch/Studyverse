@@ -15,6 +15,8 @@ interface Props {
   menuOpen: boolean;
   onMenu: () => void;
   menuRef: RefObject<HTMLButtonElement>;
+  /** `rail`: a vertical list in the desktop camp panel (slots show their key). `bottom`: the bar docked to the bottom of a phone or tablet. */
+  variant?: 'rail' | 'bottom';
 }
 
 function BadgeMark({ badge }: { badge: Badge }) {
@@ -26,15 +28,26 @@ function BadgeMark({ badge }: { badge: Badge }) {
   );
 }
 
+function KeyCap({ k }: { k: string }) {
+  // Decorative: the slot's name stays just its label, and the key is also in the tooltip.
+  return (
+    <kbd className={styles.key} aria-hidden="true">
+      {k}
+    </kbd>
+  );
+}
+
 /**
- * The five things you do daily plus the Menu, always at the bottom (the same component on desktop and phone).
+ * The five things you do daily plus the Menu. One component in two shapes: a vertical list under the player card in
+ * the desktop camp panel (with each slot's key shown as a key cap), and a bar docked to the bottom on phones and tablets.
  * Labels are always visible. The selected slot is raised, gold-framed and marked under the icon (not colour alone)
  * and carries aria-current="page". Badges are real numbers from GET /summary and each has a hidden text equivalent.
  */
-export function Hotbar({ summary, hotkeys, menuOpen, onMenu, menuRef }: Props) {
+export function Hotbar({ summary, hotkeys, menuOpen, onMenu, menuRef, variant = 'bottom' }: Props) {
+  const rail = variant === 'rail';
   const tip = (label: string, key: string) => (hotkeys ? `${label} (${key})` : label);
   return (
-    <div className={styles.hotbar} data-hotbar>
+    <div className={`${styles.hotbar} ${rail ? styles.rail : ''}`} data-hotbar data-variant={variant}>
       <nav aria-label="Main" className={styles.bar}>
         <ul className={styles.list}>
           {HOTBAR.map((slot) => {
@@ -51,9 +64,11 @@ export function Hotbar({ summary, hotkeys, menuOpen, onMenu, menuRef }: Props) {
                 >
                   <span className={styles.icon} data-ring={badge?.kind === 'resume' ? 'true' : undefined}>
                     <Sprite id={slot.sprite} scale={2} decorative />
-                    {badge && <BadgeMark badge={badge} />}
+                    {badge && !rail && <BadgeMark badge={badge} />}
                   </span>
                   <span className={styles.label}>{slot.label}</span>
+                  {badge && rail && <BadgeMark badge={badge} />}
+                  {rail && hotkeys && <KeyCap k={slot.hotkey} />}
                 </NavLink>
               </li>
             );
@@ -73,6 +88,7 @@ export function Hotbar({ summary, hotkeys, menuOpen, onMenu, menuRef }: Props) {
                 <Sprite id="ui.satchel" scale={2} decorative />
               </span>
               <span className={styles.label}>Menu</span>
+              {rail && hotkeys && <KeyCap k={MENU_HOTKEY} />}
             </button>
           </li>
         </ul>

@@ -11,7 +11,37 @@
   /* Room for the fixed hotbar, so the end of every page (and any focused field) stays clear of it. */
   padding: var(--space-4) var(--space-4) calc(var(--hotbar-h) + env(safe-area-inset-bottom, 0px) + var(--space-3));
 }
-.main:focus {
+/* Desktop: a fixed-width left panel and a page that gets the rest, full height (no bars above or below it). */
+.pageDesktop {
+  --rail-w: 16.5rem;
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  min-height: 100vh;
+  min-width: 0;
+}
+.rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  overflow-y: auto; /* a short window scrolls the panel instead of clipping the Menu slot */
+  background: var(--charcoal-950);
+  border-right: var(--pixel) solid var(--gold-700);
+}
+.mainDesktop {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-4) 2rem var(--space-5);
+}
+.main:focus,
+.mainDesktop:focus {
   outline: none; /* focus lands here after navigating; the page itself is not a control */
 }
 .skip {

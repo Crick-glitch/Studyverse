@@ -21,7 +21,10 @@ describe.skipIf(!hasTestDb)('decks, cards, review and CSV (PostgreSQL)', () => {
   let prisma: PrismaClient;
   let app: Express;
   let keys: TestKeys;
-  let now = new Date('2026-10-23T10:00:00.000Z');
+  // New cards get `dueAt = now()` from the DATABASE clock, so the app clock must be ahead of it.
+  // A hard-coded date stopped working once the real date passed it (fixed 2026-10-28). Mid-January of
+  // next year is always ahead, and never near a UTC day or ISO-week boundary.
+  let now = new Date(Date.UTC(new Date().getUTCFullYear() + 1, 0, 15, 10, 0, 0));
   beforeAll(async () => {
     prisma = createTestPrisma();
     await runSeed(prisma);

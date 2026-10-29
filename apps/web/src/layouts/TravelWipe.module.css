@@ -10,7 +10,8 @@
   box-shadow:
     calc(var(--pixel) * -2) 0 0 0 var(--gold-700),
     var(--pixel) 0 0 0 var(--gold-300);
-  animation: travel 300ms steps(8, end) both;
+  /* No fill-mode: when the 300 ms are over the bar returns to its start off-screen instead of parking at the right edge. */
+  animation: travel 300ms steps(8, end);
 }
 @keyframes travel {
   to {

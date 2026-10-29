@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthContext, type AuthValue } from '../auth/AuthContext';
 import { AppLayout } from './AppLayout';
-import { MOBILE_QUERY } from './breakpoints';
+import { DESKTOP_QUERY, MOBILE_QUERY, NARROW_QUERY } from './breakpoints';
 import { HOTKEYS_STORAGE_KEY } from './hotkeys';
 
 const mocks = vi.hoisted(() => ({ summary: vi.fn(), me: vi.fn() }));
@@ -393,3 +393,102 @@ describe('HUD', () => {
     expect(screen.getByText('LV')).toBeTruthy();
   });
 });
+
+describe('desktop camp panel (design review: the player and the navigation share one left panel)', () => {
+  const rail = () => document.querySelector('[data-rail]');
+
+  it('puts the HUD and the navigation together in a left panel, with no bottom bar', async () => {
+    matchMediaFor(DESKTOP_QUERY);
+    renderLayout();
+    await screen.findByText(/Ada/);
+    expect(document.querySelector('[data-layout]')?.getAttribute('data-layout')).toBe('desktop');
+    expect(rail()).not.toBeNull();
+    expect(rail()?.querySelector('[data-hud]')).not.toBeNull();
+    expect(rail()?.querySelector('nav[aria-label="Main"]')).not.toBeNull();
+    expect(document.querySelector('[data-hotbar]')?.getAttribute('data-variant')).toBe('rail');
+    // the page content is not inside the panel
+    expect(rail()?.contains(screen.getByRole('main'))).toBe(false);
+  });
+
+  it('the phone and tablet layout keeps the top HUD and the bottom hotbar (no panel)', async () => {
+    renderLayout(); // jsdom: no desktop media query
+    await screen.findByText(/Ada/);
+    expect(document.querySelector('[data-layout]')?.getAttribute('data-layout')).toBe('compact');
+    expect(rail()).toBeNull();
+    expect(document.querySelector('[data-hotbar]')?.getAttribute('data-variant')).toBe('bottom');
+  });
+
+  it.each([
+    ['desktop', [DESKTOP_QUERY]],
+    ['phone/tablet', []],
+  ])('labels the resources instead of leaving bare numbers (%s)', async (_name, queries) => {
+    matchMediaFor(...queries);
+    renderLayout();
+    await screen.findByText(/Ada/);
+    expect(screen.getByText('Energy')).toBeTruthy();
+    expect(screen.getByText('Streak')).toBeTruthy();
+    expect(screen.getByText('Study energy: 4')).toBeTruthy(); // the screen-reader text is unchanged
+  });
+
+  it('shows each slot\'s key as a key cap while shortcuts are on, and none when they are off', async () => {
+    matchMediaFor(DESKTOP_QUERY);
+    const first = renderLayout();
+    await screen.findByText(/Ada/);
+    const caps = [...document.querySelectorAll('[data-rail] kbd')].map((k) => k.textContent);
+    expect(caps).toEqual(['1', '2', '3', '4', '5', 'M']);
+    // decorative: the slot's accessible name is still just its label
+    expect(hotbar().getByRole('link', { name: 'Home' })).toBeTruthy();
+    first.unmount();
+    window.localStorage.setItem(HOTKEYS_STORAGE_KEY, '0');
+    renderLayout();
+    await screen.findByText(/Ada/);
+    expect(document.querySelectorAll('[data-rail] kbd')).toHaveLength(0);
+  });
+
+  it('offers unspent skill points as a link to the Hero screen, and nothing at zero', async () => {
+    matchMediaFor(DESKTOP_QUERY);
+    const first = renderLayout();
+    const chip = await screen.findByRole('link', { name: 'Spend 2 skill points' });
+    expect(chip.getAttribute('href')).toBe('/camp');
+    first.unmount();
+    mocks.summary.mockResolvedValue(summaryOf({ unspentSkillPoints: 0 }));
+    renderLayout();
+    await screen.findByText(/Ada/);
+    expect(screen.queryByRole('link', { name: /Spend .* skill point/ })).toBeNull();
+  });
+
+  it('the Menu opens from the panel and Escape returns focus to the Menu slot', async () => {
+    matchMediaFor(DESKTOP_QUERY);
+    renderLayout();
+    await screen.findByText(/Ada/);
+    fireEvent.click(menuButton());
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+    key('Escape');
+    await waitFor(() => expect(document.activeElement).toBe(menuButton()));
+  });
+
+  it('shows the session timer in the panel while a session runs', async () => {
+    matchMediaFor(DESKTOP_QUERY);
+    mocks.summary.mockResolvedValue(summaryOf({ activeSession: RUNNING }));
+    renderLayout();
+    const chip = await screen.findByRole('link', { name: /Study session running/ });
+    expect(rail()?.contains(chip)).toBe(true);
+  });
+});
+
+describe('HUD bar on the narrowest phones (a 360 px screen with a running session)', () => {
+  const segments = () => document.querySelectorAll('[data-hud] [role="progressbar"] [data-on]').length;
+
+  it.each([
+    ['390 px phone', [MOBILE_QUERY], 5],
+    ['360 px phone', [MOBILE_QUERY, NARROW_QUERY], 4],
+  ])('fits the XP bar next to the session chip without clipping it (%s)', async (_name, queries, expected) => {
+    matchMediaFor(...queries);
+    mocks.summary.mockResolvedValue(summaryOf({ activeSession: RUNNING }));
+    renderLayout();
+    await screen.findByRole('link', { name: /Study session running/ });
+    // a 5th segment does not fit in 360 px: it was clipped, so a bar that was 80% full looked 100% full
+    expect(segments()).toBe(expected);
+  });
+});
+

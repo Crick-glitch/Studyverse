@@ -7,7 +7,7 @@ import { useSummary } from '../features/summary/useSummary';
 import { api } from '../lib/api';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import styles from './AppLayout.module.css';
-import { MOBILE_QUERY } from './breakpoints';
+import { DESKTOP_QUERY, MOBILE_QUERY } from './breakpoints';
 import { Hotbar } from './Hotbar';
 import { type HotkeyAction, useHotkeys, useHotkeysSetting } from './hotkeys';
 import { Hud } from './Hud';
@@ -21,13 +21,15 @@ function ImportGate() {
 }
 
 /**
- * Signed-in shell, game style (05c): a slim HUD on top, the page in the middle, the hotbar at the bottom and the
- * Menu as a pause-menu overlay. While the Menu is open everything behind it is `inert`, so focus and screen readers
+ * Signed-in shell, game style (05c, revised after the desktop design review). From 1024 px up the player card and the
+ * navigation share one left "camp panel" and the page gets the full height; below that it is a slim HUD on top, the
+ * page in the middle and the hotbar docked at the bottom. The Menu is a pause-menu overlay in both. While the Menu is open everything behind it is `inert`, so focus and screen readers
  * stay inside it; closing returns focus to the Menu slot. The battle and login routes do not use this layout, so
  * they have no HUD and no hotbar.
  */
 export function AppLayout() {
   const isMobile = useMediaQuery(MOBILE_QUERY);
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const { signOut } = useAuth();
   const navigate = useNavigate();
   const summary = useSummary();
@@ -61,17 +63,28 @@ export function AppLayout() {
   );
   useHotkeys(hotkeys && !menuOpen, onHotkey);
 
+  const hotbar = (variant: 'rail' | 'bottom') => (
+    <Hotbar variant={variant} summary={summary.data} hotkeys={hotkeys} menuOpen={menuOpen} onMenu={() => setMenuOpen(true)} menuRef={menuRef} />
+  );
+
   return (
-    <div className={styles.shell}>
-      <div ref={pageRef} className={styles.page}>
+    <div className={styles.shell} data-layout={isDesktop ? 'desktop' : 'compact'}>
+      <div ref={pageRef} className={isDesktop ? styles.pageDesktop : styles.page}>
         <a className={styles.skip} href="#main-content">
           Skip to main content
         </a>
-        <Hud compact={isMobile} summary={summary.data} hotkeys={hotkeys} />
-        <main id="main-content" ref={mainRef} tabIndex={-1} className={styles.main}>
+        {isDesktop ? (
+          <div className={styles.rail} data-rail>
+            <Hud variant="panel" compact={false} summary={summary.data} hotkeys={hotkeys} />
+            {hotbar('rail')}
+          </div>
+        ) : (
+          <Hud compact={isMobile} summary={summary.data} hotkeys={hotkeys} />
+        )}
+        <main id="main-content" ref={mainRef} tabIndex={-1} className={isDesktop ? styles.mainDesktop : styles.main}>
           <Outlet />
         </main>
-        <Hotbar summary={summary.data} hotkeys={hotkeys} menuOpen={menuOpen} onMenu={() => setMenuOpen(true)} menuRef={menuRef} />
+        {!isDesktop && hotbar('bottom')}
       </div>
       {menuOpen && (
         <MenuOverlay

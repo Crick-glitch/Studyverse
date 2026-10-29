@@ -112,6 +112,29 @@ for (const vp of VIEWPORTS) {
   await shot(vp, 'hotbar-quiet', '/', { scenario: { summary: { dueCards: 0, claimableQuests: 0, energy: 0, unspentSkillPoints: 0 } } });
 }
 
+// The travel wipe (05c section 8) must not be on screen on first load, and must be gone again after it has run.
+// jsdom cannot see CSS animations, so this is the only check that would have caught a bar left parked at the edge.
+for (const vp of VIEWPORTS) {
+  const { ctx, page } = await open(vp);
+  await page.goto(base + '/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+  const visibleWipe = () => page.evaluate(() => {
+    const el = document.querySelector('[data-testid="travel-wipe"]');
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const s = getComputedStyle(el);
+    const onScreen = r.right > 0 && r.left < window.innerWidth && s.display !== 'none';
+    return onScreen ? `left=${Math.round(r.left)} right=${Math.round(r.right)}` : null;
+  });
+  const first = await visibleWipe();
+  if (first) problems.push(`travel wipe on first load @${vp.name}: ${first}`);
+  await page.evaluate(() => { history.pushState({}, '', '/quests'); window.dispatchEvent(new PopStateEvent('popstate')); });
+  await page.waitForTimeout(900); // the wipe lasts 300 ms
+  const left = await visibleWipe();
+  if (left) problems.push(`travel wipe still on screen 900 ms after a route change @${vp.name}: ${left}`);
+  await ctx.close();
+}
+
 await browser.close();
 await server.close();
 if (problems.length) {
