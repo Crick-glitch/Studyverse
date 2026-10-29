@@ -1,4 +1,4 @@
-import { BALANCE, levelFromTotalXp } from '@studyverse/shared';
+import { BALANCE, levelFromTotalXp, startOfUtcDay } from '@studyverse/shared';
 import { AppError } from './errors.js';
 import { Prisma, type Db, type PrismaClient } from './prisma.js';
 
@@ -11,14 +11,26 @@ export interface GrantXpInput {
   sourceType: string;
   /** Id of the thing that paid out. (userId, sourceType, sourceId) is unique in the ledger. */
   sourceId: string;
-  /** Imported/legacy XP is not verified by the server and must not rank on the leaderboard. */
+  /** Imported/legacy/self-reported/practice XP is not verified and must not rank on the leaderboard. */
   leaderboardEligible?: boolean;
+  /**
+   * Optional daily cap shared by the `group` of source types: today's (UTC) ledger amounts over the group are
+   * summed under the player lock and only the remainder is awarded. The ledger row is written even for 0 XP.
+   */
+  dailyCap?: { group: readonly string[]; amount: number };
+  /** Clock for the cap's UTC day and the ledger timestamp (tests); defaults to the real time. */
+  now?: Date;
 }
 
 export interface GrantXpResult {
   /** false when this source had already been paid (nothing changed). */
   granted: boolean;
+  /** XP actually awarded (can be 0 when a daily cap was already reached). */
   amount: number;
+  /** XP that was asked for. Equals `amount` unless `capped`. */
+  requested: number;
+  /** true when the daily cap reduced the award. */
+  capped: boolean;
   levelsGained: number;
   skillPointsAwarded: number;
   /** Player progress after the call (the current state, also when the grant was a repeat). */
@@ -51,7 +63,7 @@ async function grantInTransaction(
   input: GrantXpInput,
   tx: Prisma.TransactionClient,
 ): Promise<GrantXpResult> {
-  const { userId, amount, reason, sourceType, sourceId } = input;
+  const { userId, amount: requested, reason, sourceType, sourceId } = input;
 
   // Make sure the progress row exists, then lock it. Locking first means two concurrent grants for the
   // same player queue up instead of overwriting each other's totals.
@@ -64,6 +76,23 @@ async function grantInTransaction(
   }
 
   const before = await tx.playerProgress.findUniqueOrThrow({ where: { userId } });
+  const now = input.now ?? new Date();
+
+  // Daily cap: the player row is locked, so this sum cannot race with another grant for the same player.
+  let amount = requested;
+  if (input.dailyCap) {
+    const dayStart = startOfUtcDay(now);
+    const used = await tx.xpTransaction.aggregate({
+      where: {
+        userId,
+        sourceType: { in: [...input.dailyCap.group] },
+        createdAt: { gte: dayStart, lt: new Date(dayStart.getTime() + 86_400_000) },
+      },
+      _sum: { amount: true },
+    });
+    amount = Math.min(requested, Math.max(0, input.dailyCap.amount - (used._sum.amount ?? 0)));
+  }
+  const capped = amount < requested;
   const after = levelFromTotalXp(before.totalXp + amount);
   const levelsGained = Math.max(0, after.level - before.level);
   const skillPointsAwarded = levelsGained * BALANCE.levels.skillPointsPerLevel;
@@ -78,6 +107,7 @@ async function grantInTransaction(
         sourceType,
         sourceId,
         leaderboardEligible: input.leaderboardEligible ?? true,
+        createdAt: now,
         levelAfter: after.level,
         levelsGained,
         skillPointsAwarded,
@@ -93,8 +123,28 @@ async function grantInTransaction(
     return {
       granted: false,
       amount: existing.amount,
+      requested: existing.amount,
+      capped: false,
       levelsGained: existing.levelsGained,
       skillPointsAwarded: existing.skillPointsAwarded,
+      progress: {
+        level: before.level,
+        totalXp: before.totalXp,
+        currentLevelXp: before.currentLevelXp,
+        skillPoints: before.skillPoints,
+      },
+    };
+  }
+
+  if (amount === 0) {
+    // Capped to nothing: the ledger row above is the whole effect.
+    return {
+      granted: true,
+      amount: 0,
+      requested,
+      capped,
+      levelsGained: 0,
+      skillPointsAwarded: 0,
       progress: {
         level: before.level,
         totalXp: before.totalXp,
@@ -117,6 +167,8 @@ async function grantInTransaction(
   return {
     granted: true,
     amount,
+    requested,
+    capped,
     levelsGained,
     skillPointsAwarded,
     progress: {

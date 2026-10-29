@@ -99,3 +99,14 @@ export const BALANCE = {
     importedDeckName: 'Imported flashcards',
   },
 } as const;
+
+/**
+ * Daily XP caps per source group (UTC day). Self-reported tasks and practice battles are not proof of
+ * learning, so they pay at most this much per day; a capped grant still writes a 0 XP ledger row so the
+ * source can never pay later (04-rpg-design-spec "Reward sources", docs/DECISIONS.md session 06).
+ * The task cap is wired into the task route in session 07.
+ */
+export const DAILY_XP_CAPS = { task: 100, battle_practice: 60 } as const;
+
+/** One-time XP for the first raid victory over each boss, by dungeon tier (04 "Reward sources"). */
+export const FIRST_CLEAR_XP: Readonly<Record<1 | 2 | 3, number>> = { 1: 100, 2: 150, 3: 250 };

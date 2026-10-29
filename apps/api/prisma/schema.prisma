@@ -155,6 +155,8 @@ model XpTransaction {
   @@unique([userId, sourceType, sourceId])
   @@index([leaderboardEligible, createdAt, userId])
   @@index([userId, createdAt])
+  /// Daily caps sum a source group's amounts for one UTC day (grantXp `dailyCap`).
+  @@index([userId, sourceType, createdAt])
 }
 
 model Task {
@@ -303,6 +305,7 @@ model Flashcard {
   user           PlayerProfile          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reviews        FlashcardReview[]
   claimQuestions SessionClaimQuestion[]
+  battleTurns    BattleTurn[]
 
   @@index([deckId])
   @@index([userId, dueAt])
@@ -424,6 +427,8 @@ model Battle {
   startedAt        DateTime     @default(now())
   endedAt          DateTime?
   rewardsGrantedAt DateTime?
+  /// What `finish` paid, stored once so a repeat call returns the identical summary.
+  rewardSummary    Json?
 
   user  PlayerProfile @relation(fields: [userId], references: [id], onDelete: Cascade)
   turns BattleTurn[]
@@ -431,26 +436,50 @@ model Battle {
   @@unique([userId, idempotencyKey])
   @@index([userId, status])
   @@index([userId, startedAt])
+  /// Unlock rules are derived from raid victories per dungeon/boss (04 "unlock rules").
+  @@index([userId, status, mode, enemySlug])
 }
 
+/// One turn: intent -> move -> question -> result. The row is created when the turn OPENS (intent known, no
+/// question yet); the question is assigned when the player chooses a move, and is a SNAPSHOT (like claim
+/// quizzes) so it is stable across refreshes. correctIndex / explanation are never sent before answering.
 model BattleTurn {
-  id            String    @id @default(uuid()) @db.Uuid
-  battleId      String    @db.Uuid
-  turnNumber    Int
-  questionId    String    @db.Uuid
-  intent        String    @db.VarChar(20)
-  selectedIndex Int?
-  correct       Boolean?
-  damageDealt   Int       @default(0)
-  damageTaken   Int       @default(0)
-  createdAt     DateTime  @default(now())
-  answeredAt    DateTime?
+  id                 String      @id @default(uuid()) @db.Uuid
+  battleId           String      @db.Uuid
+  turnNumber         Int
+  intent             String      @db.VarChar(20)
+  /// steady | brace | bold; null until chosen.
+  move               String?     @db.VarChar(10)
+  /// Set for bank questions (nulled never; Restrict) ...
+  questionId         String?     @db.Uuid
+  /// ... or for the player's own flashcards (nulled if the card is later deleted).
+  cardId             String?     @db.Uuid
+  questionDifficulty Difficulty?
+  questionSubject    String?     @db.VarChar(40)
+  questionText       String?
+  choices            String[]
+  correctIndex       Int?
+  explanation        String?
+  /// cleave | bulwark armed on this turn (Insight is recorded through removedIndex).
+  armedAbility       String?     @db.VarChar(20)
+  /// The wrong choice Insight removed (never the correct one).
+  removedIndex       Int?
+  selectedIndex      Int?
+  correct            Boolean?
+  damageDealt        Int         @default(0)
+  damageTaken        Int         @default(0)
+  /// The full resolved outcome, stored so a replayed answer returns exactly the same thing.
+  result             Json?
+  createdAt          DateTime    @default(now())
+  answeredAt         DateTime?
 
-  battle   Battle   @relation(fields: [battleId], references: [id], onDelete: Cascade)
-  question Question @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  battle   Battle    @relation(fields: [battleId], references: [id], onDelete: Cascade)
+  question Question? @relation(fields: [questionId], references: [id], onDelete: Restrict)
+  card     Flashcard? @relation(fields: [cardId], references: [id], onDelete: SetNull)
 
   @@unique([battleId, turnNumber])
   @@index([questionId])
+  @@index([cardId])
 }
 
 model Achievement {
