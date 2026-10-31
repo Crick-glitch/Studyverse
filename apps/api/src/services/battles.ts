@@ -1,6 +1,9 @@
 import { randomInt } from 'node:crypto';
 import {
   BALANCE,
+  bankSubject,
+  cleanDistractors,
+  normalizeText,
   bossGate,
   dungeonGate,
   enemiesForSubject,
@@ -15,6 +18,8 @@ import {
   type BattleDto,
   type BattleMoveInput,
   type BattleQuestionResultDto,
+  type BattleSummaryDto,
+  type MissedToCardsResultDto,
 } from '@studyverse/shared';
 import { answer, armAbility, chooseMove, createBattle, publicQuestion, retreat } from '../battle/engine.js';
 import { pick, rngFor } from '../battle/rng.js';
@@ -26,8 +31,8 @@ import { Prisma, type PrismaClient } from '../lib/prisma.js';
 import { applyCardReview } from './cardReview.js';
 import { ensureStarterGear, loadHero } from './battleHero.js';
 import { buildPool, weakSubjects } from './battlePool.js';
-import { finishBattleInTx } from './battleFinish.js';
-import type { BattleExtras, StoredBattle } from './battleTypes.js';
+import { battleNotFound, finishBattleInTx } from './battleFinish.js';
+import { parseStored, type BattleExtras, type StoredBattle } from './battleTypes.js';
 import { loadUnlockFacts } from './battleUnlocks.js';
 import { toBattleDto } from './battleView.js';
 import { ensurePlayer } from './player.js';
@@ -36,14 +41,8 @@ import { getModifiers } from './streak.js';
 
 type Tx = Prisma.TransactionClient;
 
-const notFound = () => new AppError(404, 'BATTLE_NOT_FOUND', 'Battle not found');
+const notFound = battleNotFound;
 const json = (v: unknown) => v as Prisma.InputJsonValue;
-
-function parseStored(row: Battle): StoredBattle {
-  const raw = row.engineState as unknown as StoredBattle | null;
-  if (!raw || raw.v !== 1 || !raw.engine) throw new AppError(500, 'BATTLE_STATE_INVALID', 'Battle state is unreadable');
-  return raw;
-}
 
 async function loadOwned(tx: Tx, userId: string, id: string) {
   const row = await tx.battle.findFirst({ where: { id, userId } });
@@ -92,7 +91,11 @@ function assertTurn(s: EngineState, turnNumber: number): void {
 
 export async function getActiveBattle(prisma: PrismaClient, userId: string): Promise<BattleDto | null> {
   await ensurePlayer(prisma, userId);
-  const row = await prisma.battle.findFirst({ where: { userId, status: 'active' }, orderBy: { startedAt: 'desc' } });
+  // A battle that ended but whose rewards were never claimed is offered too, so the player can collect them.
+  const row = await prisma.battle.findFirst({
+    where: { userId, OR: [{ status: 'active' }, { status: { in: ['victory', 'defeat'] }, rewardsGrantedAt: null }] },
+    orderBy: { startedAt: 'desc' },
+  });
   return row ? view(prisma, row, parseStored(row)) : null;
 }
 
@@ -113,6 +116,14 @@ export async function startBattle(
   return withPlayerLock(prisma, userId, async (tx) => {
     const existing = await tx.battle.findUnique({ where: { userId_idempotencyKey: { userId, idempotencyKey: key } } });
     if (existing) return { battle: await view(tx, existing, parseStored(existing)), created: false };
+
+    // Rewards of a battle that ended but was never claimed are paid now (once), so closing the tab never loses them.
+    const unclaimed = await tx.battle.findMany({
+      where: { userId, status: { in: ['victory', 'defeat'] }, rewardsGrantedAt: null },
+      orderBy: { startedAt: 'asc' },
+      select: { id: true },
+    });
+    for (const u of unclaimed) await finishBattleInTx(tx, userId, u.id, now);
 
     const active = await tx.battle.findFirst({ where: { userId, status: 'active' }, select: { id: true } });
     if (active) throw new AppError(409, 'BATTLE_IN_PROGRESS', 'Finish or retreat from your current battle first.', { battleId: active.id });
@@ -313,5 +324,74 @@ export async function retreatBattle(prisma: PrismaClient, userId: string, id: st
     const saved = await save(tx, row, nextStored, { status: 'retreated', endedAt: now });
     await finishBattleInTx(tx, userId, id, now);
     return view(tx, saved, nextStored);
+  });
+}
+
+/** POST /battles/:id/finish. Pays once; a repeat returns the stored summary. */
+export async function finishBattle(prisma: PrismaClient, userId: string, id: string, now: Date): Promise<BattleSummaryDto> {
+  return withPlayerLock(prisma, userId, (tx) => finishBattleInTx(tx, userId, id, now));
+}
+
+const MISSED_DECK = 'Missed in battle';
+
+/**
+ * "Add missed questions to my flashcards": one deck, one card per missed question, deduplicated against every
+ * card the player already has (normalized question text). Safe to press twice.
+ */
+export async function missedToFlashcards(
+  prisma: PrismaClient,
+  userId: string,
+  id: string,
+): Promise<MissedToCardsResultDto> {
+  return withPlayerLock(prisma, userId, async (tx) => {
+    const { row } = await loadOwned(tx, userId, id);
+    if (row.status === 'active') throw new AppError(409, 'BATTLE_NOT_OVER', 'Finish the battle first.');
+    const turns = await tx.battleTurn.findMany({
+      where: { battleId: id, correct: false, answeredAt: { not: null } },
+      orderBy: { turnNumber: 'asc' },
+    });
+    const unique = new Map<string, (typeof turns)[number]>();
+    for (const t of turns) {
+      if (t.questionText === null || t.correctIndex === null) continue;
+      const key = t.questionId ?? t.cardId ?? t.questionText;
+      if (!unique.has(key)) unique.set(key, t);
+    }
+    if (unique.size === 0) throw new AppError(409, 'NOTHING_MISSED', 'You did not miss any questions in this battle.');
+    const have = new Set((await tx.flashcard.findMany({ where: { userId }, select: { question: true } })).map((c) => normalizeText(c.question)));
+    const fresh = [...unique.values()].filter((t) => {
+      if (t.cardId !== null) return false; // already one of the player's own cards
+      const norm = normalizeText(t.questionText!);
+      if (have.has(norm)) return false;
+      have.add(norm);
+      return true;
+    });
+
+    let deck = await tx.flashcardDeck.findFirst({ where: { userId, name: MISSED_DECK } });
+    if (fresh.length > 0) {
+      if ((await tx.flashcard.count({ where: { userId } })) + fresh.length > BALANCE.flashcards.maxCardsPerUser) {
+        throw new AppError(409, 'TOO_MANY_CARDS', 'This would exceed the card limit.');
+      }
+      if (!deck) {
+        if ((await tx.flashcardDeck.count({ where: { userId } })) >= BALANCE.flashcards.maxDecksPerUser) {
+          throw new AppError(409, 'TOO_MANY_DECKS', 'You have reached the deck limit.');
+        }
+        deck = await tx.flashcardDeck.create({ data: { userId, name: MISSED_DECK, subject: 'Other' } });
+      }
+      for (const t of fresh) {
+        const answer = t.choices[t.correctIndex!]!;
+        await tx.flashcard.create({
+          data: {
+            deckId: deck.id,
+            userId,
+            question: t.questionText!,
+            answer,
+            distractors: cleanDistractors(answer, t.choices.filter((_, i) => i !== t.correctIndex)),
+            subject: bankSubject(t.questionSubject ?? 'Other'),
+            difficulty: t.questionDifficulty ?? 'medium',
+          },
+        });
+      }
+    }
+    return { deckId: deck?.id ?? null, deckName: MISSED_DECK, added: fresh.length, skipped: unique.size - fresh.length };
   });
 }

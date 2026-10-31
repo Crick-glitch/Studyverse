@@ -16,6 +16,7 @@ import { playerRouter } from './routes/player.js';
 import { questionsRouter } from './routes/questions.js';
 import { questsRouter } from './routes/quests.js';
 import { tasksRouter } from './routes/tasks.js';
+import { battlesRouter } from './routes/battles.js';
 import { sessionsRouter } from './routes/sessions.js';
 import { summaryRouter } from './routes/summary.js';
 
@@ -72,6 +73,7 @@ export function createApp(config: AppConfig, deps: AppDeps): Express {
   app.use('/api/v1', auth);
   app.use('/api/v1', playerRouter(deps.prisma));
   app.use('/api/v1', sessionsRouter(deps.prisma, clock));
+  app.use('/api/v1', battlesRouter(deps.prisma, clock, limiters));
   app.use('/api/v1', summaryRouter(deps.prisma, clock));
   app.use('/api/v1', tasksRouter(deps.prisma, clock));
   app.use('/api/v1', questsRouter(deps.prisma, clock));

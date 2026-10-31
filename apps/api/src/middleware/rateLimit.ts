@@ -35,7 +35,7 @@ export function createRateLimiters(c: Limits) {
     general: make(c.RATE_LIMIT_WINDOW_MS, c.RATE_LIMIT_GENERAL_MAX),
     /** Auth-adjacent routes (/me, /profile): profile creation and name changes. */
     auth: make(c.RATE_LIMIT_WINDOW_MS, c.RATE_LIMIT_AUTH_MAX),
-    /** Used by POST /battles/:id/answer in a later phase. */
+    /** Shared by POST /battles/:id/move, /ability and /answer. */
     battleAnswer: make(c.RATE_LIMIT_WINDOW_MS, c.RATE_LIMIT_BATTLE_ANSWER_MAX),
     /** Used by the local-data import route in a later phase. */
     importData: make(c.RATE_LIMIT_WINDOW_MS, c.RATE_LIMIT_IMPORT_MAX),

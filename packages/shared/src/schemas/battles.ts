@@ -207,7 +207,8 @@ export interface BattleSummaryDto {
   alreadyFinished: boolean;
 }
 export interface MissedToCardsResultDto {
-  deckId: string;
+  /** null when every missed question was already one of the player's cards (nothing was added). */
+  deckId: string | null;
   deckName: string;
   added: number;
   skipped: number;
