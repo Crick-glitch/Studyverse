@@ -9,4 +9,5 @@ export * from './rewards.js';
 export * from './choices.js';
 export * from './csv.js';
 export * from './avatars.js';
+export * from './battle/index.js';
 export * from './schemas/index.js';

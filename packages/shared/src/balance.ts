@@ -110,3 +110,6 @@ export const DAILY_XP_CAPS = { task: 100, battle_practice: 60 } as const;
 
 /** One-time XP for the first raid victory over each boss, by dungeon tier (04 "Reward sources"). */
 export const FIRST_CLEAR_XP: Readonly<Record<1 | 2 | 3, number>> = { 1: 100, 2: 150, 3: 250 };
+
+/** Battle balance lives in `battle/constants.ts` (kept apart so this file stays small) and is re-exported here. */
+export { BATTLE } from './battle/constants.js';

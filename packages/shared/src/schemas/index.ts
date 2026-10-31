@@ -7,3 +7,4 @@ export * from './quests.js';
 export * from './import.js';
 export * from './questions.js';
 export * from './summary.js';
+export * from './battles.js';
