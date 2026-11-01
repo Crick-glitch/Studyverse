@@ -101,7 +101,65 @@ async function shot(vp, name, path, { scenario = {}, after, measure = false } = 
   await ctx.close();
 }
 
+// Battle screen: layout facts (no sideways scroll, nothing wider than its box, how much of the screen the field and panel use).
+const MEASURE_BATTLE = () => {
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const box = (el) => { if (!el) return null; const b = el.getBoundingClientRect(); return { x: Math.round(b.left), y: Math.round(b.top), w: Math.round(b.width), h: Math.round(b.height), b: Math.round(b.bottom) }; };
+  const field = document.querySelector('[data-testid="battlefield"]');
+  const panel = document.querySelector('[aria-label="Your turn"]') ?? document.querySelector('[aria-label="Battle rewards"]');
+  const clipped = [];
+  for (const el of document.querySelectorAll('[data-battle] *')) {
+    const cs = getComputedStyle(el);
+    if (el.closest('[data-asset]') || el.tagName === 'svg' || el.tagName === 'path') continue;
+    if (cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0 && !/field|bg|log|srOnly/.test(String(el.className))) clipped.push(`${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0].slice(0, 30)} ${el.scrollWidth}>${el.clientWidth}`);
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 && (r.right > vw + 1 || r.left < -1) && !el.closest('[data-testid="battlefield"]')) clipped.push(`OFFSCREEN ${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0].slice(0, 30)} ${Math.round(r.left)}..${Math.round(r.right)}`);
+  }
+  for (const plate of document.querySelectorAll('[data-battle] [data-side]')) {
+    const pr = plate.getBoundingClientRect();
+    for (const child of plate.querySelectorAll('*')) {
+      const r = child.getBoundingClientRect();
+      if (r.width > 0 && r.right > pr.right + 1) { clipped.push(`PLATE-SPILL ${child.tagName.toLowerCase()}.${String(child.className).split(' ')[0].slice(0, 24)} +${Math.round(r.right - pr.right)}px`); break; }
+    }
+  }
+  const small = [...document.querySelectorAll('[data-battle] p, [data-battle] li, [data-battle] span, [data-battle] button')].filter((e) => e.children.length === 0 && e.textContent.trim() && parseFloat(getComputedStyle(e).fontSize) < 12).map((e) => e.textContent.trim().slice(0, 20));
+  const tooSmallTargets = [...document.querySelectorAll('[data-battle] button')].filter((b) => { const r = b.getBoundingClientRect(); return r.height > 0 && r.height < 40; }).map((b) => `${b.textContent.trim().slice(0, 16)} ${Math.round(b.getBoundingClientRect().height)}px`);
+  const choices = [...document.querySelectorAll('[aria-label="Your turn"] ol button')];
+  const lastChoice = choices.length ? Math.round(choices[choices.length - 1].getBoundingClientRect().bottom - vh) : null;
+  return {
+    viewport: `${vw}x${vh}`, lastChoiceBelowFold: lastChoice, overflowX: document.documentElement.scrollWidth - vw, pageHeight: document.documentElement.scrollHeight,
+    field: box(field), panel: box(panel), panelBelowFold: panel ? Math.max(0, Math.round(panel.getBoundingClientRect().bottom - vh)) : null,
+    clipped, smallText: small, smallTargets: tooSmallTargets,
+  };
+};
+async function battleShot(vp, name, scenario, after) {
+  if (only && !name.startsWith(only)) return;
+  const { ctx, page } = await open(vp, { battle: scenario });
+  await page.goto(base + '/battle/b1', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+  if (after) { await after(page); await page.waitForTimeout(350); }
+  const m = await page.evaluate(MEASURE_BATTLE);
+  metrics[`${name}@${vp.name}`] = m;
+  if (m.overflowX > 0) problems.push(`${name}@${vp.name}: horizontal overflow ${m.overflowX}px`);
+  if (m.clipped.length) problems.push(`${name}@${vp.name}: ${m.clipped.slice(0, 4).join('; ')}`);
+  if (m.lastChoiceBelowFold !== null && m.lastChoiceBelowFold > 0) problems.push(`${name}@${vp.name}: last answer is ${m.lastChoiceBelowFold}px below the fold`);
+  if (m.smallText.length) problems.push(`${name}@${vp.name}: text under 12px: ${m.smallText.slice(0, 4).join(', ')}`);
+  if (m.smallTargets.length) problems.push(`${name}@${vp.name}: tap target under 40px: ${m.smallTargets.slice(0, 4).join(', ')}`);
+  await page.screenshot({ path: join(outDir, `${name}-${vp.name}.png`) });
+  await page.screenshot({ path: join(outDir, `${name}-${vp.name}-full.png`), fullPage: true });
+  await ctx.close();
+}
+
 for (const vp of VIEWPORTS) {
+  await battleShot(vp, 'battle-intro', 'intro');
+  await battleShot(vp, 'battle-move', 'move');
+  await battleShot(vp, 'battle-question', 'question');
+  await battleShot(vp, 'battle-feedback', 'question', async (p) => { await p.getByRole('button', { name: 'Nucleus' }).click(); await p.waitForTimeout(500); });
+  await battleShot(vp, 'battle-boss', 'boss');
+  await battleShot(vp, 'battle-rewards', 'ended');
+}
+for (const vp of VIEWPORTS) {
+  if (only.startsWith('battle')) break;
   await shot(vp, 'home', '/', { measure: true });
   await shot(vp, 'lab', '/lab', { measure: true });
   await shot(vp, 'quests', '/quests', { measure: true });

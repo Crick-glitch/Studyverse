@@ -1,34 +1,11 @@
-/* Battle route: its own full-screen layout with no main navigation. The battle itself arrives in a later phase. */
+/* Battle route: a full-height dark shell. The battle screen (features/battle) owns its own spacing and top bar. */
 .shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  min-height: 100dvh;
   background: var(--charcoal-950);
 }
 .main {
-  flex: 1;
-  padding: var(--space-4);
+  min-height: 100dvh;
 }
-.footer {
-  padding: var(--space-3) var(--space-4);
-  background: var(--charcoal-950);
-  border-top: var(--pixel) solid var(--gold-700);
-  box-shadow: inset 0 var(--pixel) 0 0 var(--charcoal-600);
-}
-.footer a {
-  display: inline-block;
-  padding: var(--space-2) var(--space-3);
-  color: var(--parchment-100);
-  font-family: var(--font-pixel);
-  font-weight: 600;
-  text-decoration: none;
-  background: var(--charcoal-800);
-  box-shadow:
-    0 calc(var(--pixel) * -1) 0 0 var(--charcoal-600),
-    0 var(--pixel) 0 0 var(--charcoal-600),
-    calc(var(--pixel) * -1) 0 0 0 var(--charcoal-600),
-    var(--pixel) 0 0 0 var(--charcoal-600);
-}
-.footer a:hover {
-  color: var(--gold-300);
+.main:focus {
+  outline: none;
 }

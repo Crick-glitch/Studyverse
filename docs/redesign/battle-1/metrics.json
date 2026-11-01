@@ -1,0 +1,692 @@
+{
+ "battle-intro@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 900,
+  "field": {
+   "x": 237,
+   "y": 70,
+   "w": 966,
+   "h": 468,
+   "b": 538
+  },
+  "panel": {
+   "x": 240,
+   "y": 549,
+   "w": 960,
+   "h": 270,
+   "b": 819
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-move@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 900,
+  "field": {
+   "x": 237,
+   "y": 70,
+   "w": 966,
+   "h": 468,
+   "b": 538
+  },
+  "panel": {
+   "x": 240,
+   "y": 549,
+   "w": 960,
+   "h": 307,
+   "b": 856
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-question@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": -114,
+  "overflowX": 0,
+  "pageHeight": 969,
+  "field": {
+   "x": 237,
+   "y": 70,
+   "w": 966,
+   "h": 468,
+   "b": 538
+  },
+  "panel": {
+   "x": 240,
+   "y": 549,
+   "w": 960,
+   "h": 393,
+   "b": 942
+  },
+  "panelBelowFold": 42,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-feedback@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 949,
+  "field": {
+   "x": 237,
+   "y": 70,
+   "w": 966,
+   "h": 468,
+   "b": 538
+  },
+  "panel": {
+   "x": 240,
+   "y": 549,
+   "w": 960,
+   "h": 373,
+   "b": 922
+  },
+  "panelBelowFold": 22,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-boss@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": -114,
+  "overflowX": 0,
+  "pageHeight": 969,
+  "field": {
+   "x": 237,
+   "y": 70,
+   "w": 966,
+   "h": 468,
+   "b": 538
+  },
+  "panel": {
+   "x": 240,
+   "y": 549,
+   "w": 960,
+   "h": 393,
+   "b": 942
+  },
+  "panelBelowFold": 42,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-rewards@1440x900": {
+  "viewport": "1440x900",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 900,
+  "field": null,
+  "panel": {
+   "x": 240,
+   "y": 52,
+   "w": 960,
+   "h": 685,
+   "b": 737
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-intro@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 800,
+  "field": {
+   "x": 157,
+   "y": 70,
+   "w": 966,
+   "h": 416,
+   "b": 486
+  },
+  "panel": {
+   "x": 160,
+   "y": 497,
+   "w": 960,
+   "h": 270,
+   "b": 767
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-move@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 831,
+  "field": {
+   "x": 157,
+   "y": 70,
+   "w": 966,
+   "h": 416,
+   "b": 486
+  },
+  "panel": {
+   "x": 160,
+   "y": 497,
+   "w": 960,
+   "h": 307,
+   "b": 804
+  },
+  "panelBelowFold": 4,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-question@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": -66,
+  "overflowX": 0,
+  "pageHeight": 917,
+  "field": {
+   "x": 157,
+   "y": 70,
+   "w": 966,
+   "h": 416,
+   "b": 486
+  },
+  "panel": {
+   "x": 160,
+   "y": 497,
+   "w": 960,
+   "h": 393,
+   "b": 890
+  },
+  "panelBelowFold": 90,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-feedback@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 897,
+  "field": {
+   "x": 157,
+   "y": 70,
+   "w": 966,
+   "h": 416,
+   "b": 486
+  },
+  "panel": {
+   "x": 160,
+   "y": 497,
+   "w": 960,
+   "h": 373,
+   "b": 870
+  },
+  "panelBelowFold": 70,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-boss@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": -66,
+  "overflowX": 0,
+  "pageHeight": 917,
+  "field": {
+   "x": 157,
+   "y": 70,
+   "w": 966,
+   "h": 416,
+   "b": 486
+  },
+  "panel": {
+   "x": 160,
+   "y": 497,
+   "w": 960,
+   "h": 393,
+   "b": 890
+  },
+  "panelBelowFold": 90,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-rewards@1280x800": {
+  "viewport": "1280x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 800,
+  "field": null,
+  "panel": {
+   "x": 160,
+   "y": 52,
+   "w": 960,
+   "h": 685,
+   "b": 737
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-intro@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1024,
+  "field": {
+   "x": 8,
+   "y": 70,
+   "w": 752,
+   "h": 532,
+   "b": 602
+  },
+  "panel": {
+   "x": 11,
+   "y": 673,
+   "w": 746,
+   "h": 313,
+   "b": 987
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-move@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1050,
+  "field": {
+   "x": 8,
+   "y": 70,
+   "w": 752,
+   "h": 532,
+   "b": 602
+  },
+  "panel": {
+   "x": 11,
+   "y": 673,
+   "w": 746,
+   "h": 350,
+   "b": 1023
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-question@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": -114,
+  "overflowX": 0,
+  "pageHeight": 1093,
+  "field": {
+   "x": 8,
+   "y": 70,
+   "w": 752,
+   "h": 532,
+   "b": 602
+  },
+  "panel": {
+   "x": 11,
+   "y": 673,
+   "w": 746,
+   "h": 393,
+   "b": 1066
+  },
+  "panelBelowFold": 42,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-feedback@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1096,
+  "field": {
+   "x": 8,
+   "y": 70,
+   "w": 752,
+   "h": 532,
+   "b": 602
+  },
+  "panel": {
+   "x": 11,
+   "y": 673,
+   "w": 746,
+   "h": 396,
+   "b": 1069
+  },
+  "panelBelowFold": 45,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-boss@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": -81,
+  "overflowX": 0,
+  "pageHeight": 1126,
+  "field": {
+   "x": 8,
+   "y": 103,
+   "w": 752,
+   "h": 532,
+   "b": 635
+  },
+  "panel": {
+   "x": 11,
+   "y": 706,
+   "w": 746,
+   "h": 393,
+   "b": 1099
+  },
+  "panelBelowFold": 75,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-rewards@768x1024": {
+  "viewport": "768x1024",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1024,
+  "field": null,
+  "panel": {
+   "x": 11,
+   "y": 52,
+   "w": 746,
+   "h": 685,
+   "b": 737
+  },
+  "panelBelowFold": 0,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-intro@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1055,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 382,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 376,
+   "h": 531,
+   "b": 1028
+  },
+  "panelBelowFold": 184,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-move@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1114,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 382,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 376,
+   "h": 590,
+   "b": 1087
+  },
+  "panelBelowFold": 243,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-question@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": -109,
+  "overflowX": 0,
+  "pageHeight": 969,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 382,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 376,
+   "h": 445,
+   "b": 942
+  },
+  "panelBelowFold": 98,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-feedback@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 963,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 382,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 376,
+   "h": 439,
+   "b": 936
+  },
+  "panelBelowFold": 92,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-boss@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": -92,
+  "overflowX": 0,
+  "pageHeight": 1007,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 382,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 514,
+   "w": 376,
+   "h": 466,
+   "b": 980
+  },
+  "panelBelowFold": 136,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-rewards@390x844": {
+  "viewport": "390x844",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1063,
+  "field": null,
+  "panel": {
+   "x": 7,
+   "y": 43,
+   "w": 376,
+   "h": 993,
+   "b": 1036
+  },
+  "panelBelowFold": 192,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-intro@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1055,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 352,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 346,
+   "h": 531,
+   "b": 1028
+  },
+  "panelBelowFold": 228,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-move@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1114,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 352,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 346,
+   "h": 590,
+   "b": 1087
+  },
+  "panelBelowFold": 287,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-question@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": -65,
+  "overflowX": 0,
+  "pageHeight": 990,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 352,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 346,
+   "h": 466,
+   "b": 963
+  },
+  "panelBelowFold": 163,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-feedback@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 963,
+  "field": {
+   "x": 4,
+   "y": 86,
+   "w": 352,
+   "h": 340,
+   "b": 426
+  },
+  "panel": {
+   "x": 7,
+   "y": 497,
+   "w": 346,
+   "h": 439,
+   "b": 936
+  },
+  "panelBelowFold": 136,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-boss@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": -18,
+  "overflowX": 0,
+  "pageHeight": 1036,
+  "field": {
+   "x": 4,
+   "y": 116,
+   "w": 352,
+   "h": 340,
+   "b": 456
+  },
+  "panel": {
+   "x": 7,
+   "y": 544,
+   "w": 346,
+   "h": 466,
+   "b": 1009
+  },
+  "panelBelowFold": 209,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ },
+ "battle-rewards@360x800": {
+  "viewport": "360x800",
+  "lastChoiceBelowFold": null,
+  "overflowX": 0,
+  "pageHeight": 1288,
+  "field": null,
+  "panel": {
+   "x": 7,
+   "y": 73,
+   "w": 346,
+   "h": 1188,
+   "b": 1261
+  },
+  "panelBelowFold": 461,
+  "clipped": [],
+  "smallText": [],
+  "smallTargets": []
+ }
+}

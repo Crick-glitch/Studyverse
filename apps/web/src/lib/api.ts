@@ -1,4 +1,14 @@
 import type {
+  BattleAbilityInput,
+  BattleAnswerResponseDto,
+  BattleCreate,
+  BattleCreateResultDto,
+  BattleDto,
+  BattleQuestionResultDto,
+  BattleSummaryDto,
+  DungeonsDto,
+  MissedToCardsResultDto,
+  Move,
   CardDto,
   CardInput,
   CardPatch,
@@ -196,6 +206,24 @@ export const api = {
       ),
     review: (id: string, body: ReviewSubmit) =>
       apiFetch<ReviewResultDto>(`/cards/${id}/review`, json('POST', body)),
+  },
+
+  battles: {
+    /** `key` is the Idempotency-Key: reuse one key per click so a double click starts one battle. */
+    start: (body: BattleCreate, key: string) =>
+      apiFetch<BattleCreateResultDto>('/battles', { ...json('POST', body), headers: { 'Idempotency-Key': key } }),
+    get: (id: string) => apiFetch<{ battle: BattleDto }>(`/battles/${id}`).then((r) => r.battle),
+    active: () => apiFetch<{ battle: BattleDto | null }>('/battles/active').then((r) => r.battle),
+    move: (id: string, turnNumber: number, move: Move) =>
+      apiFetch<BattleQuestionResultDto>(`/battles/${id}/move`, json('POST', { turnNumber, move })),
+    ability: (id: string, turnNumber: number, ability: BattleAbilityInput['ability']) =>
+      apiFetch<{ battle: BattleDto }>(`/battles/${id}/ability`, json('POST', { turnNumber, ability })).then((r) => r.battle),
+    answer: (id: string, turnNumber: number, selectedIndex: number) =>
+      apiFetch<BattleAnswerResponseDto>(`/battles/${id}/answer`, json('POST', { turnNumber, selectedIndex })),
+    retreat: (id: string) => apiFetch<{ battle: BattleDto }>(`/battles/${id}/retreat`, json('POST')).then((r) => r.battle),
+    finish: (id: string) => apiFetch<{ summary: BattleSummaryDto }>(`/battles/${id}/finish`, json('POST')).then((r) => r.summary),
+    missedToCards: (id: string) => apiFetch<MissedToCardsResultDto>(`/battles/${id}/missed-to-flashcards`, json('POST')),
+    dungeons: () => apiFetch<DungeonsDto>('/dungeons'),
   },
 
   import: {

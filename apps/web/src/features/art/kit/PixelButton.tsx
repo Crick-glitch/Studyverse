@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import styles from './kit.module.css';
 
 export interface PixelButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,6 +8,9 @@ export interface PixelButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
 }
 
 /** Four states from CSS alone: normal, hover, pressed, disabled. Always a real `<button>`. */
-export function PixelButton({ variant = 'secondary', pressed, type = 'button', className, ...rest }: PixelButtonProps) {
-  return <button type={type} className={`${styles.button} ${className ?? ''}`} data-variant={variant} data-pressed={pressed ? 'true' : undefined} {...rest} />;
-}
+export const PixelButton = forwardRef<HTMLButtonElement, PixelButtonProps>(function PixelButton(
+  { variant = 'secondary', pressed, type = 'button', className, ...rest },
+  ref,
+) {
+  return <button ref={ref} type={type} className={`${styles.button} ${className ?? ''}`} data-variant={variant} data-pressed={pressed ? 'true' : undefined} {...rest} />;
+});

@@ -14,7 +14,13 @@ vi.mock('./lib/supabase', () => ({
 
 vi.mock('./lib/api', () => ({
   errorMessage: (e: unknown) => (e instanceof Error ? e.message : 'error'),
+  ApiError: class ApiError extends Error {
+    constructor(public status: number, public code: string, message: string) {
+      super(message);
+    }
+  },
   api: {
+    battles: { get: vi.fn(() => Promise.reject(new Error('mocked: no battle'))) },
     me: vi.fn(() =>
       Promise.resolve({
         user: { id: 'u1', email: 'ada@example.com' },
@@ -87,7 +93,6 @@ const placeholders: [string, string][] = [
   ['/', 'Dashboard'],
   ['/camp', 'Hero'],
   ['/dungeons', 'Adventure'],
-  ['/battle/abc', 'Battle'],
   ['/stats', 'Progress'],
   ['/leaderboard', 'Leaderboard'],
   ['/settings', 'Settings'],
@@ -113,9 +118,12 @@ describe('route shell (signed in)', () => {
     await waitFor(() => expect(screen.getAllByText(empty).length).toBeGreaterThan(0));
   });
 
-  it('battle route has no main navigation', () => {
+  it('battle route has no HUD, no hotbar and no camp panel, and a failed load offers a way out', async () => {
     renderAt('/battle/abc');
     expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+    expect(screen.queryByRole('banner')).toBeNull();
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Back to Adventure' }).getAttribute('href')).toBe('/dungeons');
   });
 
   it('login has no hotbar and no HUD', () => {

@@ -1,16 +1,16 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import styles from './BattleLayout.module.css';
 
-/** Battle route layout: no main navigation (06-battle-screen.md). Retreat/sound/motion controls arrive in Phase 5. */
+/**
+ * Battle route layout (06-battle-screen.md): no HUD, no hotbar, no camp panel. The battle screen draws its own top bar
+ * (Retreat, sound, Auto-Steady) and the rewards screen links back out, so nothing here can pull the player away mid-fight.
+ */
 export function BattleLayout() {
   return (
     <div className={styles.shell}>
-      <main className={styles.main}>
+      <main id="main-content" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
-      <footer className={styles.footer}>
-        <Link to="/dungeons">Leave to dungeon select</Link>
-      </footer>
     </div>
   );
 }
