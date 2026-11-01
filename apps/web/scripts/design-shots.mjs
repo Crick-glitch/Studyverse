@@ -160,6 +160,11 @@ for (const vp of VIEWPORTS) {
 }
 for (const vp of VIEWPORTS) {
   if (only.startsWith('battle')) break;
+  await shot(vp, 'dungeons', '/dungeons', { scenario: { dungeons: true }, measure: true });
+  await shot(vp, 'dungeons-locked', '/dungeons', { scenario: { dungeons: true }, measure: true, after: async (p) => { await p.getByRole('button', { name: /The Sunken Library/ }).first().click(); await p.waitForTimeout(200); } });
+}
+for (const vp of VIEWPORTS) {
+  if (only.startsWith('battle') || only.startsWith('dungeons')) break;
   await shot(vp, 'home', '/', { measure: true });
   await shot(vp, 'lab', '/lab', { measure: true });
   await shot(vp, 'quests', '/quests', { measure: true });

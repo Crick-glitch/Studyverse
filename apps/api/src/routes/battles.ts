@@ -18,6 +18,7 @@ import { currentUser } from '../middleware/auth.js';
 import type { RateLimiters } from '../middleware/rateLimit.js';
 import { validate } from '../middleware/validate.js';
 import * as battles from '../services/battles.js';
+import { getDungeons } from '../services/dungeons.js';
 
 /**
  * Battles. Server-authoritative: the browser only ever sends a move, an ability, or a chosen answer index; the
@@ -30,6 +31,10 @@ export function battlesRouter(prisma: PrismaClient, clock: () => Date, limiters:
   const idParams = validate({ params: idParamSchema });
   const id = (req: Express.Request) => (req.valid.params as { id: string }).id;
   const turnLimit = limiters.battleAnswer;
+
+  r.get('/dungeons', asyncHandler(async (req, res) => {
+    res.json(await getDungeons(prisma, uid(req), clock()));
+  }));
 
   r.get('/battles/active', asyncHandler(async (req, res) => {
     res.json({ battle: await battles.getActiveBattle(prisma, uid(req)) });

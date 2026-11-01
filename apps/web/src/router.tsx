@@ -7,6 +7,7 @@ import { SessionsPage } from './features/sessions/SessionsPage';
 import { AppLayout } from './layouts/AppLayout';
 import { BattleLayout } from './layouts/BattleLayout';
 import { BattlePage } from './features/battle/BattlePage';
+import { DungeonsPage } from './features/dungeons/DungeonsPage';
 import { ComingSoon } from './pages/ComingSoon';
 import { HomePage } from './pages/HomePage';
 import { Login } from './pages/Login';
@@ -55,14 +56,7 @@ export const routes: RouteObject[] = [
           },
           {
             path: 'dungeons',
-            element: (
-              <ComingSoon
-                title="Adventure"
-                icon="dungeons"
-                phase="Phase 5"
-                description="Dungeon select, energy cost and boss gates."
-              />
-            ),
+            element: <DungeonsPage />,
           },
           {
             path: 'stats',

@@ -20,7 +20,10 @@ vi.mock('./lib/api', () => ({
     }
   },
   api: {
-    battles: { get: vi.fn(() => Promise.reject(new Error('mocked: no battle'))) },
+    battles: {
+      get: vi.fn(() => Promise.reject(new Error('mocked: no battle'))),
+      dungeons: vi.fn(() => Promise.resolve({ level: 1, energy: 0, energyCost: 3, dungeons: [], dueBySubject: {}, activeBattleId: null })),
+    },
     me: vi.fn(() =>
       Promise.resolve({
         user: { id: 'u1', email: 'ada@example.com' },
@@ -92,7 +95,6 @@ function renderAt(path: string, status: AuthValue['status'] = 'signedIn') {
 const placeholders: [string, string][] = [
   ['/', 'Dashboard'],
   ['/camp', 'Hero'],
-  ['/dungeons', 'Adventure'],
   ['/stats', 'Progress'],
   ['/leaderboard', 'Leaderboard'],
   ['/settings', 'Settings'],
@@ -116,6 +118,11 @@ describe('route shell (signed in)', () => {
     expect(screen.getByRole('heading', { level: 1, name: title })).toBeTruthy();
     expect(screen.queryByText(/Coming in a later phase/)).toBeNull();
     await waitFor(() => expect(screen.getAllByText(empty).length).toBeGreaterThan(0));
+  });
+
+  it('/dungeons is a real screen (Adventure), loaded from the API', async () => {
+    renderAt('/dungeons');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Adventure' })).toBeTruthy();
   });
 
   it('battle route has no HUD, no hotbar and no camp panel, and a failed load offers a way out', async () => {
@@ -152,7 +159,7 @@ describe('route shell (signed in)', () => {
 });
 
 describe('authentication guard', () => {
-  it.each([...placeholders.map(([p]) => [p]), ['/quests'], ['/sessions'], ['/lab']])(
+  it.each([...placeholders.map(([p]) => [p]), ['/quests'], ['/sessions'], ['/lab'], ['/dungeons']])(
     '%s redirects to the login screen when signed out',
     (path) => {
       renderAt(path as string, 'signedOut');

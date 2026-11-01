@@ -1,0 +1,241 @@
+/* Adventure (06 P1): a pixel region map with real buttons on desktop, a vertical list on phones. Body font for all reading. */
+.page {
+  --panel-pad: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  max-width: 62rem;
+  margin: 0 auto;
+}
+.resume {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: inset var(--pixel) 0 0 0 var(--gold-500);
+  color: var(--charcoal-800);
+}
+.resume a,
+.prep a,
+.fine a {
+  color: var(--wood-700);
+  font-weight: 700;
+}
+.controls {
+  display: grid;
+  gap: var(--space-2);
+}
+.field {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 22rem;
+  font-weight: 700;
+  color: var(--charcoal-800);
+}
+.select {
+  min-height: var(--tap);
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-weight: 400;
+  color: var(--charcoal-950);
+  background: var(--parchment-50);
+  border: var(--pixel) solid var(--wood-500);
+}
+.energy,
+.fine,
+.why {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--charcoal-800);
+}
+.fine {
+  font-size: 0.88rem;
+  color: var(--charcoal-600);
+}
+.why {
+  color: var(--ember-700);
+  font-weight: 700;
+}
+
+/* ---------- map (desktop) ---------- */
+.mapWrap {
+  display: flex;
+  justify-content: center;
+}
+.map {
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  box-shadow: 0 0 0 var(--pixel) var(--wood-700);
+  image-rendering: pixelated;
+}
+.node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 7.5rem;
+  min-height: var(--tap);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-body);
+  color: var(--parchment-50);
+  background: rgba(15, 31, 26, 0.9);
+  border: var(--pixel) solid var(--gold-700);
+  cursor: pointer;
+}
+.node[data-state='locked'] {
+  border-color: var(--charcoal-600);
+  color: var(--parchment-300);
+}
+.node[data-state='cleared'] {
+  border-color: var(--moss-300);
+}
+.node[aria-pressed='true'] {
+  outline: 3px solid var(--gold-300);
+  outline-offset: 2px;
+}
+.node:hover {
+  background: rgba(29, 58, 48, 0.95);
+}
+.nodeName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+}
+.nodeState {
+  font-family: var(--font-pixel);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- region list (all sizes; the whole UI on phones) ---------- */
+.list {
+  display: grid;
+  gap: var(--space-2);
+}
+.region {
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: 0 0 0 var(--pixel) var(--parchment-300);
+  color: var(--charcoal-800);
+}
+.region[data-selected='true'] {
+  box-shadow: 0 0 0 var(--pixel) var(--gold-700);
+}
+.region[data-state='locked'] {
+  background: var(--parchment-100);
+}
+.regionTitle {
+  margin: 0;
+  font-size: 1rem;
+}
+.regionButton {
+  display: flex;
+  width: 100%;
+  min-height: var(--tap);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: left;
+  color: var(--wood-700);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.badge {
+  padding: 0 var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  color: var(--charcoal-950);
+  background: var(--gold-300);
+}
+.badge[data-state='locked'] {
+  background: var(--parchment-300);
+}
+.badge[data-state='cleared'] {
+  background: var(--moss-300);
+}
+.body {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.boss {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-100);
+  box-shadow: inset var(--pixel) 0 0 0 var(--ember-500);
+}
+.boss[data-state='cleared'] {
+  box-shadow: inset var(--pixel) 0 0 0 var(--moss-500);
+}
+.boss[data-state='locked'] {
+  box-shadow: inset var(--pixel) 0 0 0 var(--charcoal-600);
+}
+.bossText {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+  min-width: 0;
+}
+.bossName {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.05rem;
+  color: var(--wood-700);
+}
+.prep {
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-100);
+  box-shadow: inset var(--pixel) 0 0 0 var(--teal-500);
+}
+.prep p {
+  margin: 0;
+}
+.prepTitle {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: var(--wood-700);
+}
+.error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ember-700);
+  color: var(--parchment-50);
+}
+.error a {
+  color: var(--gold-300);
+  font-weight: 700;
+}
+@media (max-width: 700px) {
+  .page {
+    --panel-pad: var(--space-3);
+  }
+  .boss {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.footer {
+  display: flex;
+}
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  text-decoration: none;
+}

@@ -235,6 +235,8 @@ export interface DungeonsDto {
   energy: number;
   energyCost: number;
   dungeons: DungeonStatusDto[];
+  /** Flashcards due right now, by the CARD's subject (counts only; for the boss prep panel). */
+  dueBySubject: Record<string, number>;
   /** Resume link for an unfinished battle. */
   activeBattleId: string | null;
 }

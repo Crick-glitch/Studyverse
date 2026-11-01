@@ -126,6 +126,17 @@ export const battleScenarios = {
   }),
   ended: () => battleFixture({ phase: 'ended', status: 'victory', enemy: { slug: 'gearwork-golem', name: 'Gearwork Golem', isBoss: false, bossPhase: 1, intro: null, hp: 0, maxHp: 108, atk: 13, def: 8 } }),
 };
+const dungeonRow = (tier, over = {}) => ({
+  tier, slug: ['archive', 'library', 'foundry'][tier - 1], name: ['The Whispering Archive', 'The Sunken Library', 'The Clockwork Foundry'][tier - 1],
+  background: ['dungeon.archive', 'dungeon.library', 'dungeon.foundry'][tier - 1], open: tier === 1,
+  lockedReason: tier === 1 ? null : tier === 2 ? 'Reach level 5 and defeat The Procrastination Wyrm' : 'Reach level 9 and defeat The Archivist Lich',
+  bossSlug: ['procrastination-wyrm', 'archivist-lich', 'clockwork-titan'][tier - 1], bossName: ['The Procrastination Wyrm', 'The Archivist Lich', 'The Clockwork Titan'][tier - 1],
+  bossOpen: false, bossLockedReason: 'Reach level 3 and win 2 more raids here', bossDefeated: false, raidWins: 1, raidWinsNeeded: 3, ...over,
+});
+export const dungeonsScenario = () => ({
+  level: 4, energy: 7, energyCost: 3, dueBySubject: { Math: 6, Biology: 2 }, activeBattleId: null,
+  dungeons: [dungeonRow(1, { bossOpen: true, bossLockedReason: null, raidWins: 3 }), dungeonRow(2), dungeonRow(3)],
+});
 const answerResponse = () => ({
   result: { turnNumber: 3, move: 'bold', intent: 'heavy', correct: false, selectedIndex: 0, correctIndex: 1, explanation: 'Mitochondria produce most of the cell\'s ATP through cellular respiration, which is why they are called its powerhouse.', damageDealt: 0, damageTaken: 14, enemyHealed: 0, heroHealed: 0, combo: 0, focusGained: 0, events: [{ type: 'hit', text: 'Gearwork Golem hits you for 14.' }], ended: false, outcome: null },
   battle: battleFixture({ turn: 4, hero: heroOf({ hp: 68 }), combo: 0, lastResult: null }),
@@ -158,6 +169,7 @@ export function respond(method, pathname, scenario = {}) {
     if (p === '/flashcards/due') return { items: reviewItems, dueTotal: 6, serverNow: iso(0) };
     if (/^\/sessions\/[^/]+\/claim$/.test(p)) return { session: session({ status: 'finished' }), questions: claimQuestions };
     if (p === '/battles/active') return { battle: null };
+    if (p === '/dungeons' && scenario.dungeons) return dungeonsScenario();
     if (p === '/battles/b1' && scenario.battle) return { battle: battleScenarios[scenario.battle]() };
     if (p === '/import/local/preflight') return { hasProgress: false, existing: { totalXp: 0, tasks: 0, sessions: 0, flashcards: 0 } };
   }
