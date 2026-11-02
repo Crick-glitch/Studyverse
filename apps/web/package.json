@@ -10,7 +10,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "art:sheets": "tsx scripts/art-sheets.ts",
-    "shots": "node scripts/route-shots.mjs"
+    "shots": "node scripts/route-shots.mjs",
+    "e2e:battle": "node scripts/battle-e2e.mjs"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.1.0",

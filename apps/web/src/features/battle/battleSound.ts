@@ -1,4 +1,4 @@
-import type { AnswerResultDto } from '@studyverse/shared';
+import type { BattleEventName } from './useBattleAnimations';
 
 /**
  * Battle sounds: tiny WebAudio tones (as in the old game), keyed by the same event names the animations use, so audio and
@@ -35,8 +35,6 @@ export function playTone(event: SoundEvent): void {
   }
 }
 
-export function playBattleSounds(r: AnswerResultDto): void {
-  if (r.ended) return playTone(r.outcome === 'victory' ? 'victory' : 'defeat');
-  playTone(r.correct ? 'correct' : 'wrong');
-  if (r.damageDealt > 0 || r.damageTaken > 0) window.setTimeout(() => playTone('hit'), 120);
-}
+/** The same event names the animations emit: the sound plays when the move LANDS on screen, not when the server replied. */
+const SOUND_FOR: Record<BattleEventName, SoundEvent> = { heroAttack: 'correct', enemyAttack: 'wrong', hit: 'hit', victory: 'victory', defeat: 'defeat' };
+export const playBattleEvent = (name: BattleEventName): void => playTone(SOUND_FOR[name]);

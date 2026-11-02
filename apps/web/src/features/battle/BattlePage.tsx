@@ -10,11 +10,11 @@ import { PixelButton } from '../art/kit/PixelButton';
 import { PixelPanel } from '../art/kit/PixelPanel';
 import kit from '../art/kit/kit.module.css';
 import { BattleField } from './BattleField';
-import { AbilityBar, BattleLog, FeedbackPanel, MovePanel, QuestionPanel } from './BattlePanels';
+import { AbilityBar, BattleLog, FeedbackPanel, HeroSheet, MovePanel, QuestionPanel } from './BattlePanels';
 import { battleKeyAction } from './battleKeys';
 import { AUTO_STEADY_KEY, SOUND_KEY, useStoredToggle } from './battlePrefs';
 import { initialView, reduce } from './battleReducer';
-import { playBattleSounds } from './battleSound';
+import { playBattleEvent } from './battleSound';
 import { RewardsScreen } from './RewardsScreen';
 import styles from './battle.module.css';
 
@@ -75,11 +75,10 @@ function BattleScreen({ id }: { id: string }) {
     try {
       const r = await answerM.mutateAsync({ turn: battle.turn, index });
       dispatch({ type: 'answerOk', result: r.result, battle: r.battle });
-      if (sound) playBattleSounds(r.result);
     } catch (e) {
       await resync(e);
     }
-  }, [battle, view.busy, view.step, answerM, resync, sound]);
+  }, [battle, view.busy, view.step, answerM, resync]);
 
   const armAbility = useCallback(async () => {
     const a = battle?.abilities[0];
@@ -188,7 +187,7 @@ function BattleScreen({ id }: { id: string }) {
           )
         ) : (
           <>
-            <BattleField battle={live} fx={view.fx} onFxDone={onFxDone} scale={scale} narrow={narrow} mid={mid} intro={view.stage === 'intro'} onBegin={() => dispatch({ type: 'begin' })} />
+            <BattleField battle={live} fx={view.fx} onFxDone={onFxDone} scale={scale} narrow={narrow} mid={mid} intro={view.stage === 'intro'} onBegin={() => dispatch({ type: 'begin' })} onEvent={(e) => { if (sound) playBattleEvent(e); }} />
             <PixelPanel tone="parchment" className={styles.panel} aria-label="Your turn">
               {view.step === 'awaitingMove' ? (
                 <>
@@ -221,6 +220,7 @@ function BattleScreen({ id }: { id: string }) {
                   <PixelButton className={kit.small} onClick={() => dispatch({ type: 'dismissError' })}>Dismiss</PixelButton>
                 </div>
               ) : null}
+              <HeroSheet hero={live.hero} />
               <BattleLog log={live.log} />
             </PixelPanel>
           </>

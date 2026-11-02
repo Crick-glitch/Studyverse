@@ -1,3 +1,4 @@
+import { animate, steps } from 'animejs';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { EFFECT_TEXT, type BattleSummaryDto } from '@studyverse/shared';
@@ -9,7 +10,7 @@ import kit from '../art/kit/kit.module.css';
 import { plural } from '../../lib/format';
 import styles from './battle.module.css';
 
-/** Counts a number up to `target` in whole steps (instantly when motion is reduced). */
+/** Counts a number up to `target` in whole steps with Anime.js (the `rewardCount` timeline); instant when motion is reduced. */
 export function useCountUp(target: number, ms = 700): number {
   const reduced = useReducedMotion();
   const [n, setN] = useState(reduced ? target : 0);
@@ -18,14 +19,11 @@ export function useCountUp(target: number, ms = 700): number {
       setN(target);
       return;
     }
-    const steps = Math.min(target, 20);
-    let i = 0;
-    const timer = window.setInterval(() => {
-      i += 1;
-      setN(Math.round((target * i) / steps));
-      if (i >= steps) window.clearInterval(timer);
-    }, ms / steps);
-    return () => window.clearInterval(timer);
+    const counter = { value: 0 };
+    const run = animate(counter, { value: target, duration: ms, ease: steps(Math.min(target, 20)), onUpdate: () => setN(Math.round(counter.value)), onComplete: () => setN(target) });
+    return () => {
+      run.revert();
+    };
   }, [target, reduced, ms]);
   return n;
 }

@@ -215,53 +215,6 @@
 .actor > span {
   display: inline-block;
 }
-.lungeRight {
-  animation: lungeRight 0.45s steps(1, end);
-}
-.lungeLeft {
-  animation: lungeLeft 0.45s steps(1, end);
-}
-.shake {
-  animation: shake 0.4s steps(1, end);
-}
-@keyframes lungeRight {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  30%,
-  60% {
-    transform: translateX(calc(var(--s) * 12px));
-  }
-}
-@keyframes lungeLeft {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  30%,
-  60% {
-    transform: translateX(calc(var(--s) * -12px));
-  }
-}
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(calc(var(--pixel) * -2));
-  }
-  40% {
-    transform: translateX(calc(var(--pixel) * 2));
-  }
-  60% {
-    transform: translateX(calc(var(--pixel) * -1));
-  }
-  80% {
-    transform: translateX(var(--pixel));
-  }
-}
 
 /* floating numbers and banners (decorative: the result is also in text below) */
 .fxLayer {
@@ -278,7 +231,6 @@
   font-weight: 700;
   color: var(--gold-300);
   text-shadow: 0 var(--pixel) 0 var(--charcoal-950), var(--pixel) 0 0 var(--charcoal-950), calc(var(--pixel) * -1) 0 0 var(--charcoal-950);
-  animation: rise 1s steps(8, end) forwards;
 }
 .num[data-side='enemy'] {
   right: 14%;
@@ -289,19 +241,6 @@
 }
 .num[data-tone='heal'] {
   color: var(--moss-300);
-}
-@keyframes rise {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  75% {
-    opacity: 1;
-  }
-  to {
-    transform: translateY(calc(var(--pixel) * -14));
-    opacity: 0;
-  }
 }
 .banner {
   position: absolute;
@@ -320,19 +259,6 @@
   color: var(--parchment-50);
   background: var(--ember-700);
   box-shadow: 0 0 0 var(--pixel) var(--gold-500);
-  animation: bannerIn 1.4s steps(1, end) forwards;
-}
-@keyframes bannerIn {
-  0% {
-    opacity: 0;
-  }
-  10%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
 }
 .intro {
   position: absolute;
@@ -787,18 +713,6 @@
     padding: var(--space-1) var(--space-3);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .lungeRight,
-  .lungeLeft,
-  .shake,
-  .num,
-  .bannerText {
-    animation: none;
-  }
-  .bannerText {
-    opacity: 1;
-  }
-}
 .choiceStatic {
   display: flex;
   padding: var(--space-2) var(--space-3);
@@ -828,4 +742,40 @@
   justify-content: center;
   min-height: var(--tap);
   text-decoration: none;
+}
+
+.sheet {
+  margin-top: var(--space-2);
+  font-size: 0.9rem;
+  color: var(--charcoal-800);
+}
+.sheet summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--wood-700);
+}
+.sheetList {
+  margin: 0;
+  padding: 0 0 var(--space-1) var(--space-4);
+}
+.screen {
+  animation: screenIn 0.2s steps(4, end);
+}
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--pixel) * 3));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
 }

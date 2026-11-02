@@ -123,3 +123,20 @@ export function BattleLog({ log }: { log: string[] }) {
     </ol>
   );
 }
+
+/** Gear effects and class perks as plain text (a keyboard- and touch-friendly stand-in for a hover tooltip). Never shows an answer. */
+export function HeroSheet({ hero }: { hero: BattleDto['hero'] }) {
+  const gear = [hero.weapon, hero.armor].filter((g): g is NonNullable<typeof g> => g !== null);
+  return (
+    <details className={styles.sheet}>
+      <summary>Your gear and perks</summary>
+      <ul className={styles.sheetList}>
+        {gear.map((g) => (
+          <li key={g.slug}><strong>{g.name}</strong> ({g.rarity}){g.effect ? `: ${g.effect}` : ': no special effect.'}</li>
+        ))}
+        {hero.perks.map((p) => <li key={p}>{p}</li>)}
+        {gear.length === 0 && hero.perks.length === 0 ? <li>No gear or perks yet.</li> : null}
+      </ul>
+    </details>
+  );
+}

@@ -173,3 +173,15 @@ describe('battle screen', () => {
     expect(screen.queryByRole('navigation')).toBeNull();
   });
 });
+
+describe('gear and perks panel', () => {
+  it('lists equipped gear with its effect and the class perk as plain text', async () => {
+    b.get.mockResolvedValue(fakeBattle({ turn: 2, lastResult: fakeResult() }));
+    renderScreen();
+    fireEvent.click(await screen.findByText('Your gear and perks'));
+    const sheet = screen.getByText('Your gear and perks').closest('details')!;
+    expect(sheet.textContent).toMatch(/Iron Sword/);
+    expect(sheet.textContent).toMatch(/no special effect/);
+    expect(sheet.textContent).toMatch(/Warrior: \+2 base damage/);
+  });
+});

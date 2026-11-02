@@ -1,45 +1,43 @@
-# HANDOFF — Session 06 (battle screen): INCOMPLETE
+# HANDOFF — Session 06 (battle screen): P0, P1 and P2 BUILT, with the gaps listed below
 
-Branch `rebuild/fullstack-ts`. **Do not describe session 06 as finished.** Done: Step 0, the shared battle rules, the pure engine and the balance simulation. Half-written: the API service layer. Not started: the HTTP routes, the whole web battle screen and the rewards screen.
-Read `00-master-context.md`, then `06-battle-screen.md`, `04-rpg-design-spec.md` (v2), `DESIGN-BLUEPRINT.md`, and the "Session 06" sections of `docs/DECISIONS.md` (the second one lists every balance number that changed from 04 and why).
+Branch `rebuild/fullstack-ts`. Read `00-master-context.md`, then the "Session 06" sections of `docs/DECISIONS.md` (the last one, "third sitting", is the newest).
+Do not describe anything under "Not done / unverified" as finished.
 
 ## Done (with evidence)
-- **Step 0** (unchanged from the first sitting): `grantXp` daily cap (`apps/api/src/xpCaps.int.test.ts`, 9 tests) and the additive migration `20261029000000_session06_battle`.
-- **Shared rules** `packages/shared/src/battle/` (`constants.ts` = `BATTLE`, `roster.ts`, `stats.ts` = `deriveStats`, `unlocks.ts`, `rewards.ts`, `text.ts`) and `schemas/battles.ts` (request schemas plus `BattleDto`, `AnswerResultDto`, `BattleSummaryDto`, `DungeonsDto` types). Tests: `battle/battle.test.ts`, 19 tests (roster, derived stats, unlock rules incl. reasons, reward formulas, rarity rolls).
-- **Pure engine** `apps/api/src/battle/` (`types`, `rng`, `intents`, `draw`, `resolve`, `engine`; no Express, no Prisma, no clock). Tests `engine.test.ts`, **58 tests, written before the code**: every 04 formula, combo, each intent, each move, Brace cancelling Heavy and Drain heal, Guard rules incl. the Titan's boss Guard, boss phases, Cleave/Bulwark/Insight timing and class gating, Second Wind, Stone Wall, Berserk, Executioner, gear effects, due-card share, recent-window exclusion, requeue once, determinism per (seed, turn), and the fairness invariants (nothing exposes the answer; Insight removes exactly one wrong choice).
-- **Simulation** `simulate.ts` + `balance.test.ts` (22 tests, runs the real engine, four policies, the XP-per-minute audit). Numbers are in `docs/DECISIONS.md`. It found and fixed: Brace-only dominating, bosses unwinnable, an energy-neutral raid loop, and raid XP/min over 3x a session.
-- **Server helpers, compile but are NOT wired or tested yet:** `apps/api/src/services/battleTypes.ts`, `battleHero.ts` (starter gear + `loadHero` from derived stats), `battlePool.ts` (bank + due-card pool, weak subjects), `battleUnlocks.ts` (unlock facts derived from raid `Battle` rows), `battleView.ts` (`toBattleDto`, never includes the answer).
-- **WIP, deliberately NOT in `src` (it would not compile):** `apps/api/wip/battles.ts.txt` = the main service (`startBattle`, `chooseBattleMove`, `useBattleAbility`, `answerBattle`, `retreatBattle`, `getBattle`, `getActiveBattle`). Move it to `apps/api/src/services/battles.ts` once `services/battleFinish.ts` exists (it imports `finishBattleInTx(tx, userId, battleId, now)` from it).
+- **Server (P0):** `services/battleFinish.ts` (the only place a battle pays), `services/battles.ts` (moved out of `wip/`; `applyCardReview` and `BALANCE.srs.*` names verified), `services/battleHooks.ts` (`onFirstClear`, no-op until session 07), `routes/battles.ts` (`POST /battles` with `Idempotency-Key`, `GET /battles/active`, `GET /battles/:id`, `POST …/move|ability|answer|retreat|finish|missed-to-flashcards`). Tests `battles.int.test.ts` (38), run 6 times in a row with no flakes.
+- **P1 server:** `GET /dungeons` (`services/dungeons.ts`, derived from raid `Battle` rows, plus `dueBySubject`); `dungeons.int.test.ts` (7); `battlesFirstClear.int.test.ts` (3: paid once across two victories and repeated `finish`, hook called once, no bonus on defeat).
+- **Web (P0):** `/battle/:battleId` in `BattleLayout` (no HUD, hotbar or camp panel): `features/battle/` (reducer 16 tests, keys 5, page 12, rewards 7, animations 7). Moves before the question, intent banner, abilities, feedback with explanation, rewards (XP count-up, daily-cap note, loot, first clear, missed questions, weak spot, "add to flashcards"), retreat confirm, Auto-Steady, sound toggle, gear and perks panel. Refresh resumes from server state.
+- **P1 web:** `features/dungeons/DungeonsPage.tsx` (map with node buttons at ≥ 700 px, vertical list always, locked reasons, boss gate and progress, boss prep with due cards and a Library link, resume banner). 9 tests.
+- **P2:** Anime.js 4.5 animation library with sound events in sync (`useBattleAnimations`, tested with the real library in jsdom and with a mock); browser e2e script.
+- **Screenshots looked at, five viewports** (1440×900, 1280×800, 768×1024, 390×844, 360×800), battle intro/move/question/feedback/boss/rewards and Adventure: `docs/redesign/battle-final/`, `docs/redesign/dungeons-final/`. The measurements report no sideways scroll, no clipped plates, no text under 12 px, no tap target under 40 px and no last answer below the fold. Real defects found and fixed this way are listed in DECISIONS item 14.
 
-## Checks actually run (after the last edit; PostgreSQL 16 up, `TEST_DATABASE_URL` set)
+## Checks actually run (after the last edit)
 | Command | Result |
 |---|---|
-| `npm run lint` | pass |
-| `npm run typecheck` | pass |
-| `npm run test` | pass: API 16 files / 227 tests, web 26 files / 384 tests, shared 4 files / 76 tests |
-| `npm run build` | pass |
-| `prisma migrate dev` | NOT run (schema engine stubbed; run it on a real machine and confirm no drift) |
-| Playwright, `scripts/design-shots.mjs` | NOT run (no web changes yet) |
-Nothing in the web app changed this sitting; the battle API has no routes yet, so **no endpoint exists and no API test for battles exists**.
+| `npm run lint` (`eslint .`) | pass, 0 problems |
+| `npm run typecheck` (api, web, shared) | pass |
+| `npm run test` | pass: shared 4 files / 76 tests, API 19 files / 275 tests (was 227), web 33 files / 438 tests (was 384) |
+| `npm run build` | pass (the web bundle is 559 kB, Vite warns above 500 kB; not split) |
+| `node apps/web/scripts/battle-e2e.mjs` | pass: 12 steps, 2 widths, against a SIMULATOR (see DECISIONS 19) |
+| `node apps/web/scripts/design-shots.mjs` | run; no problems reported |
+| `prisma migrate dev` | NOT run: no schema change this sitting, and the schema engine is stubbed here. Run it once on a real machine and confirm no drift from `20261029000000_session06_battle`. |
 
-## Not started / remaining, in priority order (P0 first, never half-build a tier)
-**P0, remaining**
-1. `apps/api/src/services/battleFinish.ts`: `finishBattleInTx` (one transaction through `grantXp`: raid `battle`/battleId, defeat 40%, practice `battle_practice`/battleId at 25% with `DAILY_XP_CAPS.battle_practice` and `leaderboardEligible:false`; retreat pays nothing; loot via `rollRarity` with seeded roll + pity from the last 5 regular raid summaries, duplicates become bonus XP, auto-equip into an empty slot only; raid wins/losses, `touchStreak`, `addEnergy(battleEnergy(scholar))`, quest event `battles_won` for raid victories only; build `BattleSummaryDto` incl. missed questions and weak spot; store `rewardSummary` + `rewardsGrantedAt`; a second call returns the stored summary with `alreadyFinished: true`). Use `getModifiers`/`touchStreak` from `services/streak.ts`, `recordQuestEvent` from `services/quests.ts`.
-2. Move `wip/battles.ts.txt` back into `src/services/battles.ts`; check it compiles (it uses `applyCardReview(tx, {userId, card, now, context, sageMemory, quality})`, `BALANCE.srs.choiceCorrectQuality/choiceWrongQuality` — **verify these exact names and the `applyCardReview` signature**, they were written from memory), and add `finishBattle` + `missedToFlashcards` (deck "Missed in battle", dedupe by normalized question).
-3. `apps/api/src/routes/battles.ts` and mount it in `app.ts` under `/api/v1` with the `battleAnswer` limiter on move/ability/answer: `POST /battles` (required `Idempotency-Key`, validated by `idempotencyKeySchema`, 201 new / 200 replay), `GET /battles/active`, `GET /battles/:id`, `POST /battles/:id/move|ability|answer|retreat|finish|missed-to-flashcards`. Follow `routes/sessions.ts`.
-4. API tests (`battles.int.test.ts`, list in 06): no `correctIndex`/explanation and no question text before a move (scan the JSON), answer before move = 409, same move returns the same question, different move = 409 with the stored choice, stale/future turn rejected, duplicate answer idempotent, other user 404, double Start with one key deducts energy once, finish twice pays once, practice never grants loot/raid wins/energy/quest wins and respects the cap and is not leaderboard-eligible, not enough energy and each unlock rule refused with a reason, defeat pays 40%, refresh at `awaitingMove` and `awaitingAnswer` resumes.
-5. Web (nothing exists): `/battle/:battleId` in `BattleLayout` (no HUD, hotbar, camp panel), single reducer state machine (`loading → intro → awaitingMove → awaitingAnswer → feedback → …`), move panel with the exact effect text from `MOVE_TEXT`, question panel, ability buttons with Focus pips, intent banner, `BattleBackground` + hero/enemy `Sprite` at integer scale, keyboard (`Q/W/E`, `1/2/3`, `Enter`, `A`), resume from server state, mobile (battlefield ~45vh, targets >= 44 px), Skip-tactics flag (default off; read from settings if it exists), minimal start form on `/dungeons` with a resume button. Rewards screen (XP count-up, cap line, level-up, energy, loot, missed questions + "Add missed questions to my flashcards", weak-spot line, defeat "Prepare and retry"). CSS-step idle/hit only (Anime.js is not installed; P2).
-6. Design check: render with `apps/web/scripts/design-shots.mjs` at 1440x900, 1280x800, 768x1024, 390x844, 360x800 (`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`), look at every shot, fix clipping/overflow/empty space/unreadable text before calling the screen finished.
-**P1:** `GET /dungeons` (`DungeonsDto`, derived via `loadUnlockFacts` + `allDungeonStatuses`) and the region map with locked reasons, first clear (`first_clear`/bossSlug via `grantXp`, `FIRST_CLEAR_XP`, then an `onFirstClear(userId, bossSlug)` no-op hook), boss prep panel (due cards per subject, link to `/lab`), unlock-rule tests (tier 2 needs the tier 1 boss; boss gate needs 3 RAID wins in that dungeon; practice never counts). **P2:** Anime.js `useBattleAnimations`, Playwright at both widths, then (only if budget is left) 05c P2.
+## Not done / unverified
+- **Not run against a real server and a real login:** the web app has only been driven against mocks (unit, jsdom and the simulator). The API is tested against real PostgreSQL. A first manual run with Supabase credentials is the real end-to-end test.
+- **Motion and sound were not seen or heard.** Static frames, the real Anime.js API in jsdom and a console-error-free browser run were verified; the feel of the lunges, numbers and tones needs a human.
+- **Not built:** readiness labels on the prep panel (session 07 needs mastery); cape palette and cosmetics on the hero (session 07); `hpBarTween` (on purpose); 05c P2 (quest chip, location banners); a test for the `battleAnswer` rate limit; a code-split of the web bundle.
+- **Known limit:** a missed flashcard (as opposed to a bank question) is not re-queued inside the same battle, because answering it reschedules it (DECISIONS 8).
+- Moves still cost one click per turn; Auto-Steady removes it. Only playtesting says whether encounters feel quick.
 
-## Design decisions already made (carry over; also in `docs/DECISIONS.md`)
-Engine in `apps/api/src/battle/`; seeded RNG derived from `(seed, turn, salt)`; combo uses the streak after the current correct answer; the `BattleTurn` row is created when the turn opens (intent known) and the question is snapshotted when the move is chosen; server phases are `awaitingMove | awaitingAnswer | ended` and `GET` returns `lastResult` (no persisted `feedback` phase); a wrong question may be re-queued once, only if its difficulty fits the chosen move; unlock enforcement lives in `POST /battles` (it is in the P0 API table), the map UI and tests are P1; starter gear (Iron Sword + Leather Armor) is granted lazily when a player with no gear starts a battle, and loot only auto-equips into an empty slot (Camp equipping is session 07); achievements/cosmetics are evaluated in 07, session 06 only leaves the `onFirstClear` hook; Insight removes one wrong choice and gives no hint text; bosses: Wyrm T1, Lich T2, Titan T3.
+## Next (session 07), in order
+Read `07-camp-dashboard-stats-social.md`. P0: S1 task XP cap (one call site) + Camp + Dashboard + Quest Board + Settings. When building Settings, move the two battle toggles there (keys `studyverse.skipTactics`, `studyverse.sound`). P1: S2 mastery, S3 quest generator and reroll, S4 cosmetics (attach to `onFirstClear` in `services/battleHooks.ts`; it receives the finish transaction), then readiness on `/dungeons` (the `Prepare` panel in `DungeonsPage.tsx`).
+Exact next prompt: "Continue StudyVerse from the attached zip. Read `00-master-context.md`, `docs/HANDOFF.md` and the Session 06 sections of `docs/DECISIONS.md`. Run `07-camp-dashboard-stats-social.md` from Step 0 S1, priority order, tests first."
 
-## Environment notes for the next session
-- `binaries.prisma.sh` is blocked: `PRISMA_SCHEMA_ENGINE_BINARY=<stub script that exits 0>` and `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` made `prisma generate` and `prisma validate` work. I used the stub.
-- PostgreSQL 16 from apt needed `apt-get update` first; start it with `pg_ctlcluster 16 main start`; create `studyverse_test`; `TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/studyverse_test`. I had to use this.
-- `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` for screenshots: not used yet.
-- `npm install` works (no `node_modules` in the zip); run `npm run build:shared` before API tests; run `prisma generate` for `apps/api/src/generated`.
+## Environment notes (workarounds I used)
+- `binaries.prisma.sh` blocked: `PRISMA_SCHEMA_ENGINE_BINARY=/tmp/schema-engine-stub` (a script that exits 0) and `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1`; `prisma generate` and `validate` work.
+- PostgreSQL 16 from apt (`apt-get update` first), `pg_ctlcluster 16 main start`, database `studyverse_test`, `TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/studyverse_test`. The sandbox stopped Postgres between turns more than once; restart it before API tests.
+- `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`.
+- `npm install` works (no `node_modules` in the zip); `npm run build:shared` before API tests; `prisma generate` for `apps/api/src/generated`.
 
 ## Owner decisions still open
-None new. (The earlier list in `CHANGES-v2.md` section 7 still applies: caps, 3 raid wins per boss gate, move multipliers, reroll count, S5, leaderboard.)
+Those in `CHANGES-v2.md` section 7 (caps, 3 raid wins per boss gate, move multipliers, reroll count, S5, leaderboard), plus: Scholar's raid cycle is 3.6x a session at level 12 (DECISIONS, second sitting, item 4).
