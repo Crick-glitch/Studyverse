@@ -10,3 +10,4 @@ test-results/
 .DS_Store
 # Generated Prisma client (created by `npm run db:generate`)
 apps/api/src/generated/
+docs/
