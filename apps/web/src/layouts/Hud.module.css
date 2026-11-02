@@ -1,0 +1,230 @@
+/* Slim, sticky, one row: at most 64px tall on a desktop and 56px on a phone (05c section 3). */
+.hud {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--hud-h);
+  padding: var(--space-1) var(--space-4);
+  background: var(--charcoal-950);
+  box-shadow:
+    0 var(--pixel) 0 0 var(--gold-700),
+    0 calc(var(--pixel) * 2) 0 0 var(--charcoal-950);
+}
+.identity {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--pixel); /* room for the bar's outer edge, which is drawn with a shadow */
+  overflow: hidden; /* on a very narrow phone the bar is clipped rather than drawn over the energy and flame */
+  justify-items: start;
+}
+.name {
+  font-family: var(--font-pixel);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  color: var(--parchment-50);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.cls {
+  color: var(--parchment-300);
+  font-weight: 400;
+}
+.status {
+  color: var(--parchment-300);
+}
+.stats {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  /* Body font: the pixel font's small "5" reads as an "S", and these are numbers the player checks at a glance. */
+  font-family: var(--font-body);
+  color: var(--gold-300);
+}
+/* Top bar: number and label side by side ("4 Energy"). The label is hidden on a phone, where the icon has to do. */
+.resText {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+.resNum {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.resLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--parchment-300);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Phone: portrait, level plate, XP bar, energy, flame (and the session chip) in one 56px row.
+   The name and class stay in the page for screen readers only. Keep 640px in step with MOBILE_QUERY. */
+@media (max-width: 640px) {
+  .hud {
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    min-height: var(--hud-h-mobile);
+  }
+  .name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .stats {
+    gap: var(--space-2);
+  }
+  .resNum {
+    font-size: 1rem;
+  }
+  .resLabel {
+    display: none;
+  }
+}
+
+/* ---- Desktop camp panel: the player card at the top of the left panel (AppLayout) ---- */
+.panel {
+  --frame: var(--gold-700);
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--charcoal-800);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--frame),
+    0 var(--pixel) 0 0 var(--frame),
+    calc(var(--pixel) * -1) 0 0 0 var(--frame),
+    var(--pixel) 0 0 0 var(--frame),
+    inset 0 var(--pixel) 0 0 var(--charcoal-600);
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.pId {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.pName {
+  font-family: var(--font-pixel);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--parchment-50);
+  overflow-wrap: anywhere; /* a long display name wraps instead of pushing the panel wider */
+}
+.pSub {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+.xp {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+}
+.xpBar {
+  display: flex;
+}
+.xpText {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--parchment-300);
+  font-variant-numeric: tabular-nums;
+}
+.resources {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+.res {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  background: var(--charcoal-950);
+  box-shadow: 0 0 0 var(--pixel) var(--charcoal-600);
+  font-family: var(--font-body);
+}
+.res .resText {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.res .resNum {
+  font-size: 1.25rem;
+  color: var(--gold-300);
+}
+.res .resLabel {
+  font-size: 0.75rem;
+}
+.skills {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-2);
+  background: var(--charcoal-950);
+  color: var(--parchment-100);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 0 0 var(--pixel) var(--gold-700);
+}
+.skills:hover {
+  background: var(--forest-700);
+}
+.skills:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 4px;
+}
+/* The same gold "!" as on the portrait: gold, not red, not flashing. */
+.bang {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  background: var(--gold-500);
+  color: var(--charcoal-950);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 360 px phones: 8 px side padding instead of 16, so the 4-segment XP bar fits beside the session chip without being clipped. */
+@media (max-width: 380px) {
+  .hud {
+    padding-inline: var(--space-2);
+  }
+}

@@ -1,0 +1,460 @@
+{
+ "dungeons@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 564,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 1361,
+   "r": 1440,
+   "b": 1361
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons-locked@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 564,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 1369,
+   "r": 1440,
+   "b": 1369
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 464,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 1361,
+   "r": 1280,
+   "b": 1361
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons-locked@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 464,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 1369,
+   "r": 1280,
+   "b": 1369
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 1444,
+   "r": 768,
+   "b": 1508
+  },
+  "scene": null,
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 88,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons-locked@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 1452,
+   "r": 768,
+   "b": 1516
+  },
+  "scene": null,
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 88,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 390,
+   "h": 1355,
+   "r": 390,
+   "b": 1411
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons-locked@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": -511,
+   "w": 390,
+   "h": 1363,
+   "r": 390,
+   "b": 852
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": -495,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 360,
+   "h": 1400,
+   "r": 360,
+   "b": 1456
+  },
+  "scene": null,
+  "portrait": {
+   "x": 8,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 56,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "dungeons-locked@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": -588,
+   "w": 360,
+   "h": 1388,
+   "r": 360,
+   "b": 800
+  },
+  "scene": null,
+  "portrait": {
+   "x": 8,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 56,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": -572,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ }
+}

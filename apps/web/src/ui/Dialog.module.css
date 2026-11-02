@@ -1,0 +1,31 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  background: rgb(18 20 24 / 0.88);
+}
+.dialog {
+  composes: panel from '../features/art/kit/kit.module.css';
+  --panel-pad: var(--space-4);
+  width: min(100% - var(--pixel) * 2, 36rem);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.title {
+  margin-top: 0;
+}
+@media (max-width: 480px) {
+  .dialog {
+    --panel-pad: var(--space-3);
+  }
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-4);
+}

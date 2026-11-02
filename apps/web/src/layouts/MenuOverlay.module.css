@@ -1,0 +1,180 @@
+/* Full-screen pixel "journal". Steps, not tweens: it slides in whole pixels and not at all under reduced motion. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  justify-items: center;
+  overflow-y: auto;
+  padding: var(--space-4) var(--space-3) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  /* Dimmed, not opaque: the game stays faintly visible behind the pause menu (it is inert while this is open). */
+  background: color-mix(in srgb, var(--forest-900) 90%, transparent);
+}
+.journal {
+  --pad: var(--space-4);
+  position: relative;
+  width: 100%;
+  max-width: 36rem;
+  /* auto margins centre it on a big screen and, unlike align-items: center, never clip the top of a tall one */
+  margin: auto;
+  padding: var(--pad);
+  display: grid;
+  gap: var(--space-3);
+  background: var(--parchment-100);
+  color: var(--charcoal-800);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--wood-700),
+    0 var(--pixel) 0 0 var(--wood-700),
+    calc(var(--pixel) * -1) 0 0 0 var(--wood-700),
+    var(--pixel) 0 0 0 var(--wood-700),
+    inset var(--pixel) var(--pixel) 0 0 var(--parchment-50),
+    inset calc(var(--pixel) * -1) calc(var(--pixel) * -1) 0 0 var(--parchment-300);
+  animation: slideIn 180ms steps(4, end);
+}
+@keyframes slideIn {
+  from {
+    transform: translateY(24px);
+  }
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.title {
+  margin: 0;
+  color: var(--wood-700);
+}
+.close {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: var(--wood-700);
+  color: var(--parchment-50);
+  cursor: pointer;
+  box-shadow: 0 var(--pixel) 0 0 var(--charcoal-950);
+}
+.close:hover {
+  background: var(--wood-500);
+}
+.close:focus-visible,
+.link:focus-visible,
+.disclosure:focus-visible,
+.toggle:focus-within {
+  outline: 3px solid var(--charcoal-950);
+  outline-offset: 3px;
+}
+.links {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.link,
+.disclosure {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  background: var(--parchment-300);
+  color: var(--charcoal-800);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 1.15rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow:
+    0 var(--pixel) 0 0 var(--parchment-500),
+    inset 0 var(--pixel) 0 0 var(--parchment-100);
+}
+.link:hover,
+.disclosure:hover {
+  background: var(--gold-300);
+}
+.link[aria-current='page'] {
+  background: var(--gold-300);
+  box-shadow:
+    0 0 0 var(--pixel) var(--gold-700),
+    inset 0 var(--pixel) 0 0 var(--parchment-50);
+}
+.section {
+  display: grid;
+  gap: var(--space-2);
+}
+.credits {
+  padding: var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: inset var(--pixel) var(--pixel) 0 0 var(--parchment-300);
+}
+.credits p {
+  margin: 0 0 var(--space-2);
+}
+.credits p:last-child {
+  margin-bottom: 0;
+}
+.toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  cursor: pointer;
+}
+.toggleName {
+  display: block;
+  font-weight: 700;
+}
+.hint {
+  display: block;
+  color: var(--charcoal-600);
+  font-size: 0.9rem;
+}
+.signOut {
+  justify-self: start;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: var(--space-2) var(--space-2) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  }
+  .journal {
+    --pad: var(--space-3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .journal {
+    animation: none;
+  }
+}
+
+/* Phone: a full-height sheet, with Sign out at the bottom, instead of a short card with the rest of the screen empty. */
+@media (max-width: 640px) {
+  .overlay {
+    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
+  }
+  .journal {
+    --pad: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100% - var(--pixel) * 2);
+    margin: var(--pixel);
+  }
+  .journal > :last-child {
+    margin-top: auto;
+  }
+}

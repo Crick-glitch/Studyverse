@@ -1,0 +1,82 @@
+.portrait {
+  position: relative;
+  flex: none;
+  display: block;
+  background: transparent;
+  color: var(--parchment-100);
+}
+.portrait:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 3px;
+}
+.window {
+  position: absolute;
+  overflow: hidden;
+  background: var(--forest-900);
+}
+.bust {
+  position: absolute;
+  display: block;
+  line-height: 0;
+}
+.frame {
+  position: absolute;
+  inset: 0;
+  line-height: 0;
+}
+/* Phones only (the name line is hidden there): a small plate with the level, in the body font (the pixel font's small "5" reads as "S"). */
+.level {
+  display: none;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 36px;
+  padding: 0 4px;
+  background: var(--charcoal-800);
+  color: var(--gold-300);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow:
+    0 0 0 var(--pixel) var(--gold-700),
+    inset 0 var(--pixel) 0 0 var(--charcoal-600);
+}
+.lv {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  color: var(--parchment-300);
+}
+@media (max-width: 640px) {
+  .level {
+    display: flex;
+  }
+}
+
+/* Unspent skill points: a gold square with "!" on the frame's upper right. Not red, not flashing. */
+.bang {
+  position: absolute;
+  right: -6px;
+  top: -4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--gold-500);
+  color: var(--charcoal-950);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 3px var(--charcoal-950);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

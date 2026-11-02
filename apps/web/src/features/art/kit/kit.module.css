@@ -1,0 +1,440 @@
+/* Pixel UI kit. Borders are stepped box-shadows (notched corners), sizes are multiples of --pixel (a whole number of px). */
+.panel {
+  --edge: var(--gold-500);
+  --fill: var(--forest-700);
+  --ink: var(--parchment-100);
+  --hi: var(--forest-500);
+  --lo: var(--forest-900);
+  position: relative;
+  min-width: 0;
+  margin: var(--pixel);
+  padding: var(--panel-pad, var(--space-3));
+  border: 0;
+  background: var(--fill);
+  color: var(--ink);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--edge),
+    0 var(--pixel) 0 0 var(--edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--edge),
+    var(--pixel) 0 0 0 var(--edge),
+    inset var(--pixel) var(--pixel) 0 0 var(--hi),
+    inset calc(var(--pixel) * -1) calc(var(--pixel) * -1) 0 0 var(--lo);
+}
+.panel[data-tone='parchment'] {
+  --edge: var(--wood-700);
+  --fill: var(--parchment-100);
+  --ink: var(--charcoal-800);
+  --hi: var(--parchment-50);
+  --lo: var(--parchment-300);
+}
+.panel[data-tone='dark'] {
+  --edge: var(--charcoal-600);
+  --fill: var(--charcoal-800);
+  --hi: var(--charcoal-600);
+  --lo: var(--charcoal-950);
+}
+.title {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-500);
+}
+.panel[data-tone='parchment'] .title {
+  color: var(--wood-700);
+}
+
+.button {
+  --fill: var(--forest-500);
+  --edge: var(--parchment-500);
+  --lip: var(--forest-900);
+  --hi: var(--teal-500);
+  --ink: var(--parchment-50);
+  position: relative;
+  min-height: 44px;
+  margin: var(--pixel);
+  padding: 0.35rem 1.1rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--fill);
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--edge),
+    var(--pixel) 0 0 0 var(--edge),
+    0 var(--pixel) 0 0 var(--edge),
+    0 calc(var(--pixel) * 2) 0 0 var(--lip),
+    inset 0 var(--pixel) 0 0 var(--hi);
+}
+.button[data-variant='primary'],
+.button.primary {
+  --fill: var(--gold-500);
+  --edge: var(--gold-700);
+  --lip: var(--gold-700);
+  --hi: var(--gold-300);
+  --ink: var(--charcoal-950);
+}
+.button[data-variant='danger'],
+.button.danger {
+  --fill: var(--ember-700);
+  --edge: var(--ember-500);
+  --lip: var(--charcoal-950);
+  --hi: var(--ember-500);
+}
+.button.small {
+  min-height: 40px;
+  padding: 0.2rem 0.8rem;
+  font-size: 0.9rem;
+}
+.button:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+.button:active:not(:disabled),
+.button[data-pressed='true'] {
+  transform: translateY(var(--pixel));
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--edge),
+    var(--pixel) 0 0 0 var(--edge),
+    0 var(--pixel) 0 0 var(--edge),
+    inset 0 var(--pixel) 0 0 var(--lip);
+}
+.button:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.7) brightness(0.8);
+  opacity: 0.75;
+}
+.button:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 4px;
+}
+
+.bar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.track {
+  display: inline-flex;
+  gap: var(--pixel);
+  padding: var(--pixel);
+  background: var(--charcoal-950);
+  box-shadow: 0 0 0 var(--pixel) var(--charcoal-600);
+}
+.seg {
+  width: calc(var(--pixel) * 3);
+  height: calc(var(--pixel) * 4);
+  background: var(--forest-700);
+}
+.seg[data-on='true'] {
+  background: var(--seg-color);
+  box-shadow: inset 0 var(--pixel) 0 0 var(--seg-hi);
+}
+.bar[data-tone='hp'] {
+  --seg-color: var(--moss-500);
+  --seg-hi: var(--moss-300);
+}
+.bar[data-tone='xp'] {
+  --seg-color: var(--gold-500);
+  --seg-hi: var(--gold-300);
+}
+.bar[data-tone='focus'] {
+  --seg-color: var(--teal-500);
+  --seg-hi: var(--teal-300);
+}
+.bar[data-tone='enemy'] {
+  --seg-color: var(--ember-500);
+  --seg-hi: var(--ember-300);
+}
+.numbers {
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
+  min-width: 5ch;
+  color: var(--parchment-100);
+}
+
+.slot {
+  display: inline-grid;
+  place-items: center;
+  min-width: 80px;
+  min-height: 80px;
+  margin: var(--pixel);
+  padding: var(--pixel);
+  background: var(--forest-900);
+  color: var(--parchment-100);
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--slot-edge, var(--charcoal-600)),
+    0 var(--pixel) 0 0 var(--slot-edge, var(--charcoal-600)),
+    calc(var(--pixel) * -1) 0 0 0 var(--slot-edge, var(--charcoal-600)),
+    var(--pixel) 0 0 0 var(--slot-edge, var(--charcoal-600));
+}
+button.slot {
+  cursor: pointer;
+}
+.slot[data-rarity='uncommon'] {
+  --slot-edge: var(--moss-500);
+}
+.slot[data-rarity='rare'] {
+  --slot-edge: var(--gold-500);
+}
+.slot[data-empty='true'] {
+  background: repeating-linear-gradient(45deg, var(--forest-900) 0 6px, var(--forest-700) 6px 12px);
+}
+.slot[aria-pressed='true'] {
+  --slot-edge: var(--parchment-50);
+}
+.slot:hover:not([data-empty='true']) {
+  filter: brightness(1.2);
+}
+.slot:focus-visible,
+.node:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 4px;
+}
+
+.node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  width: 112px;
+  min-height: 96px;
+  margin: var(--pixel);
+  padding: var(--space-2);
+  border: 0;
+  border-radius: 0;
+  background: var(--forest-700);
+  color: var(--parchment-100);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--node-edge),
+    0 var(--pixel) 0 0 var(--node-edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--node-edge),
+    var(--pixel) 0 0 0 var(--node-edge);
+  --node-edge: var(--gold-500);
+}
+.node[data-state='locked'] {
+  --node-edge: var(--charcoal-600);
+  background: var(--charcoal-800);
+  color: var(--charcoal-200);
+  cursor: not-allowed;
+}
+.node[data-state='unlocked'] {
+  --node-edge: var(--moss-500);
+  background: var(--forest-500);
+  cursor: default;
+}
+.node[data-state='available']:hover {
+  filter: brightness(1.2);
+}
+.nodeName {
+  font-family: var(--font-pixel);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+.cost {
+  font-family: var(--font-pixel);
+  font-size: 0.85rem;
+  padding: 0 var(--space-2);
+  background: var(--charcoal-950);
+  color: var(--gold-300);
+}
+
+.crest {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+/* The level sits on a small plate at the shield's lower right: the crest art has a star in the middle that would hide a number placed on top of it. */
+.crestLevel {
+  position: absolute;
+  right: calc(var(--pixel) * -2);
+  bottom: calc(var(--pixel) * -1);
+  min-width: 1.7em;
+  padding: 0 calc(var(--pixel) * 1.5);
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--gold-300);
+  background: var(--charcoal-950);
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--gold-700),
+    0 var(--pixel) 0 0 var(--gold-700),
+    calc(var(--pixel) * -1) 0 0 0 var(--gold-700),
+    var(--pixel) 0 0 0 var(--gold-700);
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Shared recipes used by every screen (05b). ui/common.module.css `composes` these, so the whole app has
+   one pixel look. Edges are the same notched box-shadow as .panel; every size is a whole number of px.
+   ------------------------------------------------------------------------------------------------ */
+.entry,
+.scroll,
+.input,
+.chip,
+.alert {
+  --notch:
+    0 calc(var(--pixel) * -1) 0 0 var(--edge),
+    0 var(--pixel) 0 0 var(--edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--edge),
+    var(--pixel) 0 0 0 var(--edge);
+}
+
+/* A slot-style list row. */
+.entry {
+  --edge: var(--charcoal-600);
+  margin: var(--pixel);
+  padding: var(--space-3);
+  background: var(--charcoal-800);
+  color: var(--parchment-100);
+  box-shadow:
+    var(--notch),
+    inset 0 var(--pixel) 0 0 var(--charcoal-600),
+    inset 0 calc(var(--pixel) * -1) 0 0 var(--charcoal-950);
+}
+
+/* A parchment quest scroll: wooden rods at both ends, dark text for contrast. */
+.scroll {
+  --edge: var(--wood-700);
+  --scroll-ink: var(--charcoal-800);
+  --scroll-muted: var(--charcoal-600);
+  --scroll-accent: var(--wood-700);
+  margin: var(--pixel);
+  padding: var(--space-3) calc(var(--pixel) * 8);
+  color: var(--scroll-ink);
+  background:
+    linear-gradient(
+      90deg,
+      var(--wood-700) 0 calc(var(--pixel) * 2),
+      var(--wood-500) calc(var(--pixel) * 2) calc(var(--pixel) * 3),
+      transparent calc(var(--pixel) * 3) calc(100% - var(--pixel) * 3),
+      var(--wood-500) calc(100% - var(--pixel) * 3) calc(100% - var(--pixel) * 2),
+      var(--wood-700) calc(100% - var(--pixel) * 2)
+    ),
+    var(--parchment-100);
+  box-shadow:
+    var(--notch),
+    inset 0 var(--pixel) 0 0 var(--parchment-50),
+    inset 0 calc(var(--pixel) * -1) 0 0 var(--parchment-300);
+}
+
+/* Form controls: sunken parchment fields with the body font (readable), dark pixel edge. */
+.input {
+  --edge: var(--wood-700);
+  display: block;
+  width: calc(100% - var(--pixel) * 2);
+  min-height: var(--tap);
+  margin: var(--pixel);
+  padding: 0.45rem 0.8rem;
+  border: 0;
+  border-radius: 0;
+  background-color: var(--parchment-100);
+  color: var(--charcoal-800);
+  font: inherit;
+  box-shadow: var(--notch), inset var(--pixel) var(--pixel) 0 0 var(--parchment-300);
+}
+.input::placeholder {
+  color: var(--charcoal-600);
+  font-style: italic;
+  opacity: 1;
+}
+.input:focus-visible {
+  --edge: var(--gold-700);
+  outline: 3px solid var(--gold-300);
+  outline-offset: 3px;
+}
+.input:disabled {
+  filter: grayscale(0.6) brightness(0.85);
+  cursor: not-allowed;
+}
+.input[aria-invalid='true'] {
+  --edge: var(--ember-500);
+}
+/* Native arrow replaced by a crisp 7x4 pixel arrow (the colour is --charcoal-800; CSS variables cannot reach a data URI). */
+.select {
+  padding-right: 2.9rem;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 4' shape-rendering='crispEdges'%3E%3Cpath fill='%2323262b' d='M0 0h7v1H0zM1 1h5v1H1zM2 2h3v1H2zM3 3h1v1H3z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 21px 12px;
+  image-rendering: pixelated;
+}
+.textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+/* Small label chip (subject, difficulty, status). */
+.chip {
+  --edge: var(--teal-500);
+  display: inline-block;
+  justify-self: start;
+  width: fit-content;
+  margin: var(--pixel);
+  padding: 0 var(--space-2);
+  background: var(--charcoal-950);
+  color: var(--parchment-50);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Notices: a dark box with a coloured pixel edge. The edge colour is the only thing that changes. */
+.alert {
+  --edge: var(--moss-500);
+  margin: var(--pixel);
+  padding: var(--space-2) var(--space-3);
+  background: var(--charcoal-800);
+  color: var(--parchment-100);
+  box-shadow: var(--notch);
+}
+.alertError {
+  --edge: var(--ember-500);
+}
+.alertNotice {
+  --edge: var(--moss-500);
+}
+
+/* Loading placeholder: stepped, so it never looks like a smooth modern shimmer. */
+.skeletonLine {
+  height: 1.2rem;
+  background: repeating-linear-gradient(90deg, var(--charcoal-800) 0 12px, var(--forest-700) 12px 24px);
+  background-size: 48px 100%;
+  animation: skeleton-step 1.2s steps(4, end) infinite;
+}
+@keyframes skeleton-step {
+  to {
+    background-position: -48px 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeletonLine {
+    animation: none;
+  }
+}
+
+/* A dashed pixel rule under page titles. */
+.rule {
+  height: var(--pixel);
+  margin: 0;
+  border: 0;
+  background: repeating-linear-gradient(90deg, var(--gold-700) 0 calc(var(--pixel) * 2), transparent calc(var(--pixel) * 2) calc(var(--pixel) * 4));
+}

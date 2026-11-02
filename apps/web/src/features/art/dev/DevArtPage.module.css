@@ -1,0 +1,61 @@
+.page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.nav a {
+  font-family: var(--font-pixel);
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+.grid + .grid {
+  margin-top: var(--space-4);
+}
+.card {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--forest-900);
+  border: 2px solid var(--charcoal-600);
+}
+.card figcaption,
+.cell figcaption {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--parchment-300);
+  overflow-wrap: anywhere;
+  max-width: 28ch;
+}
+.states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.cell {
+  margin: 0;
+}
+.checker {
+  display: inline-block;
+  line-height: 0;
+  background-color: var(--forest-700);
+  background-image: conic-gradient(var(--forest-900) 25%, transparent 0 50%, var(--forest-900) 0 75%, transparent 0);
+  background-size: 16px 16px;
+}
+.layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.note {
+  color: var(--parchment-300);
+  font-size: 0.85rem;
+}

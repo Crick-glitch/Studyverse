@@ -1,0 +1,781 @@
+/*
+ * Battle screen (06-battle-screen.md). A centred "game window": a pixel battlefield on top, a parchment panel below.
+ * Pixel font for the HUD, the intent banner and damage numbers only; questions, answers and explanations use the body font.
+ * Sizes that touch art are whole pixels; --s is the scene's integer scale (set inline by the page).
+ */
+.screen {
+  --s: 3;
+  --col: calc(320px * var(--s));
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2) var(--space-4);
+  background: var(--charcoal-950);
+  color: var(--parchment-100);
+}
+.column {
+  width: 100%;
+  max-width: calc(var(--col) + 2 * var(--pixel));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+/* ---------- top bar ---------- */
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-2);
+}
+.where {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.dungeon {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gold-500);
+  letter-spacing: 0.04em;
+}
+.badge {
+  padding: 0 var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  line-height: 1.5rem;
+  color: var(--charcoal-950);
+  background: var(--parchment-300);
+}
+.badge[data-kind='raid'] {
+  background: var(--ember-300);
+}
+.badge[data-kind='boss'] {
+  background: var(--gold-300);
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+}
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.toggle input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--gold-500);
+}
+
+/* ---------- battlefield ---------- */
+.field {
+  --scene-h: calc(180px * var(--s));
+  position: relative;
+  width: 100%;
+  height: min(var(--scene-h), 52dvh);
+  overflow: hidden;
+  background: var(--forest-900);
+  box-shadow: 0 0 0 var(--pixel) var(--gold-700), 0 0 0 calc(var(--pixel) * 2) var(--charcoal-950);
+  isolation: isolate;
+}
+.bg {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: flex;
+  justify-content: center;
+  z-index: 0;
+  image-rendering: pixelated;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(15, 31, 26, 0.55) 0, rgba(15, 31, 26, 0) 34%);
+}
+.hudRow {
+  position: absolute;
+  inset: var(--space-2) var(--space-2) auto var(--space-2);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-2);
+}
+.plate {
+  --edge: var(--gold-700);
+  display: grid;
+  gap: var(--space-1);
+  max-width: 100%;
+  padding: var(--space-1) var(--space-2);
+  background: rgba(15, 31, 26, 0.88);
+  box-shadow: 0 0 0 var(--pixel) var(--edge);
+  font-family: var(--font-pixel);
+}
+.plate[data-side='enemy'] {
+  justify-self: end;
+  --edge: var(--ember-700);
+}
+.plateName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.plateName small {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--parchment-300);
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: 0.78rem;
+  color: var(--parchment-300);
+}
+.pips {
+  display: inline-flex;
+  gap: var(--pixel);
+  align-items: center;
+}
+.pip {
+  width: calc(var(--pixel) * 3);
+  height: calc(var(--pixel) * 3);
+  background: var(--charcoal-600);
+  box-shadow: 0 0 0 1px var(--charcoal-950);
+}
+.pip[data-on='true'] {
+  background: var(--teal-300);
+}
+.intent {
+  --edge: var(--gold-500);
+  align-self: start;
+  max-width: 22rem;
+  padding: var(--space-1) var(--space-3);
+  text-align: center;
+  background: rgba(35, 38, 43, 0.92);
+  box-shadow: 0 0 0 var(--pixel) var(--edge);
+  font-family: var(--font-pixel);
+}
+.intent[data-key='heavy'] {
+  --edge: var(--ember-500);
+}
+.intent[data-key='guard'] {
+  --edge: var(--teal-300);
+}
+.intent[data-key='drain'] {
+  --edge: var(--violet-300);
+}
+.intentName {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+.intentEffect {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.25;
+  color: var(--parchment-100);
+}
+.actors {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 8% calc(var(--s) * 14px);
+}
+.actor {
+  position: relative;
+  line-height: 0;
+}
+.actor > span {
+  display: inline-block;
+}
+
+/* floating numbers and banners (decorative: the result is also in text below) */
+.fxLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.num {
+  position: absolute;
+  bottom: calc(var(--s) * 70px);
+  font-family: var(--font-pixel);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--gold-300);
+  text-shadow: 0 var(--pixel) 0 var(--charcoal-950), var(--pixel) 0 0 var(--charcoal-950), calc(var(--pixel) * -1) 0 0 var(--charcoal-950);
+}
+.num[data-side='enemy'] {
+  right: 14%;
+}
+.num[data-side='hero'] {
+  left: 14%;
+  color: var(--ember-300);
+}
+.num[data-tone='heal'] {
+  color: var(--moss-300);
+}
+.banner {
+  position: absolute;
+  inset: 38% 0 auto 0;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.bannerText {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-pixel);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--parchment-50);
+  background: var(--ember-700);
+  box-shadow: 0 0 0 var(--pixel) var(--gold-500);
+}
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  gap: var(--space-3);
+  justify-items: center;
+  padding: var(--space-3);
+  text-align: center;
+  background: rgba(15, 31, 26, 0.78);
+}
+.introTitle {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.6rem;
+  color: var(--gold-300);
+}
+.introLine {
+  margin: 0;
+  max-width: 28rem;
+  font-style: italic;
+}
+
+/* ---------- parchment panel ---------- */
+.panel {
+  --panel-pad: var(--space-3);
+  min-height: 12rem;
+  font-family: var(--font-body);
+}
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+}
+.panelTitle {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
+  color: var(--wood-700);
+}
+.panelNote {
+  font-size: 0.85rem;
+  color: var(--charcoal-600);
+}
+.moves {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+.move {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-height: 6.25rem;
+  height: auto;
+  margin: var(--pixel);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+.move[aria-pressed='true'] {
+  outline: 3px solid var(--gold-300);
+  outline-offset: 1px;
+}
+.moveName {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-pixel);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.key {
+  min-width: 1.5rem;
+  padding: 0 var(--space-1);
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--charcoal-950);
+  background: var(--parchment-100);
+  box-shadow: 0 var(--pixel) 0 0 var(--charcoal-950);
+}
+.moveText {
+  font-size: 0.85rem;
+}
+.below {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+}
+.abilities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.abilityNote {
+  max-width: 28rem;
+  font-size: 0.82rem;
+  color: var(--charcoal-600);
+}
+.autoNote {
+  font-size: 0.9rem;
+  color: var(--charcoal-600);
+}
+.question {
+  margin: 0 0 var(--space-2);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--charcoal-950);
+  overflow-wrap: anywhere;
+}
+.choices {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: calc(100% - 2 * var(--pixel));
+  min-height: 2.75rem;
+  height: auto;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.choice[data-state='correct'] {
+  --fill: var(--moss-700);
+  --edge: var(--moss-300);
+  --hi: var(--moss-500);
+  opacity: 1;
+}
+.choice[data-state='wrong'] {
+  --fill: var(--ember-700);
+  --edge: var(--ember-300);
+  --hi: var(--ember-500);
+  opacity: 1;
+}
+.choice[data-state='removed'] {
+  text-decoration: line-through;
+}
+.choice[data-state='picked'] {
+  outline: 3px solid var(--gold-300);
+  outline-offset: 1px;
+}
+.verdictRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+}
+.verdictRow .verdict {
+  margin: 0;
+}
+.verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.verdict[data-ok='true'] {
+  color: var(--moss-700);
+}
+.verdict[data-ok='false'] {
+  color: var(--ember-700);
+}
+.explain {
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: inset var(--pixel) 0 0 0 var(--wood-500);
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--charcoal-800);
+}
+.explainEmpty {
+  color: var(--charcoal-600);
+  font-style: italic;
+}
+.events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--charcoal-800);
+}
+.log {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  max-height: 5.5rem;
+  overflow: hidden;
+  list-style: none;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: var(--parchment-300);
+  background: var(--charcoal-950);
+  box-shadow: 0 0 0 var(--pixel) var(--charcoal-600);
+}
+.log li:last-child {
+  color: var(--parchment-50);
+}
+.error {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ember-700);
+  color: var(--parchment-50);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- rewards ---------- */
+.rewards {
+  --panel-pad: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+.rewardsHead {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+.outcome {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+.outcome[data-outcome='victory'] {
+  color: var(--moss-700);
+}
+.outcome[data-outcome='defeat'] {
+  color: var(--ember-700);
+}
+.outcome[data-outcome='retreated'] {
+  color: var(--wood-700);
+}
+.lead {
+  margin: 0;
+  color: var(--charcoal-800);
+}
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tile {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: 0 0 0 var(--pixel) var(--parchment-300);
+  color: var(--charcoal-800);
+}
+.tileLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--charcoal-600);
+}
+.tileValue {
+  font-family: var(--font-pixel);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--wood-700);
+  line-height: 1.1;
+}
+.tileNote {
+  font-size: 0.82rem;
+  color: var(--charcoal-600);
+}
+.lootCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: 0 0 0 var(--pixel) var(--gold-700);
+  color: var(--charcoal-800);
+}
+.lootName {
+  font-family: var(--font-pixel);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--wood-700);
+}
+.rarity[data-rarity='uncommon'] {
+  color: var(--teal-700);
+}
+.rarity[data-rarity='rare'] {
+  color: var(--violet-700);
+}
+.sectionTitle {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-pixel);
+  font-size: 1.1rem;
+  color: var(--wood-700);
+}
+.missedList {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.missed {
+  padding: var(--space-2) var(--space-3);
+  background: var(--parchment-50);
+  box-shadow: inset var(--pixel) 0 0 0 var(--ember-500);
+  color: var(--charcoal-800);
+}
+.missedQ {
+  margin: 0 0 var(--space-1);
+  font-weight: 700;
+}
+.missedA {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+.note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--charcoal-600);
+}
+.centerPage {
+  display: grid;
+  place-content: center;
+  gap: var(--space-3);
+  min-height: 60dvh;
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: var(--space-4);
+  text-align: center;
+}
+
+/* ---------- small screens: the panel sits under the field, moves stack, bars shrink ---------- */
+@media (max-width: 700px) {
+  .screen {
+    --s: 2;
+    padding-inline: var(--space-1);
+  }
+  .field {
+    height: min(var(--scene-h), 340px, 52dvh);
+  }
+  .actors {
+    padding-inline: 4%;
+  }
+  .panel {
+    --panel-pad: var(--space-2);
+    min-height: 0;
+  }
+  .panelHead {
+    margin-bottom: var(--space-1);
+  }
+  .panelTitle {
+    font-size: 1rem;
+  }
+  .topbar {
+    padding: 0 var(--space-1);
+    gap: 0 var(--space-2);
+  }
+  .dungeon {
+    font-size: 1rem;
+  }
+  .toggle {
+    min-height: 2.5rem;
+  }
+  .moves {
+    grid-template-columns: 1fr;
+  }
+  .move {
+    min-height: 0;
+  }
+  .question {
+    font-size: 1.05rem;
+    margin-bottom: var(--space-1);
+  }
+  .plateName {
+    font-size: 0.85rem;
+  }
+  .plateName small {
+    flex-basis: 100%;
+  }
+  .stats {
+    display: none;
+  }
+  .num {
+    font-size: 1.5rem;
+  }
+}
+/* Tablets and phones: two plates across the top; the intent is a strip under the field. */
+@media (max-width: 1000px) {
+  .hudRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .intent[data-placement='strip'] {
+    width: 100%;
+    max-width: none;
+    padding: var(--space-1) var(--space-3);
+  }
+}
+.choiceStatic {
+  display: flex;
+  padding: var(--space-2) var(--space-3);
+  margin: var(--pixel);
+  background: var(--forest-500);
+  color: var(--parchment-50);
+  box-shadow: 0 0 0 var(--pixel) var(--parchment-500);
+}
+.choiceStatic[data-state='correct'] {
+  background: var(--moss-700);
+  box-shadow: 0 0 0 var(--pixel) var(--moss-300);
+}
+.choiceStatic[data-state='wrong'] {
+  background: var(--ember-700);
+  box-shadow: 0 0 0 var(--pixel) var(--ember-300);
+}
+
+/* Links on the parchment: readable colour, and link-buttons look like the kit's buttons (no underline). */
+.lead a,
+.note a {
+  color: var(--wood-700);
+  font-weight: 700;
+}
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  text-decoration: none;
+}
+
+.sheet {
+  margin-top: var(--space-2);
+  font-size: 0.9rem;
+  color: var(--charcoal-800);
+}
+.sheet summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--wood-700);
+}
+.sheetList {
+  margin: 0;
+  padding: 0 0 var(--space-1) var(--space-4);
+}
+.screen {
+  animation: screenIn 0.2s steps(4, end);
+}
+@keyframes screenIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--pixel) * 3));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .screen {
+    animation: none;
+  }
+}

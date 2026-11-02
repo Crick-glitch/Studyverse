@@ -1,0 +1,61 @@
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  background: var(--forest-700);
+  color: var(--gold-300);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--gold-700),
+    0 var(--pixel) 0 0 var(--gold-700),
+    calc(var(--pixel) * -1) 0 0 0 var(--gold-700),
+    var(--pixel) 0 0 0 var(--gold-700);
+}
+.chip:hover {
+  background: var(--forest-500);
+}
+.chip:focus-visible {
+  outline: 3px solid var(--parchment-50);
+  outline-offset: 5px;
+}
+.time {
+  min-width: 3.4ch;
+}
+@media (max-width: 640px) {
+  .chip {
+    gap: var(--space-1);
+    padding: 0 var(--space-2) 0 var(--space-1);
+    font-size: 0.95rem;
+  }
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* In the desktop panel: a full-width row, icon and "Session" on the left, the time on the right. */
+.wide {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  gap: var(--space-2);
+}
+.wideLabel {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--parchment-100);
+}
+.wide .time {
+  text-align: right;
+}

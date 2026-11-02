@@ -1,0 +1,11 @@
+/* Battle route: a full-height dark shell. The battle screen (features/battle) owns its own spacing and top bar. */
+.shell {
+  min-height: 100dvh;
+  background: var(--charcoal-950);
+}
+.main {
+  min-height: 100dvh;
+}
+.main:focus {
+  outline: none;
+}

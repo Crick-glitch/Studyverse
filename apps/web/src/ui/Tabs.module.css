@@ -1,0 +1,49 @@
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--pixel);
+  border-bottom: var(--pixel) solid var(--gold-700);
+}
+.tab {
+  --edge: var(--charcoal-600);
+  min-height: var(--tap);
+  margin: var(--pixel) var(--pixel) 0;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: 0;
+  background: var(--charcoal-800);
+  color: var(--parchment-100);
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--pixel) * -1) 0 0 var(--edge),
+    calc(var(--pixel) * -1) 0 0 0 var(--edge),
+    var(--pixel) 0 0 0 var(--edge);
+}
+.tab:hover {
+  --edge: var(--parchment-500);
+  color: var(--gold-300);
+}
+.selected,
+.selected:hover {
+  --edge: var(--gold-500);
+  background: var(--forest-500);
+  color: var(--parchment-50);
+  /* the selected tab sits on the rule: it covers it, so the tab and its panel read as one piece */
+  position: relative;
+  margin-bottom: calc(var(--pixel) * -2);
+  padding-bottom: calc(var(--space-2) + var(--pixel) * 2);
+}
+
+@media (max-width: 480px) {
+  .tab {
+    padding-inline: var(--space-2);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+  }
+}

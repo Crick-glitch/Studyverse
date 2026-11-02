@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>h</title>
+<link rel="stylesheet" href="out/app.css"></head><body><div id="root"></div>
+<script>
+const q = new URLSearchParams(location.search);
+const base = { me: { user:{id:'u1',email:'a@b.c'}, profile:{id:'u1',displayName:'Ada Lovelace',avatarKey:q.get('avatar'),avatarUrl:null,playerClass:q.get('class'),showOnLeaderboard:false,createdAt:''},
+  progress:{level:4,totalXp:610,currentLevelXp:160,xpForNextLevel:200,streak:5,studyEnergy:4,skillPoints:2,raidWins:0,raidLosses:0} },
+  summary: { dueCards:12, claimableQuests:1, energy:4, unspentSkillPoints:2, serverNow:new Date().toISOString(), activeSession:null } };
+window.__MOCK = JSON.parse(JSON.stringify(base));
+if (q.get('scenario')) Object.assign(window.__MOCK.summary, JSON.parse(q.get('scenario')));
+if (q.get('summary') === 'error') window.__MOCK.summary = 'error';
+</script><script src="out/app.js"></script></body></html>

@@ -1,0 +1,189 @@
+/*
+ * Shared building blocks for feature screens (05b). Every look here is composed from the pixel kit
+ * (features/art/kit/kit.module.css), so there is one pixel style in the app and screens keep their markup.
+ * Colours come from tokens.css only.
+ */
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+.pageTitle {
+  margin: 0;
+}
+.pageHeader {
+  display: grid;
+  gap: var(--space-2);
+}
+.pageHeading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.rule {
+  composes: rule from '../features/art/kit/kit.module.css';
+}
+
+.panel {
+  composes: panel from '../features/art/kit/kit.module.css';
+  --panel-pad: var(--space-4);
+}
+.panel > h2,
+.panel > h3 {
+  margin-top: 0;
+}
+@media (max-width: 480px) {
+  .panel {
+    --panel-pad: var(--space-3);
+  }
+}
+.stack {
+  display: grid;
+  align-content: start; /* a stretched panel keeps its rows together instead of spreading them */
+  gap: var(--space-3);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+.spread {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+}
+.grid2 {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+.field {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.label {
+  font-weight: 700;
+  color: var(--parchment-100);
+}
+
+.input {
+  composes: input from '../features/art/kit/kit.module.css';
+}
+.select {
+  composes: input select from '../features/art/kit/kit.module.css';
+}
+.textarea {
+  composes: input textarea from '../features/art/kit/kit.module.css';
+}
+
+.btn {
+  composes: button from '../features/art/kit/kit.module.css';
+}
+.primary {
+  composes: primary from '../features/art/kit/kit.module.css';
+}
+.danger {
+  composes: danger from '../features/art/kit/kit.module.css';
+}
+.small {
+  composes: small from '../features/art/kit/kit.module.css';
+}
+
+.error {
+  composes: alert alertError from '../features/art/kit/kit.module.css';
+}
+.notice {
+  composes: alert alertNotice from '../features/art/kit/kit.module.css';
+}
+.muted {
+  color: var(--parchment-300);
+  margin: 0;
+}
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.item {
+  composes: entry from '../features/art/kit/kit.module.css';
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+.itemMain {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1 1 14rem;
+  overflow-wrap: anywhere;
+}
+/* Quest scrolls: parchment rows with dark ink. Add next to .item. */
+.scroll {
+  composes: scroll from '../features/art/kit/kit.module.css';
+}
+.scroll .muted {
+  color: var(--scroll-muted);
+}
+.scroll .reward {
+  color: var(--scroll-accent);
+}
+.badge {
+  composes: chip from '../features/art/kit/kit.module.css';
+}
+.reward {
+  color: var(--gold-500);
+  font-weight: 700;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.skeleton {
+  display: grid;
+  gap: var(--space-2);
+}
+.skeletonLine {
+  composes: skeletonLine from '../features/art/kit/kit.module.css';
+}
+/* Pixel-font numerals for timers and other HUD-style readouts. */
+.readout {
+  margin: 0;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 9vw, 3.2rem);
+  line-height: 1.1;
+  color: var(--gold-300);
+}
+.plain {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.flush {
+  margin: 0;
+}
+.flushTop {
+  margin-top: 0;
+}
+.start {
+  justify-items: start;
+}
+.whitespace {
+  white-space: pre-wrap;
+}
+.question {
+  margin: 0;
+  font-size: 1.2rem;
+  white-space: pre-wrap;
+}

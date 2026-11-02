@@ -1,0 +1,958 @@
+{
+ "home@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 564,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 900,
+   "r": 1440,
+   "b": 900
+  },
+  "scene": {
+   "x": 296,
+   "y": 24,
+   "w": 640,
+   "h": 360,
+   "r": 936,
+   "b": 384
+  },
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "home@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 464,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 800,
+   "r": 1280,
+   "b": 800
+  },
+  "scene": {
+   "x": 296,
+   "y": 24,
+   "w": 640,
+   "h": 360,
+   "r": 936,
+   "b": 384
+  },
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "home@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 772,
+   "r": 768,
+   "b": 836
+  },
+  "scene": {
+   "x": 64,
+   "y": 88,
+   "w": 640,
+   "h": 360,
+   "r": 704,
+   "b": 448
+  },
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 496,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "home@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 390,
+   "h": 609,
+   "r": 390,
+   "b": 665
+  },
+  "scene": {
+   "x": 35,
+   "y": 72,
+   "w": 320,
+   "h": 180,
+   "r": 355,
+   "b": 252
+  },
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 300,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "home@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 360,
+   "h": 609,
+   "r": 360,
+   "b": 665
+  },
+  "scene": {
+   "x": 20,
+   "y": 72,
+   "w": 320,
+   "h": 180,
+   "r": 340,
+   "b": 252
+  },
+  "portrait": {
+   "x": 8,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 56,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 300,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1"
+  ]
+ },
+ "lab@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 564,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 900,
+   "r": 1440,
+   "b": 900
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "lab@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 464,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 800,
+   "r": 1280,
+   "b": 800
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "lab@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 749,
+   "r": 768,
+   "b": 813
+  },
+  "scene": null,
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 88,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "lab@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 390,
+   "h": 1002,
+   "r": 390,
+   "b": 1058
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1usxs_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "lab@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 360,
+   "h": 1002,
+   "r": 360,
+   "b": 1058
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1usxs_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "quests@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 564,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 935,
+   "r": 1440,
+   "b": 935
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "quests@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 288,
+   "r": 245,
+   "b": 304
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 320,
+   "w": 229,
+   "h": 464,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 935,
+   "r": 1280,
+   "b": 935
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "quests@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 1091,
+   "r": 768,
+   "b": 1155
+  },
+  "scene": null,
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 88,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "quests@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 390,
+   "h": 1500,
+   "r": 390,
+   "b": 1556
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1usxs_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "quests@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 360,
+   "h": 1721,
+   "r": 360,
+   "b": 1777
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1usxs_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1usxs_74 108>1"
+  ]
+ },
+ "session-running@1440x900": {
+  "viewport": "1440x900",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 348,
+   "r": 245,
+   "b": 364
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 380,
+   "w": 229,
+   "h": 504,
+   "r": 245,
+   "b": 884
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1176,
+   "h": 900,
+   "r": 1440,
+   "b": 900
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1",
+   "span._srOnly_13k41_38 406>1"
+  ]
+ },
+ "session-running@1280x800": {
+  "viewport": "1280x800",
+  "hud": {
+   "x": 16,
+   "y": 16,
+   "w": 229,
+   "h": 348,
+   "r": 245,
+   "b": 364
+  },
+  "hotbar": {
+   "x": 16,
+   "y": 380,
+   "w": 229,
+   "h": 404,
+   "r": 245,
+   "b": 784
+  },
+  "main": {
+   "x": 264,
+   "y": 0,
+   "w": 1016,
+   "h": 800,
+   "r": 1280,
+   "b": 800
+  },
+  "scene": null,
+  "portrait": {
+   "x": 32,
+   "y": 32,
+   "w": 72,
+   "h": 72,
+   "r": 104,
+   "b": 104
+  },
+  "chromeHeightPx": 0,
+  "firstCardTop": 24,
+  "nameFont": null,
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 75>54",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1",
+   "span._srOnly_13k41_38 406>1"
+  ]
+ },
+ "session-running@768x1024": {
+  "viewport": "768x1024",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 768,
+   "h": 64,
+   "r": 768,
+   "b": 64
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 944,
+   "w": 768,
+   "h": 80,
+   "r": 768,
+   "b": 1024
+  },
+  "main": {
+   "x": 0,
+   "y": 64,
+   "w": 768,
+   "h": 749,
+   "r": 768,
+   "b": 813
+  },
+  "scene": null,
+  "portrait": {
+   "x": 24,
+   "y": 8,
+   "w": 48,
+   "h": 48,
+   "r": 72,
+   "b": 56
+  },
+  "chromeHeightPx": 156,
+  "firstCardTop": 88,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._srOnly_1iu2c_74 108>1",
+   "span._srOnly_13k41_38 406>1"
+  ]
+ },
+ "session-running@390x844": {
+  "viewport": "390x844",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 56,
+   "r": 390,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 764,
+   "w": 390,
+   "h": 80,
+   "r": 390,
+   "b": 844
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 390,
+   "h": 1002,
+   "r": 390,
+   "b": 1058
+  },
+  "scene": null,
+  "portrait": {
+   "x": 16,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 64,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1",
+   "span._srOnly_13k41_38 385>1"
+  ]
+ },
+ "session-running@360x800": {
+  "viewport": "360x800",
+  "hud": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 56,
+   "r": 360,
+   "b": 56
+  },
+  "hotbar": {
+   "x": 0,
+   "y": 720,
+   "w": 360,
+   "h": 80,
+   "r": 360,
+   "b": 800
+  },
+  "main": {
+   "x": 0,
+   "y": 56,
+   "w": 360,
+   "h": 1002,
+   "r": 360,
+   "b": 1058
+  },
+  "scene": null,
+  "portrait": {
+   "x": 8,
+   "y": 4,
+   "w": 48,
+   "h": 48,
+   "r": 56,
+   "b": 52
+  },
+  "chromeHeightPx": 148,
+  "firstCardTop": 72,
+  "nameFont": "16.8px \"Pixelify Sans\"",
+  "overflowX": 0,
+  "clipped": [
+   "span._window_5smlo_12 50>36",
+   "span._srOnly_5smlo_75 189>1",
+   "span._name_1iu2c_25 159>1",
+   "ELLIPSIS Ada Lovelace · Lv 4",
+   "span._srOnly_1iu2c_74 108>1",
+   "span._srOnly_13k41_38 385>1"
+  ]
+ }
+}
